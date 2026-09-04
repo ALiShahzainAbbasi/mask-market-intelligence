@@ -1,5 +1,7 @@
 # MASK AI Market Intelligence & Selection System
 
+Private GitHub repository: <https://github.com/ALiShahzainAbbasi/mask-market-intelligence>
+
 Phase 0 is the accepted baseline. Phase 1/2 live database acceptance is deferred, while the user has authorized Phase 3 collector code. The modular monolith now includes the earlier identity/market/authentication core plus a policy-gated evidence pipeline and two offline-tested collectors for RSS/Atom and permitted static HTML. Auth and collection routes remain unregistered until their database, tenant, and live acceptance requirements pass, so the running app does not yet expose sign-in, market, or collection workflows.
 
 The system is designed to answer: which market should MASK AI target, why, how confident are we, what supports and contradicts the conclusion, and what remains to be proven?
