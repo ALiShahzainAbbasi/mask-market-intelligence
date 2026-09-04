@@ -1,0 +1,13 @@
+title = "MASK source secret scanning"
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Dependency, build, and Git internals (not application source)"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.next/''',
+  '''(^|/)\.git/''',
+]
+

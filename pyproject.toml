@@ -1,0 +1,49 @@
+[project]
+name = "mask-development"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["mask-api"]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["apps/api"]
+
+[tool.uv.sources]
+mask-api = { workspace = true }
+
+[dependency-groups]
+dev = [
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "ruff==0.16.5",
+  "mypy==2.3.1",
+  "httpx==0.28.1",
+  "pyyaml==6.0.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["apps/api/tests", "tests"]
+pythonpath = [".", "apps/api/src"]
+addopts = "-ra --import-mode=importlib"
+markers = ["integration: requires provisioned local PostgreSQL, API, and Windows worker"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = ["node_modules", ".venv", ".next"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+python_version = "3.12"
+strict = true
+mypy_path = "apps/api/src"
+exclude = ["node_modules", ".venv"]
+
+[[tool.mypy.overrides]]
+module = ["pgvector.*"]
+ignore_missing_imports = true

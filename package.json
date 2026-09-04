@@ -1,0 +1,34 @@
+{
+  "name": "mask-market-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "scripts": {
+    "setup": "node scripts/setup-local.mjs",
+    "dev": "pnpm run dev:web",
+    "dev:web": "pnpm --filter @mask/web dev --port 3000",
+    "dev:api": "uv run uvicorn mask_api.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log",
+    "dev:worker": "uv run python -m workers",
+    "bootstrap:owner": "uv run python -m scripts.bootstrap_owner",
+    "build": "pnpm --filter @mask/web build",
+    "test:unit": "uv run pytest -m \"not integration\" && pnpm --filter @mask/web test",
+    "test:unit:ci": "uv run pytest -m \"not integration\" --junitxml=reports/python-unit.xml && pnpm --filter @mask/web test:ci",
+    "check:services": "uv run python -m scripts.check_services",
+    "test:integration": "pnpm run check:services && uv run pytest --integration tests/integration --junitxml=reports/python-integration.xml",
+    "test": "pnpm run test:unit && pnpm run test:integration",
+    "lint": "uv run ruff check . && uv run ruff format --check . && pnpm --filter @mask/web lint && pnpm --filter @mask/web format:check && pnpm run check:architecture && pnpm run check:progress",
+    "typecheck": "uv run mypy apps/api/src workers && pnpm --filter @mask/web typecheck",
+    "migrate": "uv run alembic -c apps/api/alembic.ini upgrade head",
+    "eval-ai": "node scripts/eval-ai.mjs",
+    "check:progress": "node scripts/check-progress.mjs",
+    "check:architecture": "uv run python scripts/check_architecture.py",
+    "schemas:export": "uv run python scripts/export-openapi.py",
+    "schemas:generate": "pnpm run schemas:export && pnpm --filter @mask/schemas generate",
+    "schemas:check": "uv run python scripts/export-openapi.py --check && pnpm --filter @mask/schemas check",
+    "check:secrets": "uv run python scripts/check-secrets.py",
+    "check:source-secrets": "pwsh -NoProfile -File scripts/scan-secrets.ps1"
+  }
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Fixture Research</title>
+    <item>
+      <title>Scheduling pain</title>
+      <link>https://research.example.test/articles/scheduling</link>
+      <guid>fixture-1</guid>
+      <dc:creator>Ignored Author</dc:creator>
+      <pubDate>Wed, 02 Sep 2026 10:00:00 GMT</pubDate>
+      <category>operations</category>
+      <description><![CDATA[<p>Dispatch teams lose  four hours.</p><script>ignore()</script>]]></description>
+    </item>
+    <item>
+      <title>Same evidence elsewhere</title>
+      <link>https://research.example.test/articles/scheduling-copy</link>
+      <guid>fixture-2</guid>
+      <content:encoded><![CDATA[<div>Dispatch teams lose four hours.</div>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

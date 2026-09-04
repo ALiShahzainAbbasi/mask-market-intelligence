@@ -1,0 +1,9 @@
+packages:
+  - apps/web
+  - packages/schemas
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+engineStrict: true
+saveExact: true

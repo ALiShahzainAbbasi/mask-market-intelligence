@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fixture Atom</title>
+  <entry>
+    <title>Invoice rework</title>
+    <id>urn:fixture:atom:1</id>
+    <link rel="alternate" href="https://research.example.test/articles/invoice-rework" />
+    <updated>2026-09-02T11:30:00Z</updated>
+    <author><name>Ignored Person</name></author>
+    <category term="billing" />
+    <summary type="html">Teams re-enter invoice data every week.</summary>
+  </entry>
+</feed>

@@ -1,0 +1,1772 @@
+MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
+MASTER PROGRESS TRACKER
+========================================================================
+Last updated: 2026-09-04 19:48 PKT (UTC+05:00)
+Tracker version: 1
+Project root: outputs/mask-market-intelligence/ (relative to workspace)
+Canonical tracker: progress.txt in this project root
+Source of requirements: supplied MASK AI Complete Development Guide and docs/
+
+1. CURRENT POSITION
+------------------------------------------------------------------------
+Current phase: P03 - evidence/source collector implementation; P01/P02 live acceptance is deliberately deferred.
+Current implementation status: IN_PROGRESS - the source-policy gate, common collector pipeline, bounded HTTP adapter, deterministic normalization/deduplication, and two fixture-backed collectors are offline-verified; database/live integration remains.
+Current task: P03 collector code slice is complete; next independent database-deferred work is P03-04 safe upload/manual-capture validation.
+Local authentication code remains implemented but unregistered; no authenticated market workflow, live collection, AI analysis, or scoring is implemented.
+
+Completed checkpoints: 16/151
+Remaining checkpoints: 135/151
+Checkpoint-count progress: 10.6%
+Completed phases: 1/25 (P00 baseline approved for infrastructure work).
+Phase 0 drafting/initial verification checkpoints complete: 10/10.
+Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
+Implementation/operational checkpoints complete: 5/140 (Phases 1-24).
+Phase 1: IN_PROGRESS (5/10 verified). Phase 2: IN_PROGRESS (0/7 verified).
+Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
+
+IMPORTANT: Checkpoints are not equal effort. This percentage measures
+checklist completion, NOT engineering hours, budget, delivery time, or
+percentage of working software. No reliable delivery-date estimate exists
+yet. Recalculate counts when the baseline changes; never inflate progress
+by marking documentation as implemented functionality.
+
+Next checkpoint: P03-04 safe analyst upload/manual capture; P03-01 persistence and P01-05/P01-06/P02-01 live database checks remain deferred under D10 and the user's sequencing.
+User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
+Independent Phase 2 development may now proceed with P01 checks still open;
+this is a sequencing change, not acceptance of missing live-service/CI or security checks.
+No production deployment, paid services, outreach, or research is authorized.
+
+Resume prerequisites and sequence:
+1. Technical lead: apply the implemented Alembic 0003 queue migration to the
+   isolated database and verify atomic claims, leases, retries, heartbeat,
+   recovery, idempotency, safe logs, and bounded shutdown (P01-06).
+2. Owner/admin: provision one isolated native Windows PostgreSQL 17/pgvector
+   instance with separate application/migration roles (D10). No container,
+   Redis, Linux, WSL, VM, paid provider, or hosted runner is required.
+3. Technical lead: from this project root, use pinned Node/pnpm/Python/uv;
+   pnpm install --frozen-lockfile; uv sync --frozen; pnpm run setup.
+   setup preserves the existing ignored .env; privately configure actual service
+   URLs. It does not provision database roles or start services.
+4. On the isolated configured Windows environment:
+   pnpm migrate; separate terminals for pnpm dev:worker, pnpm dev:api, and pnpm dev.
+   pnpm check:services; pnpm test; pnpm lint; pnpm typecheck; pnpm schemas:check.
+   Inspect worker logs/shutdown and operator service-restart recovery separately;
+   resolve real-service findings before closing P01-05/P01-06/P01-07/P01-10.
+5. Implement the offline Phase 3 source-policy/collector core and two bounded,
+   fixture-backed collectors. Do not dispatch live collection until a source and
+   current policy version are registered and approved.
+6. After D10, apply Alembic 0004, run bootstrap/auth/session/CSRF acceptance,
+   and only then register auth/market routes; role administration remains later work.
+7. Run the complete local Windows release suite. Hosted CI/branch protection is
+   deferred until an owner-approved remote exists and is not a private-MVP blocker.
+8. Update this tracker after every attempt. The latest user request permits
+   early Phase 3 development; Phases 1-3 cannot be signed off until
+   their dependencies/acceptance pass. Do not claim mocks as live integration.
+
+Current local verification: 229 tests PASS (218 Python current + 11 web),
+including 36 evidence/collector cases;
+24 real PostgreSQL/service integration cases are collected, deselected, and NOT
+RUN. Python Ruff/format (155 files), strict mypy (83 source files),
+architecture/import-cycle, auth/queue model-to-frozen migration SQL, generated
+OpenAPI/TypeScript schemas, and Windows runtime/tooling checks PASS.
+The 48-package uv lock pins argon2-cffi 25.1.0 and passed lock verification.
+Dedicated auth coverage includes 48 password/token/service/repository/bootstrap/
+HTTP/schema cases; auth and collection routes remain absent from the main OpenAPI
+by design. Collector coverage verifies policy/tenant/URL gates, public-DNS and
+response controls, two parser families and fixtures, raw/normalized lineage,
+duplicates, retries, limits, cancellation, circuit breaking, and safe persistence
+failures without making live requests.
+Python execution used the existing isolated venv; a full clean uv sync/root-alias
+run remains NOT RUN. The pinned Windows Gitleaks script has not executed.
+Production build, current JS dependency audit, and live PostgreSQL/worker/auth
+checks retain earlier or NOT RUN status; no frontend product route was added.
+No runtime server was started this session; nothing was deployed.
+
+2. STATUS AND COMPLETION RULES
+------------------------------------------------------------------------
+[x] DONE             Work and its acceptance checks are completed.
+[~] IN_PROGRESS      Started; incomplete or verification still running.
+[?] REVIEW_PENDING   Waiting for a specific human review/approval.
+[!] BLOCKED          Cannot proceed; record exact cause, owner, and next step.
+[ ] NOT_STARTED      No checkpoint implementation has begun.
+
+A phase is DONE only when every checkpoint and its exit condition are met.
+Partial code, a drafted plan, skipped tests, unavailable credentials, or an
+unapproved numerical rubric are not completion.
+Dependencies not yet reached are NOT_STARTED, not automatically BLOCKED.
+
+For each applicable implementation checkpoint, completion includes:
+- Implementation and safe error handling/logging.
+- Unit tests and relevant integration/end-to-end or parser/evaluation tests.
+- Lint and type checks.
+- Migration for schema changes.
+- Documentation and evidence of acceptance.
+- No secrets, access-control bypass, or unapproved methodology changes.
+If a check is not applicable, say why. If not run, say NOT RUN and why.
+A checkpoint may only be closed with an explicit documented acceptance of
+any permitted limitation; mandatory safety/methodology controls cannot be waived.
+
+3. UPDATE PROTOCOL - AFTER EVERY CHECKPOINT
+------------------------------------------------------------------------
+1. Read this file and AGENTS.md before starting project work.
+2. Identify the checkpoint ID and verify dependencies/current files.
+3. On starting work, mark it IN_PROGRESS and set the current/next checkpoint.
+4. After each checkpoint attempt, update its status immediately; do not
+   wait until the end of a whole phase or a long work session.
+5. Append a history entry with date/time, ID, work done, changed files,
+   verification commands/results, limitations, and next action.
+6. If interrupted or blocked, record partial work, exact blocker, responsible
+   person/action, and resumable next step. Do not mark it DONE.
+7. Recalculate completed/remaining totals, checkpoint-count percentage,
+   phase rollup, current status, pending decisions, and next checkpoint.
+8. Keep README status and any detailed phase checklist consistent.
+9. Preserve stable IDs and prior history. New scope gets new IDs; explain
+   denominator changes. Do not silently delete unfinished work.
+10. Before ending a work session, save this file even if no checkpoint closed.
+
+Canonical requirements stay in docs/; this file tracks execution and does
+not replace specifications. The detailed Phase 1 checklist expands the
+P01 checkpoints; its checkboxes are not counted a second time.
+The Phase 0 ZIP is a static historical snapshot, not the live tracker.
+No scheduled/background automation is needed: the agent updates this file
+while doing authorized project work. Future project instructions enforce it.
+
+4. ROADMAP AND NUMBERING
+------------------------------------------------------------------------
+Numbering follows the original guide's PHASE 0 through PHASE 24 headings.
+The guide's later dependency list decomposes some of these into smaller
+steps; authentication, embeddings, initial AI evaluation, and confidence
+are included here as checkpoints rather than duplicate phases.
+Follow checkpoint dependencies, not just ascending phase numbers.
+
+Security, audit, evaluation, and critical-veto controls begin in the modules
+that need them. Phases 18-21 consolidate and harden them; they are not
+permission to leave earlier modules unsafe or unaudited.
+M10 is the last analytical module. Gate 3/4 behavior remains not_ready until
+its rubric and evidence are approved. Fixtures must not masquerade as real
+market research.
+
+ID  | Status         | Done  | Phase
+P00 | DONE           | 11/11 | Freeze the Research Specification
+P01 | IN_PROGRESS    |  5/10 | Repository & Development Environment
+P02 | IN_PROGRESS    |  0/ 7 | Authentication, Market Registry & Research Workspace
+P03 | IN_PROGRESS    |  0/ 8 | Evidence & Source Engine
+P04 | NOT_STARTED    |  0/ 9 | Sentiment & Commercial Pain Intelligence
+P05 | NOT_STARTED    |  0/ 5 | Quantitative Market Intelligence (M1)
+P06 | NOT_STARTED    |  0/ 5 | Economic Pain Engine (M4)
+P07 | NOT_STARTED    |  0/ 5 | Competitive Intelligence (M5)
+P08 | NOT_STARTED    |  0/ 5 | Search & Buying Intent (M6)
+P09 | NOT_STARTED    |  0/ 5 | Buyer Accessibility & Channel Fit (M7)
+P10 | NOT_STARTED    |  0/ 5 | Workflow Intelligence (M3)
+P11 | NOT_STARTED    |  0/ 5 | Primary Customer Research (M8)
+P12 | NOT_STARTED    |  0/ 4 | MASK AI & Productization Fit (M9)
+P13 | NOT_STARTED    |  0/ 7 | Deterministic Scoring & Confidence Engine
+P14 | NOT_STARTED    |  0/ 4 | Evidence Gap Detection
+P15 | NOT_STARTED    |  0/ 6 | Stage-Gate Engine
+P16 | NOT_STARTED    |  0/ 7 | Market Comparison Dashboard
+P17 | NOT_STARTED    |  0/ 5 | Real-World Market Validation (M10)
+P18 | NOT_STARTED    |  0/ 4 | Red Flag & Veto Engine
+P19 | NOT_STARTED    |  0/ 5 | Audit Trail
+P20 | NOT_STARTED    |  0/ 5 | Quality & AI Evaluation Hardening
+P21 | NOT_STARTED    |  0/ 7 | Security, Operations & Production Readiness
+P22 | NOT_STARTED    |  0/ 5 | First Real System Test: 3-5 Markets
+P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
+P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
+
+5. PHASE CHECKPOINTS
+========================================================================
+
+P00 - FREEZE THE RESEARCH SPECIFICATION
+------------------------------------------------------------------------
+Status: DONE
+Completed checkpoints: 11/11
+Dependencies: Supplied development guide; owner review of the drafted specifications.
+Exit condition: Specifications, evidence lineage, responsibilities, and architecture are reviewed; unresolved numerical rules are explicitly deferred with owners.
+
+[x] P00-01 Draft product purpose, users, workflow, stages, MVP boundary, and acceptance invariants. Evidence: docs/PRODUCT.md.
+
+[x] P00-02 Document all ten methodologies, automation/human responsibilities, and their approved overall weights. Evidence: docs/RESEARCH_METHODOLOGY.md.
+
+[x] P00-03 Draft component boundaries, monorepo, asynchronous processing, and deployment architecture. Evidence: docs/ARCHITECTURE.md.
+
+[x] P00-04 Draft logical data model, versioning, tenant boundaries, and score-to-source evidence lineage. Evidence: docs/DATA_MODEL.md.
+
+[x] P00-05 Document scoring, confidence, gaps, gate profiles, vetoes, and human overrides; flag unapproved numerical details. Evidence: docs/SCORING.md.
+
+[x] P00-06 Document permitted collection, source registration, rate limits, uploads, deduplication, and retention. Evidence: docs/SCRAPING_POLICY.md.
+
+[x] P00-07 Define AI responsibilities, extraction contracts, prompt/model versioning, validation, and review. Evidence: docs/AI_PIPELINE.md.
+
+[x] P00-08 Define labelled evaluation, test layers, provisional quality gates, security, and privacy controls. Evidence: docs/EVALUATION.md and docs/SECURITY.md.
+
+[x] P00-09 Create project instructions, documentation index, and detailed Phase 1 checklist. Evidence: AGENTS.md, README.md, docs/phases/PHASE_1_CHECKLIST.md.
+
+[x] P00-10 Validate initial document coverage, ten methods, 100% overall weights, and local links; package documentation-only Phase 0 handoff. Evidence: prior verification and outputs/mask-market-intelligence-phase-0.zip (relative to workspace).
+
+[x] P00-11 Baseline accepted for Phase 1 by the user's instruction to move onwards and start the new phase with AGENTS.md/progress.txt. Numerical engineering proposals/rubric activation remain explicitly deferred under D02-D06, not implicitly approved.
+
+
+P01 - REPOSITORY & DEVELOPMENT ENVIRONMENT
+------------------------------------------------------------------------
+Status: IN_PROGRESS
+Completed checkpoints: 5/10
+Dependencies: P00-11; detailed checklist: docs/phases/PHASE_1_CHECKLIST.md.
+Exit condition: A clean Windows environment starts web/API/PostgreSQL/pgvector/native worker; migrations, durable jobs, tests, lint, and type checks pass.
+
+[x] P01-01 Record and pin runtime, package manager, queue, authentication approach, storage abstraction, and test-tool choices. Evidence: docs/decisions/0001-phase-1-baseline.md and dependency manifests; official registry checks passed.
+
+[x] P01-02 Initialize Git and monorepo directories; add ignore rules, lockfiles, environment examples, and root task commands. Evidence: frozen pnpm/uv installs, generated .env ignored, root quality commands and explicit integration preflight verified. No remote or branch protection configured.
+
+[x] P01-03 Scaffold Next.js App Router/TypeScript web skeleton and typed API boundary with a minimal health/status page. Evidence: 11 web tests, lint/types/contracts, production build, and local HTTP unavailable-dependency rendering passed. Shared format automation is tracked under P01-08.
+
+[x] P01-04 Scaffold FastAPI settings, safe errors, structured logs, OpenAPI, liveness/readiness, and test setup. Evidence: API/contract unit tests, Ruff, mypy pass; real PostgreSQL/worker integration is separately pending P01-05/P01-06/P01-10.
+
+[!] P01-05 Configure PostgreSQL/pgvector, SQLAlchemy, Alembic, initial infrastructure migration, and vector round-trip test. Code/offline SQL checks pass; actual migration/role/vector/downgrade-upgrade acceptance requires provisioned native PostgreSQL (D10).
+
+[~] P01-06 Configure the PostgreSQL-backed native Windows worker, typed jobs, status reporting, leases/heartbeats, idempotency, bounded retries, recovery, and graceful shutdown. Generic queue schema/adapter, Alembic 0003, native concurrency-1 runner, safe retry/logging behavior, and offline/unit contracts pass. Real PostgreSQL concurrent-claim, recovery, round-trip, and operator shutdown/restart acceptance remain D10.
+
+[~] P01-07 Provide native Windows web/API/worker commands, PostgreSQL/worker readiness checks, and safe startup/shutdown instructions. All commands and PostgreSQL/worker preflight are implemented and unit-tested; full clean Windows startup/shutdown acceptance remains D10.
+
+[~] P01-08 Configure unit/integration tests, lint, type checks, contract checks, and secret scanning. Windows quality/integration workflows and pinned checksum-verified PowerShell Gitleaks script are implemented; 141 local tests and static gates pass. Live scanner execution, clean frozen install, build/audits, hosted run, and branch protection remain unverified/deferred as applicable.
+
+[x] P01-09 Document reproducible setup, commands, migrations, troubleshooting, service ports, and safe shutdown. Evidence: docs/DEVELOPMENT.md, ADR 0001, README links verified, detailed checklist updated; full clean setup execution remains P01-10.
+
+[!] P01-10 Verify clean Windows startup, migration, web-to-API connectivity, worker round-trip, failure states, and all quality commands. Historical web/API unavailable-state HTTP smoke passes; queue replacement and complete native PostgreSQL/startup/operator acceptance remain.
+
+
+P02 - AUTHENTICATION, MARKET REGISTRY & RESEARCH WORKSPACE
+------------------------------------------------------------------------
+Status: IN_PROGRESS
+Completed checkpoints: 0/7
+Dependencies: Phase 1; approved organization and role model.
+Exit condition: An authenticated researcher can create a market and see an empty ten-method workspace without tenant leakage.
+
+[!] P02-01 Add organization, user, role, market, definition-version, hypothesis, and research-plan migrations. Seven feature-owned models and Alembic 0002 are written; offline model/DDL/upgrade/downgrade checks pass. Actual PostgreSQL constraint/grant/migration/reflection tests require a provisioned native test service (D10). No business endpoints enabled.
+
+[~] P02-02 Implement authentication/session handling and server-enforced organization/role permissions. Authorization core plus local Argon2id credentials, hashed PostgreSQL sessions, transactional login/rotation/revocation/audit, bounded account lockout, CSRF cookie adapter, Alembic 0004, composition wiring, and interactive one-time bootstrap CLI are offline-tested. Auth HTTP adapter remains unregistered; audited role administration and live PostgreSQL/bootstrap/browser acceptance remain. No login or market route is enabled.
+
+[ ] P02-03 Implement market create/read/update/archive APIs and validated definitions, owner, reviewer, and hypotheses.
+
+[ ] P02-04 Build registry and creation UI for market, submarket, geography, company band, buyer, owner, and reviewer.
+
+[ ] P02-05 Create empty ten-method scorecard and overview for stage, status, completeness, gaps, and next action.
+
+[ ] P02-06 Add explicit stage/status interfaces and audit events; do not allow uncontrolled direct stage transitions.
+
+[ ] P02-07 Verify market creation, edits/versioning, authorization, tenant isolation, validation, and empty states.
+
+
+P03 - EVIDENCE & SOURCE ENGINE
+------------------------------------------------------------------------
+Status: IN_PROGRESS
+Completed checkpoints: 0/8
+Dependencies: Phase 2; collection/security policies.
+Exit condition: At least two offline test collectors feed the same lineage-preserving evidence pipeline with duplicate-safe persistence.
+
+[ ] P03-01 Add source/policy-version, collector-run, job, upload, raw-document, normalization, duplicate-link, and evidence migrations.
+
+[~] P03-02 Implement source-policy registration/approval and block disallowed, expired, or unreviewed collection.
+
+[~] P03-03 Implement common discover/fetch/parse/normalize/persist contracts and typed normalized-document schema.
+
+[ ] P03-04 Implement safe analyst upload/manual capture with provenance, checksums, file validation, and access/retention classes.
+
+[~] P03-05 Implement versioned normalization, exact deduplication, duplicate provenance, and idempotent persistence.
+
+[~] P03-06 Implement per-source limits, capped backoff, circuit breakers, cancellation, partial results, and job monitoring.
+
+[ ] P03-07 Implement evidence browse/detail APIs and raw-source drill-down with organization/access filtering.
+
+[~] P03-08 Verify two fixture-backed test collectors, parsers, lineage, retry behavior, duplicate counts, upload failure handling, and migrations.
+
+
+P04 - SENTIMENT & COMMERCIAL PAIN INTELLIGENCE
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/9
+Dependencies: Phase 3; approved source access and AI processing policy.
+Exit condition: Reviewed pain intelligence is traceable, clustered, evaluated, and not used for scoring until its release gates pass.
+
+[ ] P04-01 Select and approve two or three initial permitted sources; implement production collector adapters with fixtures.
+
+[ ] P04-02 Implement versioned relevance classification and routing for relevant, possible, and irrelevant documents.
+
+[ ] P04-03 Implement persona classification without mixing operator, customer, employee, and vendor evidence.
+
+[ ] P04-04 Implement strict commercial pain extraction contracts, evidence-span validation, bounded repair, and quarantine.
+
+[ ] P04-05 Add analysis/pain/review persistence with model/prompt/schema/taxonomy versions and immutable history.
+
+[ ] P04-06 Implement versioned embeddings, near-duplicate detection, semantic clustering, memberships, and outlier handling.
+
+[ ] P04-07 Build pain review/cluster UI showing sources, samples, severity, urgency, economics, intent, contradictions, and proposed names.
+
+[ ] P04-08 Create a human-labelled 100-200-record gold set, reproducible make eval-ai, metrics, slices, and reviewed release decision.
+
+[ ] P04-09 Verify ingestion-to-reviewed-cluster flow, rejected/duplicate exclusion, privacy, failed jobs, evaluation thresholds, and no AI scoring.
+
+
+P05 - QUANTITATIVE MARKET INTELLIGENCE (M1)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Phases 3-4; M1 normalization approval is required before computed M1 scoring.o the next phase 
+
+Exit condition: Comparable, sourced quantitative records and serviceable-buyer estimates can be reviewed without invented values.
+
+[ ] P05-01 Approve M1 units, source periods, market boundaries, normalization rules, and proposed subweight configuration or keep computed scoring disabled.
+
+[ ] P05-02 Add quantitative metric/schema/migration support for counts, company sizes, revenue, growth, geography, and fragmentation.
+
+[ ] P05-03 Implement validated CSV/Excel import and permitted API adapters only where practical.
+
+[ ] P05-04 Build quantitative views with serviceable-business estimates, provenance, assumptions, ranges, and contradictions.
+
+[ ] P05-05 Verify import validation, units/populations, duplicate records, unknowns, evidence links, and approved deterministic transformations.
+
+
+P06 - ECONOMIC PAIN ENGINE (M4)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine and market definitions; approved ROI input/denominator conventions.
+Exit condition: Every economic value is sourced or explicitly estimated/unknown; ROI calculations are reproducible and reviewed.
+
+[ ] P06-01 Define economic evidence categories, currencies/periods, ranges, estimation labels, and versioned ROI calculation conventions.
+
+[ ] P06-02 Add economic-evidence and ROI-scenario persistence/APIs with explicit source/interview links.
+
+[ ] P06-03 Implement observed/estimated/interview-confirmed/unknown input capture and assumption approval.
+
+[ ] P06-04 Implement deterministic potential value, value-to-price ratio, payback, annual net benefit, and sensitivity views.
+
+[ ] P06-05 Verify units, non-overlapping cost categories, missing values, zero denominators, boundary cases, evidence, and review.
+
+
+P07 - COMPETITIVE INTELLIGENCE (M5)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine; permitted competitor/review sources.
+Exit condition: Researchers can compare evidenced alternatives, pricing labels, gaps, and switching friction.
+
+[ ] P07-01 Add competitor and finding schemas/migrations for AI vendors, vertical SaaS, agencies, consultancies, BPO, and DIY.
+
+[ ] P07-02 Implement manual/import collection for target buyers, problems, features, integrations, positioning, and case studies.
+
+[ ] P07-03 Implement source-grounded extraction/summaries with exact/starting-at/estimated/unknown pricing labels.
+
+[ ] P07-04 Build competitor landscape/detail views with strengths, complaints, weaknesses, substitutes, and evidence review.
+
+[ ] P07-05 Verify unsupported pricing is rejected, findings preserve contradiction/provenance, and tenant/review rules hold.
+
+
+P08 - SEARCH & BUYING INTENT (M6)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine; licensed/export/API access where applicable.
+Exit condition: Search demand is segmented by intent, source, geography, and time with auditable numerical metrics.
+
+[ ] P08-01 Add keyword schemas/migrations for volume, trend, CPC, competition, country, date, and source.
+
+[ ] P08-02 Implement manual/CSV imports and approved API adapters with units, period, and data-source validation.
+
+[ ] P08-03 Implement/evaluate intent taxonomy: problem, informational, solution, commercial, comparison, transactional, and switching.
+
+[ ] P08-04 Build demand/trend views with deterministic aggregation and explicit incomplete/source-overlap caveats.
+
+[ ] P08-05 Verify intent boundary cases, seasonality/period handling, duplicate keywords, absent metrics, and source drill-down.
+
+
+P09 - BUYER ACCESSIBILITY & CHANNEL FIT (M7)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine and market registry; no outreach is authorized merely by this roadmap.
+Exit condition: Reachable economic buyers, viable channels, and procurement friction are evidenced rather than assumed.
+
+[ ] P09-01 Add buyer persona/stakeholder and channel schemas/migrations.
+
+[ ] P09-02 Implement economic buyer, champion, technical, and procurement stakeholder mapping.
+
+[ ] P09-03 Capture account reach, contact-data availability, sales cycle, procurement, channel diversity, and Meta suitability evidence.
+
+[ ] P09-04 Build channel comparison and deterministic coverage views with unknowns, access restrictions, and cost assumptions.
+
+[ ] P09-05 Verify counts, buyer-role evidence, privacy, inaccessible-buyer flags, review, and channel metric calculations.
+
+
+P10 - WORKFLOW INTELLIGENCE (M3)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine and economic module; interview validation is completed through Phase 11.
+Exit condition: Versioned workflows expose evidenced bottlenecks; AI suggestions cannot become validated workflows by themselves.
+
+[ ] P10-01 Add versioned workflow-map/step schemas, evidence links, ownership, and review state.
+
+[ ] P10-02 Build human workflow editor for roles, systems, inputs/outputs, frequency, handling/wait times, failures, and consequences.
+
+[ ] P10-03 Implement optional source-grounded AI workflow proposals without automatic approval.
+
+[ ] P10-04 Implement deterministic bottleneck/value calculations and primary-research validation state.
+
+[ ] P10-05 Verify sequence/versioning, units, assumptions, evidence, unvalidated-state warnings, and researcher/reviewer boundaries.
+
+
+P11 - PRIMARY CUSTOMER RESEARCH (M8)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Evidence engine, private-data controls, and an approved interview process.
+Exit condition: Qualified, consented interviews can confirm or contradict desk research with inspectable transcript context.
+
+[ ] P11-01 Add interview/finding schemas, participant-fit metadata, consent/authority, private storage, and retention support.
+
+[ ] P11-02 Build interview creation, transcript upload, notes, role tagging, and restricted access.
+
+[ ] P11-03 Implement/evaluate extraction of confirmation/rejection, urgency, spend, workflow, authority, objections, and willingness.
+
+[ ] P11-04 Build desk-research versus interview comparison with explicit denominators and disagreement flags.
+
+[ ] P11-05 Verify consent/access, span fidelity, participant qualification, correction history, contradictions, and deletion inheritance.
+
+
+P12 - MASK AI & PRODUCTIZATION FIT (M9)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/4
+Dependencies: Evidence engine, economic/workflow/competitive evidence, and technical/business reviewers.
+Exit condition: Light and full fit assessments are leadership-reviewed and high ratings have written supporting evidence.
+
+[ ] P12-01 Add light/full assessment schema and criteria for technical/integration fit, complexity, standardization, recurring revenue, proof, and expansion.
+
+[ ] P12-02 Build leadership assessment UI with written rationale, evidence attachments, and unknown/assumption states.
+
+[ ] P12-03 Implement technical/business review, version history, and completeness checks for high ratings.
+
+[ ] P12-04 Verify permissions, missing rationale, light-versus-full profile separation, evidence links, and scoring-input eligibility.
+
+
+P13 - DETERMINISTIC SCORING & CONFIDENCE ENGINE
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/7
+Dependencies: Structured method inputs and approvals D02-D06 below; M10 scoring remains unavailable until Phase 17 evidence exists.
+Exit condition: Scores, confidence, overrides, and immutable snapshots are reproducible; unknown rubrics cannot produce invented scores.
+
+[ ] P13-01 Approve and version applicable method rubrics, normalizers, subweights, minimums, manual-review rules, and confidence dimensions.
+
+[ ] P13-02 Add scoring configuration/rubric, method-score, evidence-join, override, confidence, and market-snapshot migrations.
+
+[ ] P13-03 Implement pure backend method calculations and fixed overall weights M1-M10 totaling 100%; store full breakdowns.
+
+[ ] P13-04 Implement computed versus reviewed score workflows with explicit overrides, reviewer/rationale/evidence/timestamp.
+
+[ ] P13-05 Implement deterministic confidence indices/labels, manual confidence challenges, completeness, and duplicate/source-diversity controls.
+
+[ ] P13-06 Implement complete overall scores, fixed-scope gate scores, incompatible-snapshot warnings, and deterministic rankings.
+
+[ ] P13-07 Verify all formulas, weight sums, boundaries, nulls, overrides, reproducibility, tenant isolation, immutable history, and no LLM calls.
+
+
+P14 - EVIDENCE GAP DETECTION
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/4
+Dependencies: Method requirements, review states, scoring configuration, and confidence/completeness conventions.
+Exit condition: Every market shows proven, weak, and missing evidence with a deterministic next research action.
+
+[ ] P14-01 Version evidence requirement rules by methodology and gate, with sample/quality/recency/source checks.
+
+[ ] P14-02 Implement deterministic proven/weak/missing/not-applicable gap calculation and result persistence.
+
+[ ] P14-03 Build prioritized next actions and gap views; AI may explain but must not select actions.
+
+[ ] P14-04 Verify all gap states, approved exceptions, recalculation, gate/veto priorities, counts, and evidence traceability.
+
+
+P15 - STAGE-GATE ENGINE
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/6
+Dependencies: Phases 13-14; minimum veto/audit controls are required here; full Gate 3/4 acceptance awaits Phase 17.
+Exit condition: Gate recommendations explain every condition; only an authorized human decision changes a stage.
+
+[ ] P15-01 Version four gate profiles, fixed method sets, thresholds, confidence rules, completeness checks, and veto requirements.
+
+[ ] P15-02 Implement Gate 1: 6.0 indicative score, required desk-research methods/light M9, and no open confirmed critical veto.
+
+[ ] P15-03 Implement Gate 2: 7.0+, at least Medium confidence, full workflow/interview/product-fit evidence.
+
+[ ] P15-04 Implement Gate 3: 7.5+ and approved measurable behavior requirements; return not_ready without sufficient M10 evidence.
+
+[ ] P15-05 Implement Gate 4: preferred 8.0, High confidence, required final evidence, founder selection/exception records.
+
+[ ] P15-06 Verify not_ready/blocked/eligible/fail/founder-review results, score boundaries, hold/reject/advance/select transitions, and audit.
+
+
+P16 - MARKET COMPARISON DASHBOARD
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/7
+Dependencies: Registry, evidence, method modules, scoring, confidence, gaps, and gate recommendation APIs.
+Exit condition: Users can inspect a numeric comparison and navigate every conclusion back to its evidence.
+
+[ ] P16-01 Build leaderboard with reviewed scores, confidence, stage, completion, veto state, and compatible-comparison rules.
+
+[ ] P16-02 Build market-detail navigation for all method tabs, including clear unimplemented/unknown/empty states.
+
+[ ] P16-03 Build evidence explorer with source, persona, date, pain, method, sentiment, confidence, and access filters.
+
+[ ] P16-04 Build pain intelligence visualizations with frequency, economics, intent, source mix, trends, and supporting context.
+
+[ ] P16-05 Build side-by-side ten-method comparison with actual numbers; charts are supplemental.
+
+[ ] P16-06 Build score calculation/approval drill-down, gaps, next action, red flags, and stage-decision surfaces.
+
+[ ] P16-07 Verify end-to-end UI flows, accessibility, responsive layouts, loading/errors, numeric fidelity, evidence links, and tenant scope.
+
+
+P17 - REAL-WORLD MARKET VALIDATION (M10)
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Scoring/gates and experiment approval; external spend, publication, or outreach needs explicit authorization.
+Exit condition: Manual experiment inputs yield reliable funnel/unit-economic metrics and traceable behavioral evidence.
+
+[ ] P17-01 Approve outcome definitions, attribution windows, denominator conventions, M10 rubric, and strong-behavior thresholds.
+
+[ ] P17-02 Add experiment/metric schemas and manual entry/import for offer, message, channel, dates, spend, funnel, revenue, and gross profit.
+
+[ ] P17-03 Implement deterministic CTR, CPL, CPQL, cost/meeting, opportunity/close rates, CAC, value ratios, and sales-cycle calculations.
+
+[ ] P17-04 Build experiment review/comparison and paid-pilot/pricing/retention/expansion evidence capture.
+
+[ ] P17-05 Verify source totals, zero denominators, cohort/currency consistency, approved M10 scoring, and Gate 3/4 end-to-end eligibility.
+
+
+P18 - RED FLAG & VETO ENGINE
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/4
+Dependencies: Minimum blocking controls already exist before gate use; this phase completes dedicated lifecycle/UI coverage.
+Exit condition: A high score cannot conceal an unresolved critical veto or an undocumented founder exception.
+
+[ ] P18-01 Complete veto taxonomy and suspected/confirmed/resolved/accepted-exception lifecycle with severity, evidence, and owner.
+
+[ ] P18-02 Build investigation/resolution UI and deterministic founder-review/blocking rules.
+
+[ ] P18-03 Implement founder exceptions with rationale, evidence, gate scope, review/expiry date, and visible retained veto.
+
+[ ] P18-04 Verify lifecycle transitions, expired exceptions, suspected-versus-confirmed handling, review priorities, and gate integration.
+
+
+P19 - AUDIT TRAIL
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Audit events are added with every earlier mutation; this phase completes query, coverage, and tamper-resistance checks.
+Exit condition: The team can reconstruct why a market or score changed without exposing secrets or losing historical evidence.
+
+[ ] P19-01 Complete append-only audit schema, event taxonomy, correlation IDs, actors/roles, and safe before/after references.
+
+[ ] P19-02 Audit score/confidence/rubric/prompt/source/review/stage/experiment/veto/founder changes and evidence retention actions.
+
+[ ] P19-03 Build authorized market/record history and reviewable decision reports with exact version/evidence references.
+
+[ ] P19-04 Implement audit export/access controls, retention, immutability safeguards, and sensitive-payload redaction.
+
+[ ] P19-05 Verify event coverage, ordered history, failed/unauthorized actions, source changes, and rejection/selection reconstruction.
+
+
+P20 - QUALITY & AI EVALUATION HARDENING
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Initial labelled evaluation already blocks unsafe Phase 4 use; this phase extends coverage across the platform.
+Exit condition: Every production analysis version has reproducible evidence of quality and an approved release decision.
+
+[ ] P20-01 Expand versioned gold/challenge datasets across methods, sources, personas, markets, and sensitive-data classes.
+
+[ ] P20-02 Implement complete precision/recall/agreement/MAE/kappa/span metrics, slices, uncertainty, and regression reports.
+
+[ ] P20-03 Evaluate clustering coherence, duplicate dominance, outliers, stability, and name fidelity.
+
+[ ] P20-04 Enforce prompt/model/taxonomy/schema-change regression gates and critical-error human review.
+
+[ ] P20-05 Verify release/rollback/reanalysis procedures, drift/correction monitoring, make eval-ai reproducibility, and reporting.
+
+
+P21 - SECURITY, OPERATIONS & PRODUCTION READINESS
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/7
+Dependencies: Security is incremental from Phase 1; production provider/account choices and deployment require approval.
+Exit condition: An approved deployment is authenticated, tenant-isolated, observable, recoverable, and has no unresolved critical findings.
+
+[ ] P21-01 Complete threat model, role matrix, service identities, authentication hardening, and tenant-isolation verification.
+
+[ ] P21-02 Harden uploads, HTML rendering, SSRF/collector egress, rate limiting, prompt injection, and secret handling.
+
+[ ] P21-03 Verify private transcript/object access, retention/deletion propagation, consent, and provider processing controls.
+
+[ ] P21-04 Configure encrypted production services, migrations, least-privilege credentials, and environment separation.
+
+[ ] P21-05 Configure backups, restore drill, health/metrics/alerts, queue monitoring, and incident owners/runbooks.
+
+[ ] P21-06 Run dependency/host-runtime/security testing, log/audit redaction checks, performance/reliability tests, and remediation. Packaging requirement updated by D12; hardening is not waived.
+
+[ ] P21-07 With explicit approval, deploy a controlled pilot environment and verify rollback, migrations, access, and end-to-end smoke tests.
+
+
+P22 - FIRST REAL SYSTEM TEST: 3-5 MARKETS
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Gate 1 MVP acceptance plus security/audit/evaluation baseline; approved research sources and market list.
+Exit condition: A documented real-data pilot proves collection, interpretation, scoring fairness, and workflow usability before scale.
+
+[ ] P22-01 Select 3-5 materially different markets and freeze a common definition/profile/configuration and research plan.
+
+[ ] P22-02 Run M1, M2, M4, M5, M6, M7, and light M9 with the same collection/review rules.
+
+[ ] P22-03 Measure collector reliability, source access, relevance/extraction accuracy, clusters, evidence gaps, and research effort.
+
+[ ] P22-04 Compare scored evidence and reviewer judgement; inspect misleading rankings, missing fields, and dashboard usability.
+
+[ ] P22-05 Fix/retest pilot defects and record a human go/no-go for calibration with acceptance evidence.
+
+
+P23 - CALIBRATION RUN: APPROXIMATELY 10 MARKETS
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/5
+Dependencies: Successful technical pilot and approved calibration protocol.
+Exit condition: A reviewed scoring configuration supports fair cross-market comparison without favoring a preferred industry.
+
+[ ] P23-01 Select approximately 10 diverse markets and run the identical frozen research methodology.
+
+[ ] P23-02 Collect independent researcher/reviewer assessments and compare with computed scores/confidence.
+
+[ ] P23-03 Analyze systematic severity, search-demand, source/sample, economic, and accessibility bias.
+
+[ ] P23-04 Approve justified normalization/rubric updates, version them, and recalculate/backtest all comparable markets.
+
+[ ] P23-05 Record calibration findings, regression results, unresolved risks, and approval to scale.
+
+
+P24 - FULL MARKET DISCOVERY, VALIDATION & FINAL SELECTION
+------------------------------------------------------------------------
+Status: NOT_STARTED
+Completed checkpoints: 0/7
+Dependencies: Approved calibration; explicit authorization and budgets for any live outreach, publication, or paid tests.
+Exit condition: One primary market is selected by an authorized human using a fully traceable final report and buyer behavior.
+
+[ ] P24-01 Load 30-50 candidate markets and freeze the common research plan, scoring configuration, and evidence policy.
+
+[ ] P24-02 Run/review Gate 1 and document advancement of approximately 10-15 markets plus every hold/rejection.
+
+[ ] P24-03 Complete deep research/interviews/workflows/economics and Gate 2 to narrow to approximately 5.
+
+[ ] P24-04 Conduct authorized outbound, landing-page, message, pricing, demo, and small paid tests; evaluate Gate 3 to reach 2-3 finalists.
+
+[ ] P24-05 Gather paid-pilot, pricing, CAC, sales-friction, margin, productization, retention, and expansion evidence for finalists.
+
+[ ] P24-06 Produce the final comparative report with all ten scores, confidence, evidence, contradictions, gaps, vetoes, and next experiments.
+
+[ ] P24-07 Record founder/reviewer Gate 4 decision and primary-market selection; preserve rejected-market history and operational handoff.
+
+6. RELEASE MILESTONES (ROLLUPS, NOT EXTRA COUNTED CHECKPOINTS)
+------------------------------------------------------------------------
+R0 - Specification baseline reviewed: P00.
+R1 - Local development environment works: P01.
+R2 - Secure market/evidence workspace works: P02-P03.
+R3 - Reviewed/evaluated pain intelligence works: P04.
+R4 - Gate 1 MVP ready: authentication, evidence, 2-3 collectors, evaluated
+     pain/embeddings/clustering, quantitative/competitor/search inputs,
+     economic/buyer evidence, light product fit, manual reviewed scoring,
+     deterministic weighted scoring/confidence, gaps, gate controls,
+     leaderboard, evidence drill-down, and baseline security/audit.
+     Missing advanced method automation does not imply a full-platform
+     release. Any earlier MVP cut must explicitly mark its partial scope.
+R5 - Full research and validation platform ready: required P05-P21 work.
+R6 - Technical pilot accepted: P22.
+R7 - Calibration accepted: P23.
+R8 - Evidence-backed primary market selected: P24.
+
+7. OPEN DECISIONS / DEPENDENCIES
+------------------------------------------------------------------------
+These are pending decisions, not claims that a current implementation failed.
+The guide refers to two original MASK AI research documents; only the
+development guide was supplied. If the originals define missing rubrics,
+use those instead of inventing policy.
+
+D01 | Owner: MASK AI project owner
+    | Needed by: P00-11
+    | CLOSED FOR PHASE 1: user explicitly authorized starting the next phase
+      using the existing instructions/tracker. Architecture baseline adopted.
+      Numerical proposals remain pending under D02-D06 before activation.
+
+D02 | Owner: Research lead + reviewer
+    | Needed by: computed M1/M2 activation, P05-01/P13-01
+    | Approve M1 normalizers, M2 frequency denominator, duplicate handling,
+      cluster-to-market aggregation, and minimum samples/subweights.
+
+D03 | Owner: Methodology/business lead + reviewer
+    | Needed by: P13-01 and method-specific computed scoring
+    | Supply/approve deterministic M3-M10 rubrics. No AI-invented scores.
+
+D04 | Owner: Research lead + reviewer
+    | Needed by: P13-01/P13-05 and automated completeness/gate use
+    | Approve confidence dimension transforms, minimum evidence, recency,
+      source-family grouping, and any allowed exception rules.
+
+D05 | Owner: Founder + sales/research leads
+    | Needed by: P17-01 and Gate 3/4 readiness
+    | Define strong behavioral signals, qualified outcomes, attribution,
+      pricing/pilot/unit-economics requirements, and M10 scoring thresholds.
+
+D06 | Owner: Research/technical leads
+    | Needed by: scoring/AI release activation
+    | Approve provisional engineering gates, fixed-profile gate-score
+      conventions, override threshold, and release-risk acceptance process.
+
+D07 | Owner: Technical lead
+    | Needed by: P01-01 and production preparation
+    | PHASE 1 BASELINE ADOPTED then superseded in part by D13: runtime/tool
+      pins remain; PostgreSQL queue and local session directions replace Celery/OIDC.
+      The S3-compatible storage boundary remains optional behind a local adapter.
+      Provider accounts and production deployment target remain pending.
+      Infrastructure choices do not permit changing research policy.
+
+D08 | Owner: Data/source policy owner
+    | Needed by: live collection and AI provider use
+    | Approve each source, rights, credentials, rate/retention limits,
+      restricted-data processing, and first 2-3 production collectors.
+
+D09 | Owner: MASK AI project owner/founder
+    | Needed by: P21 deployment and P22-P24 research/experiments
+    | Supply approved markets, participants, provider accounts, budgets,
+      and explicit authorization for publication, outreach, or paid tests.
+      This tracker alone grants no external-action authority.
+
+D10 | Owner: Project owner/system administrator; technical lead for verification
+    | Needed by: P01-05/P01-06/P01-07/P01-08/P01-10
+    | Updated by D13: provide one isolated native Windows PostgreSQL/pgvector
+      instance with separate restricted application and migration roles; record
+      actual versions/readiness. Redis/Linux/WSL/VM/containers are not required.
+      Hosted CI is deferred; do not publish code without separate approval.
+
+D11 | Owner: Project owner + technical lead | APPROVED 2026-09-03
+    | Needed by: P02-02 authentication and authenticated market API/UI
+    | D13 selects local application accounts with maintained Argon2id password
+      hashing and PostgreSQL-backed hashed server sessions for the private Windows
+      MVP. Explicit local owner bootstrap, cookies/CSRF, expiry/revocation/logout,
+      audit, rate limiting, and live acceptance remain implementation work.
+      Optional OIDC/email/social login is deferred; no account was created.
+
+D12 | Owner: Project owner | APPROVED 2026-09-03
+    | User explicitly requested removing Docker; it must no longer be required
+      by development commands, CI, tests, or current setup instructions.
+      D13 retains PostgreSQL/pgvector, authentication, and test safety while
+      superseding the interim Redis/Celery/Linux requirement with a Windows worker.
+      P01-07 is rescoped in place; all 151 checkpoint IDs/counts are preserved.
+      Do not uninstall system software, erase runtime data, or alter Windows PATH.
+
+D13 | Owner: Project owner | APPROVED 2026-09-03
+    | The system must run natively on Windows, remain container-free, satisfy the
+      supplied development guide without speculative scope, and keep market
+      research/model usage lean. Architecture direction is adopted: retain
+      PostgreSQL/pgvector, replace Redis/Celery/Linux with a durable PostgreSQL-
+      backed Python worker, use local server-side authentication for the initial
+      private installation, and enforce explicit per-run collection/model budgets.
+      This decision changes infrastructure, not methodology weights, evidence
+      lineage, deterministic scoring, authorization, or audit requirements.
+      Target architecture/docs are aligned; replacement code and live acceptance
+      remain under P01-06/P01-07/P01-08/P01-10 and P02-02.
+
+8. DEFERRED / OPTIONAL BACKLOG (NOT IN BASELINE COUNTS)
+------------------------------------------------------------------------
+- Additional social scrapers and every possible market-data API.
+- Meta/Google Ads/CRM/outbound/analytics integrations after manual imports.
+- Optional n8n scheduling/notifications/integration workflows.
+- Automated outreach or interviews, only after a separately approved scope.
+- Fully autonomous workflow mapping and predictive market-success ML.
+- Complex multi-agent architecture, custom warehouse, and Kubernetes.
+When an item is approved, add stable checkpoints and record the count/scope
+change. Core scoring must remain in the application, not orchestration.
+
+9. CHECKPOINT HISTORY (APPEND; DO NOT REWRITE PAST RESULTS)
+------------------------------------------------------------------------
+2026-09-02 | BASELINE-001 | P00-01 through P00-10 | DONE
+Work:
+  Prepared 12 Markdown artifacts: AGENTS.md, README.md, eight required
+  specification documents, SECURITY.md, and PHASE_1_CHECKLIST.md.
+  Packaged the original documentation-only Phase 0 ZIP.
+Evidence:
+  Files are in this project root and docs/.
+Verification:
+  Required-doc presence: PASS (8/8).
+  Method sections: PASS (10).
+  Approved overall weights: PASS (100%).
+  README relative document links: PASS (0 broken).
+  Initial package implementation files: NONE.
+  Application tests/lint/types/migrations: NOT RUN - no application exists.
+Limitations:
+  Drafting completion is not owner sign-off or scoring-rubric approval.
+Next:
+  P00-11; then P01-01 after approval.
+
+2026-09-02 23:03 PKT (UTC+05:00) | TRACK-001 | Tracking setup | IN_PROGRESS
+Work:
+  Added 25-phase roadmap, 151 stable checkpoints, honest baseline counts,
+  dependencies, release milestones, decisions, and append-only history.
+  Project instruction/index updates and tracker verification are pending.
+Verification:
+  NOT RUN yet for this tracker.
+Limitations:
+  Documentation/tracking only; no application implementation authorized.
+Next:
+  Verify IDs/counts, phase rollup, links, and update instructions; close
+  TRACK-001 without counting administrative tracking as product progress.
+
+2026-09-02 23:10 PKT (UTC+05:00) | TRACK-002 | Close TRACK-001 | DONE
+Work:
+  Completed the canonical tracker and required after-every-checkpoint rule.
+  Linked it from README and corrected the unrecorded approval claim there.
+Files:
+  progress.txt (new), AGENTS.md (updated), README.md (updated).
+Verification:
+  PowerShell Get-Content + regex checkpoint scan: PASS, 151 unique stable
+  IDs, 10 DONE, 141 remaining, 25 phase sections, 25 matching phase rows.
+  Sequential-ID and per-phase completed/total comparisons: PASS.
+  Summary completed/remaining counts and phase rollups: PASS.
+  Get-Content AGENTS.md update-protocol presence check: PASS.
+  README relative links checked with Test-Path: PASS, 0 broken.
+  Initial validator falsely rejected padded table columns; its whitespace
+  pattern was corrected and the full validation rerun passed (exit 0).
+  Application tests/lint/types/migrations: NOT RUN - no application exists.
+Limitations:
+  Tracking setup is not counted as additional product completion.
+  No architecture sign-off, scoring-rule approval, or Phase 1 implementation
+  is inferred from this tracking request. The original ZIP remains static.
+Next:
+  P00-11 - record baseline review; then P01-01 after approval.
+  On future authorized work, update this file at each checkpoint attempt.
+
+2026-09-02 | PHASE1-START | P00-11 DONE; P01-01 IN_PROGRESS
+Work:
+  Read project instructions, tracker, architecture, Phase 1 requirements,
+  security, evaluation, and infrastructure-related data model.
+  Recorded user's authorization to start Phase 1 as baseline acceptance.
+Verification:
+  Preflight found bundled Node 24.19.0 and Python 3.12.13; Git available.
+  Docker CLI/Desktop absent from PATH and standard installation paths.
+  Network permission granted for dependency downloads this turn.
+Limitations:
+  Numerical scoring approvals remain pending. Docker-backed acceptance
+  cannot run until a Docker Linux-container environment is available.
+Next:
+  P01-01 runtime decisions; build/test local scaffold without claiming
+  missing Docker integration checks passed.
+
+2026-09-02 | PHASE1-001 | P01-01 DONE; P01-02 IN_PROGRESS
+Work:
+  Adopted ADR 0001 and pinned Node/Python/pnpm/uv, web/API packages,
+  queue, auth/storage boundaries, and test tooling. Initialized Git main.
+Files:
+  docs/decisions/0001-phase-1-baseline.md; package.json; pyproject.toml;
+  apps/api/pyproject.toml; workspace/runtime/environment/ignore files.
+Verification:
+  Official npm/PyPI registry version checks: PASS. Runtime versions: PASS.
+  git init -b main: PASS. uv 0.12.9 installed in workspace tooling only.
+Limitations:
+  Docker unavailable; dependency locks and infrastructure verification pending.
+Next:
+  P01-02 dependency installation/locks and cross-platform commands.
+
+2026-09-02 | PHASE1-002 | P01-02/P01-04/P01-05/P01-06 | IN_PROGRESS
+Work:
+  Added API settings/contracts/health/error handling and protected local
+  smoke endpoints, SQLAlchemy infrastructure job model, Celery worker,
+  Alembic 0001, and initial unit tests. Starting the web scaffold.
+Verification:
+  uv sync resolved 60 packages and built mask-api; installation finishing.
+  Initial resolver caught Celery incompatibility with redis-py 8; pinned
+  redis-py 6.4.0 per Kombu's supported range and resolution succeeded.
+Limitations:
+  Code is not yet verified; migration/real worker checks require Docker.
+Next:
+  Web/status and root commands; run unit, lint, types, and integration preflight.
+
+2026-09-02 | PHASE1-003 | P01-03 through P01-08 | IN_PROGRESS
+Work:
+  Added local Next.js status UI, runtime-validated typed client, component
+  tests, Compose/Dockerfiles, restricted DB role initialization, and
+  database/worker/failure/recovery integration test specifications.
+Verification:
+  Initial API suite: 11 PASS. Contract export caught callable dependency
+  parameters; fixed via a zero-argument readiness wrapper and added regression.
+  Four Docker image tags/digests verified against official registry: PASS.
+  pnpm installed packages but refused unapproved unrs-resolver build script;
+  inspected its package/postinstall and explicitly approved that dependency.
+Limitations:
+  Full checks/contract generation rerun pending. Docker tests still blocked.
+Next:
+  Complete lockfiles, run expanded tests/lint/types/build, and prepare CI/docs.
+
+2026-09-03 | PHASE1-004 | P01-03/P01-04/P01-08/P01-09 | IN_PROGRESS
+Work:
+  Expanded contract/idempotency tests, generated OpenAPI/TS declarations,
+  configured CI and local secret guard, and wrote local development guide.
+Verification:
+  Backend tests: 19 PASS, 5 real integration tests excluded (not passed).
+  Web tests: 11 PASS. TS route/type generation: PASS on first run.
+  ESLint 10 failed with React plugin API incompatibility; reverted to the
+  previously pinned compatible ESLint 9 and recorded the decision in ADR.
+  Python typing gaps corrected; final lint/type/build rerun in progress.
+  Corrected setup documentation to pnpm run setup (pnpm setup is a built-in).
+Limitations:
+  No Docker/CI execution yet; cannot close the phase on offline tests alone.
+Next:
+  Finish complete local checks and live unavailable-dependency smoke check.
+
+2026-09-03 | PHASE1-005 | P01-04 | DONE
+Work:
+  Completed typed FastAPI scaffold, startup validation/redaction, structured
+  logs, safe readiness/error responses, dev-only authorization, and OpenAPI.
+Verification:
+  uv run pytest -m "not integration": 20 PASS, 5 integration deselected.
+  uv run ruff check .: PASS. uv run mypy apps/api/src workers: PASS (15 files).
+  uv run python scripts/check-secrets.py: PASS (narrow local guard only).
+Limitations:
+  TestClient emits an upstream httpx deprecation warning; tests pass.
+  Docker, Podman, and WSL Linux installation are unavailable. Real DB,
+  migration, queue/worker, and container tests remain NOT RUN.
+Next:
+  Finish web lint/build and repository locks; then status-page HTTP smoke.
+
+2026-09-03 00:12 PKT (UTC+05:00) | PHASE1-006 | P01-02/P01-03/P01-07/P01-08 | IN_PROGRESS
+Work:
+  Completed Next.js production compilation, type generation, and build traces.
+  Generated ignored local secrets without printing values or overwriting files.
+  Downloaded official standalone Compose v2.40.3 into workspace tooling and
+  verified its published SHA256 before execution; no system installation.
+Verification:
+  pnpm --filter @mask/web build: PASS (/, /api/health, /_not-found).
+  docker-compose.exe config --quiet: PASS (configuration syntax only).
+  git check-ignore .env: PASS. Tracker: PASS (13/151).
+  pnpm schemas:check: FAILED because pnpm forwarded an extra -- to argparse.
+  Corrected the root command to invoke the checker directly; rerun pending.
+Limitations:
+  Standalone Compose is not a Docker engine. Actual container startup,
+  migrations, vector round-trip, worker, and recovery remain NOT RUN.
+Next:
+  Rerun quality commands; smoke-test local production web and API responses.
+
+2026-09-03 00:20 PKT (UTC+05:00) | PHASE1-007 | P01-02 DONE; P01-03/P01-04/P01-08 | IN_PROGRESS
+Work:
+  Verified repository setup/locks and local production web/API connectivity.
+  Final hardening disables inherited Redis health retries, catches unexpected
+  API errors before server traceback logging, and adds regression tests.
+  Removed premature standalone packaging to align the local next start
+  command with its build; production packaging remains a Phase 21 concern.
+Verification:
+  pnpm install --frozen-lockfile --offline and uv sync --frozen: PASS.
+  pnpm schemas:check: PASS after fixing argument forwarding.
+  pnpm test:unit: PASS (20 Python + 11 web; 5 integration deselected).
+  pnpm lint; pnpm typecheck; pnpm check:secrets: PASS.
+  pnpm audit --prod --audit-level high: PASS, no known JS production findings.
+  Local HTTP smoke: PASS, API live 200/ready 503, correlation preserved,
+  unauthorized smoke POST 401, web 200 with real unavailable state/CSS 200.
+  pnpm test:integration: BLOCKED at preflight (exit 1), Docker engine absent.
+Limitations:
+  Newly added hardening regressions and adjusted web build need rerun.
+  Python/container vulnerability audits and hosted CI have not run.
+Next:
+  Rerun regressions/build, finish documentation, then record remaining blockers.
+
+2026-09-03 00:21 PKT (UTC+05:00) | PHASE1-008 | P01-03/P01-09 | DONE
+Work:
+  Completed status-page scaffold and development documentation, environment
+  ownership table, startup dependency map, extension procedures, limitations.
+  Updated the detailed Phase 1 checklist without treating configured services
+  as runtime-tested or hosted CI as executed.
+Verification:
+  Final hardening tests: 22 Python + 11 web PASS; 5 integration deselected.
+  pnpm lint/typecheck/schemas:check: PASS. Adjusted pnpm build: PASS.
+  README relative links: PASS. Git main exists, no commits or remote created.
+  Previous local HTTP smoke demonstrated real web-to-API unavailable state.
+Limitations:
+  Docker acceptance remains outstanding. Checklist review also identified
+  explicit job request-key/retry metadata and web-format/report configuration
+  as remaining local details; these are not marked complete.
+Next:
+  P01-06 metadata alignment and P01-08 format/report automation; then record
+  exact Docker and hosted-CI prerequisites for resuming the five open checkpoints.
+
+2026-09-03 00:28 PKT (UTC+05:00) | PHASE1-009 | P01-06/P01-08 | LOCAL CHECKS PASS; ACCEPTANCE OPEN
+Work:
+  Added explicit request-key and attempt metadata, validated stored identity,
+  and aligned two retries with three total attempts. Added unit regressions.
+  Added pinned Prettier, non-mutating format gate, ignored JUnit reports,
+  and safe CI report retention. Verified/pinned the CI Gitleaks image digest.
+  Updated development guide/checklist and D07/D10 without changing scope counts.
+Verification:
+  pnpm test:unit:ci: PASS (24 Python + 11 web; 5 integration deselected).
+  JUnit output: PASS (reports/python-unit.xml and reports/web-unit.xml).
+  pnpm lint (Ruff, ESLint, Prettier, tracker): PASS.
+  pnpm typecheck and pnpm schemas:check: PASS.
+  Gitleaks image tag/digest existence verified; scanner itself NOT RUN.
+Limitations:
+  Real database/vector/migration, queue delivery/retry/shutdown, full
+  five-service startup, recovery, and hosted CI remain unverified.
+  Python/container vulnerability audits are not claimed; plan documented.
+Next:
+  Final frozen-lock/build/secret checks and local HTTP recheck; record
+  the remaining five checkpoints as blocked on real infrastructure/CI.
+
+2026-09-03 00:31 PKT (UTC+05:00) | PHASE1-010 | SESSION HANDOFF | PHASE 1 BLOCKED, 5/10 DONE
+Work:
+  Finished all current scaffold edits and final local checks. Added Linux
+  init-script line-ending assertion; verified setup preserves existing .env.
+  Saved exact resume steps and dependencies for the five open checkpoints.
+Verification:
+  pnpm test:unit:ci: 24 Python + 11 web PASS; 5 integration deselected.
+  Latest contracts-only rerun: 4 PASS (including shell LF assertion).
+  Final pnpm build: PASS; next start launched without standalone warning.
+  Final frozen pnpm install: PASS. Earlier frozen uv sync: PASS.
+  Ruff/ESLint/Prettier, mypy/TypeScript, OpenAPI/TS contracts: PASS.
+  Compose v2.40.3 config --quiet: PASS; no Docker engine involved.
+  Final HTTP smoke: API live 200, ready 503 with both dependencies down,
+  correlation retained, protected route 401, web/CSS 200 and truthful state.
+  Setup re-run preserved .env; .env and JUnit report ignore checks: PASS.
+  Narrow secret guard: PASS. JS production audit: no known findings.
+  API/web verification servers stopped; no deployment, commit, or remote.
+Limitations/blockers:
+  D10: host has no Docker/Podman or installed WSL Linux. Five real integration
+  tests, image builds, migration/vector/worker/recovery/shutdown acceptance
+  remain NOT RUN, not passed. No hosted CI/source scan/branch protection.
+  Python/container vulnerability audits remain outstanding before production.
+  HTTP/component verification is not a browser visual review. TestClient
+  still emits the documented upstream httpx deprecation warning.
+Next:
+  Owner supplies running Linux-container Docker; technical lead follows
+  the resume sequence above. Request an approved remote before hosted CI.
+  Counts: 16/151 DONE, 135 remaining, 10.6% checkpoint-count progress;
+  1/25 phases complete. No Phase 2 implementation or scoring approval inferred.
+
+2026-09-03 02:40 PKT (UTC+05:00) | MOD-001 / PHASE2-START | IN_PROGRESS
+Work:
+  Read instructions, tracker, architecture, identity/market data model,
+  product roles, and security requirements. User requested highly modular
+  code, persistent instruction rules, and starting the next phase.
+  Added root/scoped modularity instructions and MODULARITY.md.
+Verification:
+  Docker still absent from PATH and the standard Desktop CLI path.
+  Refactor/schema implementation checks have not yet run.
+Limitations:
+  Early P02 work does not close P01 or waive live integration/authentication.
+  Identity-provider choice remains pending; no secrets/accounts requested
+  beyond the non-blocking provider question. No market HTTP routes enabled.
+Next:
+  Extract composition/transport/smoke service boundaries and regression-test;
+  then implement P02-01 tenant-constrained models/migration without live activation.
+
+2026-09-03 02:50 PKT (UTC+05:00) | MOD-002 | Refactor written; initial verification
+Work:
+  Split main.py into composition, shared transport, feature routers, typed
+  smoke ports/service/repository/wiring, and feature-owned contracts/model.
+  Workers now call the same smoke service, not ORM/session code. Compatibility
+  exports preserve existing imports. Added boundary/cycle and service tests.
+Verification:
+  Initial root checks DID NOT RUN: existing uv executable is inaccessible
+  this session, including after a scoped read permission grant.
+  Used the existing accessible venv Python 3.12.13 directly instead:
+  24 Python tests PASS, 5 integration deselected; mypy 32 files PASS.
+  New architecture/service tests were added afterward and await their run.
+Limitations:
+  uv-based root aliases cannot be reported as passing this session.
+  Existing pytest cache is access-denied; subsequent runs disable that cache.
+  No security permissions/ACLs were changed or bypassed.
+Next:
+  Verify expanded modularity suite and frozen API contract; implement P02-01.
+
+2026-09-03 02:52 PKT (UTC+05:00) | MOD-003 | Modular refactor verification | DONE
+Work:
+  Composition root is now wiring-only; feature ownership, pure service ports,
+  repositories, safe transport, and shared worker service are separated.
+  Root/scoped instructions and executable architecture checks preserve this.
+Verification:
+  Existing venv Python: 38 unit/architecture/service/contract tests PASS;
+  5 integration tests deselected. Web suite: 11 PASS.
+  Architecture boundary/cycle check: PASS. Mypy: 32 source files PASS.
+  OpenAPI snapshot unchanged: PASS. Ruff initially found long lines; formatter
+  corrected them and the subsequent Ruff check passed.
+Limitations:
+  No new roadmap checkpoint counted for refactoring; totals remain 16/151.
+  uv runner unavailable in this session; direct venv checks used instead.
+Next:
+  P02-01 feature-owned identity/market models and frozen Alembic 0002.
+
+2026-09-03 03:02 PKT (UTC+05:00) | PHASE2-001 | P02-01 | IN_PROGRESS
+Work:
+  Added feature-owned identity/market vocabulary and seven ORM tables,
+  shared persistence primitives/registry, schema revision 0002, and frozen
+  PostgreSQL migration SQL. No live schema was changed.
+  Added composite tenant/market foreign keys, immutable-definition app grants,
+  version fields, approval-pair checks, offline consistency and live PG cases.
+Verification:
+  SQLAlchemy PostgreSQL mock compilation produced all seven table definitions.
+  Initial lint caught formatting and a test lambda; corrected without
+  disabling rules. Full model/type/test rerun is pending.
+  Prior refactor OpenAPI/TypeScript schema checks and web lint/types: PASS.
+Limitations:
+  PostgreSQL constraints/grants/migrations remain NOT RUN without Docker.
+  No login provider chosen; no business HTTP routes or UI enabled.
+Next:
+  Run expanded schema/architecture suite, update physical-model documentation,
+  and preserve the actual migration/tenant acceptance blockers.
+
+2026-09-03 03:12 PKT (UTC+05:00) | PHASE2-002 | P02-01 | LOCAL PASS; LIVE ACCEPTANCE BLOCKED
+Work:
+  Implemented seven models, tenant/market composite references, snapshot
+  application grants, centralized metadata/head, and frozen Alembic 0002.
+  Added Phase 2 checklist and physical-model documentation. Extracted smoke
+  identity/state decisions into a pure domain function. No live DB changed.
+Verification:
+  Existing venv Python: 52 tests PASS, 14 integration deselected.
+  Mypy: 43 source files PASS. Ruff lint/format: PASS.
+  Architecture boundary/cycle check and unchanged OpenAPI: PASS.
+  Alembic head 0002 and offline upgrade/downgrade/model DDL consistency: PASS.
+  Refactored API live HTTP: 200 liveness/correlation, 503 readiness,
+  unregistered business route 404, protected lookup 401. Server stopped.
+  Narrow local secret guard: PASS. Earlier web unit/lint/types/contracts: PASS.
+  Test collection initially hit duplicate basenames; switched pytest to
+  importlib mode without deleting caches. Full rerun then passed.
+  A documentation patch failed context validation; confirmed it applied
+  nothing, corrected the context, and reapplied successfully.
+Limitations:
+  Docker-backed 14-case acceptance NOT RUN. No schema checkpoint closed,
+  no tenant authorization claimed, and no private data or accounts seeded.
+  Two additional lookup error-contract regressions added afterward await
+  final run; historical lookup outage status remains 500 with sanitized JSON.
+  D11 provider choice and D10 infrastructure/CI remain unresolved.
+Next:
+  Final combined checks and tracker validation; resume with working Docker
+  for P02-01 and an owner-approved OIDC configuration for P02-02.
+
+2026-09-03 03:17 PKT (UTC+05:00) | PHASE2-003 | SESSION HANDOFF | MODULARITY DONE; P02 PARTIAL
+Work:
+  Persistent modularity rules are in root AGENTS.md, apps/api/AGENTS.md,
+  apps/web/AGENTS.md, workers/AGENTS.md, and docs/MODULARITY.md.
+  Modular API/worker refactor is implemented, including pure smoke decisions,
+  typed ports/use cases, private persistence, and composition-only main.py.
+  Phase 2's seven models and frozen 0002 migration are written and checked
+  offline. Added its detailed checklist and kept routes disabled before auth.
+Verification:
+  Existing venv Python -m pytest -p no:cacheprovider -m "not integration":
+  54 PASS, 14 deselected. pnpm --filter @mask/web test: 11 PASS.
+  Python Ruff lint/format and mypy (43 source files): PASS.
+  Web ESLint/Prettier/TypeScript and generated TS contract check: PASS.
+  check_architecture.py, export-openapi.py --check, check-secrets.py: PASS.
+  Lookup 404/500 error-contract regressions and safe correlation headers: PASS.
+  README/instruction/development/architecture local links: 22 PASS.
+  check-progress.mjs: PASS (16/151 DONE, 135 remaining; denominator unchanged).
+  check-docker.mjs: blocked exit 1; integration explicitly NOT RUN.
+Limitations/blockers:
+  P02-01 remains BLOCKED on actual PostgreSQL migration/grant/constraint/
+  reflection/rollback checks; P01's five acceptance checkpoints remain open.
+  D11 OIDC provider/configuration is needed for the next authentication work.
+  Restore a working approved uv runner for standard root/clean setup commands.
+  No live schema changes, account/seed creation, private research, deployment,
+  remote creation, or commits. No Phase 2 completion or scoring approval claimed.
+Next:
+  With Docker available, run the 14-case integration suite and resolve P01/P02-01
+  findings. Confirm an OIDC provider before P02-02; implement authenticated
+  tenant-scoped market services/API/UI only after that boundary is in place.
+
+2026-09-03 18:14 PKT (UTC+05:00) | PHASE2-004 | P02-02 | IN_PROGRESS
+Work:
+  Read canonical/scoped instructions, tracker, security/product/data model,
+  modularity contract, and Phase 2 checklist for the next unfinished checkpoint.
+  Continue Phase 2 rather than claim it complete or skip its security dependency.
+  Implement provider-independent session-reader/membership interfaces, fresh
+  server-side tenant/role checks, and an explicit deny-by-default permission map.
+Verification:
+  Read-only tool discovery still finds no docker or uv on PATH.
+  New implementation checks are pending. No acceptance checkpoint closed.
+Limitations/blockers:
+  D10 live PostgreSQL/containers/CI and D11 OIDC provider choice remain open.
+  No provider account, credentials, auth route, or business route will be created
+  by this preparatory work. The session reader will have no fake runtime fallback.
+Next:
+  Implement/test the identity core and tenant-scoped read adapter; update this
+  checkpoint immediately with results and the remaining integration boundary.
+
+2026-09-03 18:20 PKT (UTC+05:00) | PHASE2-005 | P02-02 | CORE IMPLEMENTED; ACCEPTANCE OPEN
+Work:
+  Added identity-owned contracts/errors/ports/service/read-only repository,
+  explicit Phase 2 permission map, fresh tenant membership/status/role lookup,
+  session expiry/revocation checks, acting roles, and recent-auth admin guard.
+  No OIDC adapter, session persistence, login, bootstrap, or market routes added.
+Files:
+  apps/api/src/mask_api/modules/identity/{domain,contracts,errors,ports,services,repository}.py
+  apps/api/tests/identity/; tests/integration/test_identity_membership.py.
+Verification:
+  Focused identity tests: 39 PASS. Ruff initially found import/line formatting;
+  sorted/formatted and reran: lint PASS, format PASS (92 files).
+  Mypy: 48 source files PASS. Architecture/OpenAPI/narrow secret guard: PASS.
+  Expanded suite collects 111 Python cases, including 18 live integration cases.
+  Docker preflight fails explicitly: integration NOT RUN. Full unit run in progress.
+Limitations/blockers:
+  The session reader is only a port; no insecure runtime fallback exists.
+  Unit SQL assertions/mocks do not prove actual PostgreSQL read isolation.
+  Four new membership integration cases await D10, plus the previous fourteen.
+  Provider D11, secure session storage/CSRF/logout, bootstrap/audit, and E2E remain.
+  Permission grants are preliminary role gates, not resource-level authorization.
+Next:
+  Record detailed identity boundaries and permissions, finish regression checks,
+  and keep P02-02 incomplete until the real authentication boundary is verified.
+
+2026-09-03 18:26 PKT (UTC+05:00) | PHASE2-006 | P02-02 | CORE VERIFIED; INTEGRATION BLOCKED
+Work:
+  Completed the provider-independent identity slice and documented its exact
+  public boundaries and preliminary seven-permission/six-role matrix.
+  Preserved backend-only enforcement, modular service/port/repository ownership,
+  explicit acting roles, no admin wildcard, and no fake authentication fallback.
+  Added four real membership repository acceptance cases, not yet executed.
+Files:
+  Identity module and unit/integration tests listed in PHASE2-005.
+  docs/AUTHORIZATION.md, docs/SECURITY.md, docs/MODULARITY.md,
+  docs/DEVELOPMENT.md, docs/phases/PHASE_2_CHECKLIST.md, apps/api/AGENTS.md,
+  README.md, and this tracker. No dependency, migration, or runtime route change.
+Verification:
+  Existing venv: python -m pytest -p no:cacheprovider -m "not integration" -q:
+  93 PASS, 18 deselected. Existing upstream TestClient deprecation warning remains.
+  python -m ruff check . and python -m ruff format --check .: PASS.
+  python -m mypy apps/api/src workers: PASS (48 source files).
+  check_architecture.py; export-openapi.py --check; check-secrets.py: PASS.
+  pnpm --filter @mask/web test: 11 PASS; web lint/format:check/typecheck: PASS.
+  pnpm --filter @mask/schemas check: PASS. Local document link check: 25 PASS.
+  node scripts/check-progress.mjs: PASS, 16/151 done, 135 remaining, 10.6%.
+  node scripts/check-docker.mjs: exit 1, integration explicitly NOT RUN.
+Limitations/blockers:
+  P02-02 and Phase 2 marked BLOCKED after this safe independent slice.
+  D11 owner must choose OIDC provider; implementation then needs verified
+  issuer/subject linkage, real server session storage, secure cookies/CSRF,
+  expiry/logout/rotation, explicit bootstrap, audited roles, safe HTTP errors,
+  security events, and actual login/tenant/permission acceptance.
+  D10 owner/admin must supply Docker Linux containers for eighteen real tests;
+  approved remote/hosted CI and a usable standard uv runner remain outstanding.
+  Live schema constraints and membership-query isolation are not proven by mocks.
+  The new grants are internal role gates, not serialized credentials or complete
+  object/workflow authorization. No business endpoints, accounts, or real data.
+  Build/audits/frozen installs retain earlier results; they were not rerun here.
+  No server left running, provider account, deployment, remote, or commit created.
+Next:
+  Confirm D11 provider and implement its validated adapter and secure session
+  lifecycle behind the existing ports. Run D10 acceptance with working Docker.
+  P02-03 market APIs and Phase 3 remain unstarted until their dependencies allow.
+
+2026-09-03 18:40 PKT (UTC+05:00) | DOCKER-DIAG-001 | D10 / P02-01 | STILL BLOCKED
+Work:
+  User requested the exact Docker blocker and reproducible terminal checks.
+  Performed read-only local runtime/install/process diagnostics; no fix applied.
+Verification:
+  Get-Command docker: not found on PATH.
+  Docker Desktop and docker.exe absent from the standard all-user and current-
+  user install paths. No Docker installed-app entries found in HKLM/HKCU.
+  No com.docker.service or Docker Desktop/backend/dockerd process found.
+  wsl.exe exists, but both --status and --list --verbose report:
+  "The Windows Subsystem for Linux is not installed." Both exit nonzero.
+  Docker Compose YAML and API/web Dockerfiles exist in the project.
+  Bundled Node running scripts/check-docker.mjs exits 1 before container work.
+Limitations/blockers:
+  This is an unavailable host runtime, not an observed image-build, container,
+  migration, or application error. Eighteen live tests remain NOT RUN.
+  No software installed, Windows features changed, or services started.
+  Prior unit/lint/type/contract results remain historical, not rerun here.
+  Counts unchanged: 16/151 complete, 135 remaining; D11 also remains open.
+Next:
+  Owner can reproduce with docker version, docker compose version, install-path
+  checks, and wsl --status. Install/start an approved Docker Desktop Linux-
+  container environment (with WSL 2 if using that backend), reopen the terminal,
+  then verify client/server connectivity before attempting project startup.
+
+2026-09-03 19:04 PKT (UTC+05:00) | DOCKER-DIAG-002 | D10 / P02-01 | COMPOSE AVAILABLE; ENGINE BLOCKED
+Work:
+  User supplied the existing work/docker-compose.exe and reported adding PATH.
+  Verified that exact executable and checked current/saved PATH without changing
+  persistent environment settings or starting containers.
+Verification:
+  Absolute-path docker-compose.exe version: v2.40.3, exit 0.
+  Absolute-path Compose -f docker-compose.yml config --quiet: exit 0.
+  Saved machine PATH contains the executable path itself, not its work directory.
+  Current process resolves neither docker nor docker-compose as a command.
+  Read-only Compose ps forced to the local Windows docker_engine endpoint fails:
+  open //./pipe/docker_engine: The system cannot find the file specified; exit 1.
+  The generic error mentions elevation, but the underlying result is missing
+  endpoint, not a demonstrated access-denied error.
+Limitations/blockers:
+  Standalone Compose is available and configuration validation passes. It does
+  not provide Docker Engine or the docker CLI/compose plugin our scripts invoke.
+  No engine integration demonstrated; all eighteen integration cases NOT RUN.
+  No installer, PATH edit, container startup, or application change performed.
+  Checkpoint totals remain 16/151 complete, 135 remaining.
+Next:
+  Correct the saved PATH entry to the containing work directory if retaining
+  standalone Compose. Supply/start an approved Linux-container Docker Engine
+  (normally Docker Desktop here), then verify docker version and compose version.
+
+2026-09-03 21:24 PKT (UTC+05:00) | NATIVE-001 | P01-07/P01-08 / D12 | IN_PROGRESS
+Work:
+  User explicitly rejected Docker. Inventory found project Compose/Dockerfiles,
+  startup/preflight/init scripts, CI commands, contract tests, two service-stop
+  integration cases, environment comments, and active documentation to replace.
+  Plan direct web/API commands and Linux worker entrypoint, native service
+  preflight, safe application-level dependency-recovery acceptance, and native CI.
+Verification:
+  Read root/scoped modularity rules and applicable development/runtime docs.
+  No code change verified yet. Existing tests/services/data are preserved.
+Limitations:
+  Docker removal does not install PostgreSQL/Redis, approve hosted services,
+  make Celery supported on Windows, waive live tests, or resolve provider D11.
+  System software and standalone executable outside project are not removal targets.
+Next:
+  Implement replacements, remove only obsolete project-owned files, then run
+  regression checks and update current instructions/decisions without erasing history.
+
+2026-09-03 21:35 PKT (UTC+05:00) | NATIVE-002 | P01-07/P01-08 | PARTIAL VERIFICATION
+Work:
+  Removed six obsolete project runtime files with recovery text copies outside
+  the project under work/docker-removal-backup-2026-09-03. Added direct web/API
+  commands, native Linux worker entrypoint, service-based integration preflight,
+  isolated application connectivity-failure tests, and native CI/source scanning.
+Verification:
+  Focused tooling/contract tests: 25 PASS. Ruff lint/format PASS after formatting.
+  Extended mypy found two narrow dictionary-key type errors in the new preflight;
+  widened the report dictionary annotation explicitly; rerun pending.
+  Actual native preflight reports PostgreSQL/Redis/API/worker down and exits 1.
+  No integration test claimed as run; no services were started or stopped.
+  A documentation patch failed context validation and applied nothing; checked
+  the target files, corrected context, and reapplied. Documentation still underway.
+Next:
+  Finish native setup/checklists, rerun complete quality checks, and record precise
+  remaining service/CI/identity blockers without any Docker prerequisite.
+
+2026-09-03 21:46 PKT (UTC+05:00) | NATIVE-003 | P01-07/P01-08 | REGRESSION PASS; FINAL CHECK
+Work:
+  Updated native setup/CI/security docs, root/API/worker instructions, runtime
+  architecture, phase checklists, and D10/D12. Preserved old ADR/history as
+  superseded evidence. PostgreSQL/Redis/Celery and identity boundaries unchanged.
+Verification:
+  Full unit suite: 114 Python PASS, 18 live cases deselected; web 11 PASS.
+  Extended mypy: 50 source files PASS after replacing the narrow report mapping
+  conversion with a typed comprehension; no ignored type errors added.
+  Web lint/format/types/generated contracts and backend architecture/OpenAPI/
+  narrow secret guard PASS. Setup leaves existing .env byte-identical (hash check).
+  Native Windows worker guard exits 2 as designed; service preflight reports
+  all four services down and exits 1 without running integration.
+  A pnpm exec next command failed to resolve its Windows shim. Changed dev:web
+  to invoke the existing web package dev script; exact CLI rerun is pending.
+Limitations:
+  No full native service startup, live schema/worker/fault tests, native Linux
+  Gitleaks execution, or hosted CI has run. No Bash executable was found here.
+  No active server, system installation, PATH change, database mutation, or
+  dependency version change. Standard uv aliases still need an approved uv tool.
+Next:
+  Verify the final launcher command, rerun changed checks, validate documentation
+  links/tracker, and hand off removal with native-service acceptance still open.
+
+2026-09-03 21:47 PKT (UTC+05:00) | NATIVE-004 | P01-07/P01-08 / D12 | CONVERSION VERIFIED; ACCEPTANCE BLOCKED
+Work:
+  Completed the user-requested container-free conversion. Removed active
+  Compose, ignore, image, preflight, and bootstrap files; recovery copies exist
+  outside the project. Added direct loopback web/API commands, guarded native
+  Linux worker, safe service preflight, isolated connection-fault tests, native
+  CI/security scan, ADR 0002, current setup docs, checklists, and instructions.
+Verification:
+  Final non-integration suite: 114 Python PASS, 18 live cases deselected;
+  web suite: 11 PASS. Total local unit/component/contract/tooling: 125 PASS.
+  Ruff lint/format: PASS (98 files). Extended mypy: 50 source files PASS.
+  Web ESLint/Prettier/TypeScript, generated schemas, API OpenAPI snapshot,
+  architecture boundaries, narrow secret guard, tracker, and 30 doc links: PASS.
+  pnpm run setup left existing .env byte-identical; no values/hash printed.
+  Exact web launcher now resolves Next CLI and displays help; API Uvicorn CLI
+  resolves. Worker guard exits 2 on Windows before credentials; unit-tested
+  Linux argv uses existing app/concurrency. No actual worker was run here.
+  Native service preflight safely reports postgres/redis/api/worker down, exits
+  1, and does NOT run integration. Six obsolete files absent and six recovery
+  copies present. No active workflow has a container/service job declaration.
+Limitations/blockers:
+  P01-07 remains incomplete because no clean provisioned native environment ran.
+  All eighteen real cases, operator service restart/recovery, worker logs and
+  graceful shutdown, native Gitleaks execution, hosted CI, isolated Linux runner,
+  full audits, and branch protection remain NOT RUN/unconfigured under D10.
+  No service/account/provider/runtime was provisioned, no database/data changed,
+  no Windows PATH/system software/standalone Compose executable altered, and no
+  server left running. Standard uv aliases remain unverified on this host.
+  D11 OIDC provider choice remains separate; roadmap is still 16/151 complete.
+  Production build/audit/frozen-install results are historical, not rerun here.
+Next:
+  Provision isolated native PostgreSQL/pgvector and Redis plus a supported Linux
+  worker environment, privately configure URLs/roles, migrate, start direct
+  processes, run check:services and eighteen live cases, then hosted acceptance.
+  Independently confirm the OIDC provider before authenticated market routes.
+
+2026-09-03 21:55 PKT (UTC+05:00) | NATIVE-005 | D13 / P01-06/P01-07/P01-08 | IN_PROGRESS
+Work:
+  User established Windows-only, no-Docker, private-use, requirements-only, and
+  cost-conscious constraints. Began replacing the remaining Linux/Redis/Celery
+  and paid-provider assumptions with a lean Windows-native operating model.
+Verification:
+  Confirmed the supplied guide permits an equivalent Python queue, explicitly
+  discourages expensive AI on every item, limits the first pilot to 3-5 markets,
+  and defers non-MVP automation. Documentation/code alignment checks are pending.
+Limitations/blockers:
+  The existing worker still rejects Windows and still depends on Redis/Celery;
+  no queue/auth implementation, service install, migration, or research run has
+  occurred. No checkpoint is closed and counts remain 16/151.
+Next:
+  Adopt a Windows-first ADR and cost-control contract; update active instructions,
+  architecture, setup, checklists, README, and tracker. Queue/auth code follows as
+  separately verified checkpoint work.
+
+2026-09-03 22:06 PKT (UTC+05:00) | NATIVE-006 | D13 / P01-06/P01-07/P01-08/P02-02 | ARCHITECTURE ADOPTED; IMPLEMENTATION OPEN
+Work:
+  Adopted ADR 0003 and the mandatory lean research contract. The target is one
+  private Windows installation using Next.js, FastAPI, PostgreSQL/pgvector, a
+  PostgreSQL-backed native Python worker, and local accounts/server sessions.
+  Paid AI defaults off; every enabled run has hard request/token/document/time/
+  currency limits, deterministic filtering/dedup first, and version-aware reuse.
+  Rescoped current instructions, architecture, authorization, phase checklists,
+  security/evaluation/AI/product docs, README, D07/D10-D13, and resume sequence.
+Files:
+  AGENTS.md; workers/AGENTS.md; apps/api/AGENTS.md; README.md;
+  docs/{ARCHITECTURE,AUTHORIZATION,COST_CONTROL,DATA_MODEL,DEVELOPMENT,
+  EVALUATION,MODULARITY,PRODUCT,SECURITY,AI_PIPELINE}.md;
+  docs/decisions/0001-phase-1-baseline.md,
+  docs/decisions/0002-container-free-development.md,
+  docs/decisions/0003-windows-first-lean-runtime.md;
+  docs/phases/PHASE_1_CHECKLIST.md, docs/phases/PHASE_2_CHECKLIST.md;
+  progress.txt. No runtime code, dependency manifest, workflow, or schema changed.
+Verification:
+  check-progress.mjs: PASS, 16/151 complete and 135 remaining.
+  Local markdown links: PASS across 20 instruction/document files.
+  Existing venv non-integration Python suite: 114 PASS, 18 deselected, with the
+  existing single upstream Starlette/httpx deprecation warning. Web 11 PASS is
+  retained from NATIVE-004 and was NOT rerun because no frontend code changed.
+  Initial link-check command used an over-broad recursion and hit unreadable
+  .pytest_cache; it made no change. Exact AGENTS/README/docs rerun then passed.
+Limitations/blockers:
+  Architecture is settled, but the checked-in implementation still contains
+  Redis/Celery, a Windows worker guard, Redis readiness/config/tests, and a
+  Linux-oriented workflow/scanner. Do not provision those transitional services.
+  PostgreSQL jobs/leases/worker and local credential/session migrations are not
+  implemented. No PostgreSQL service, account, model call, research, deployment,
+  paid resource, or runtime process was created or run. No checkpoint closed.
+Next:
+  Implement P01-06 as one modular migration: durable PostgreSQL jobs, native
+  Windows worker, service preflight/tests, dependency cleanup, and queue acceptance.
+  Then implement P02-02 local credential/session/bootstrap/CSRF boundaries.
+
+2026-09-03 22:13 PKT (UTC+05:00) | P01Q-001 | P01-06 | IMPLEMENTATION STARTED
+Work:
+  User explicitly authorized moving from architecture into real implementation.
+  Re-read root/API/worker instructions, tracker, modularity contract, ADR 0003,
+  and inventoried the queue/worker/test surface. P01-06 remains the active task.
+Verification:
+  No implementation check has run yet. The first read-only inspection command
+  contained a malformed timeout token and did not execute; corrected inspection
+  completed successfully. No files or runtime state changed by that failure.
+Limitations/blockers:
+  Existing code still uses Redis/Celery and rejects Windows. Live PostgreSQL is
+  not provisioned, so implementation can be verified offline/unit-first but the
+  real queue concurrency/recovery acceptance cannot yet be claimed.
+Next:
+  Define the durable job domain/ports and frozen Alembic revision, implement the
+  PostgreSQL adapter/Windows runner, replace service checks, then remove old
+  dependencies only after focused tests pass.
+
+2026-09-03 22:28 PKT (UTC+05:00) | P01Q-002 | P01-06 | CORE WRITTEN; TEST MIGRATION PENDING
+Work:
+  Added modular job_queue domain/contracts/ports/models/repository/wiring. The
+  adapter transactionally enqueues, claims with FOR UPDATE SKIP LOCKED, leases,
+  heartbeats, retries with capped jittered backoff, cancels, reclaims, records
+  safe outcomes, and tracks worker liveness. Added a concurrency-1 native Python
+  worker runtime with lease maintenance and bounded signal-driven shutdown.
+  Smoke API now uses the durable queue row directly; removed broker publication,
+  the Celery task/app, and single-purpose smoke ORM/domain implementation.
+  Added frozen Alembic 0003 with preservation of existing synthetic smoke rows.
+  Removed Redis from settings/readiness/example/preflight target code.
+Verification:
+  Focused Ruff initially reported unused/import formatting and one long line;
+  corrected them. Mypy initially reported retry return typing, SQL rowcount, and
+  output mapping variance; corrected with explicit types/RETURNING/JsonValue.
+  Focused rerun: Ruff PASS; strict mypy PASS across 56 source files.
+  An earlier atomic refactor patch was rejected because one file was both deleted
+  and added; it applied nothing. The in-place replacement then succeeded.
+Limitations/blockers:
+  Old Redis/Celery tests, dependencies/lock entries, frontend readiness display,
+  integration expectations, workflow/scanner, and documentation remain to migrate.
+  Alembic 0003 has not yet passed offline DDL/reversibility checks. No live
+  PostgreSQL exists, so real atomic claim/lease/recovery remains NOT RUN.
+Next:
+  Replace unit/integration/tooling contracts, verify frozen migration/model DDL,
+  regenerate OpenAPI/TypeScript, then remove manifests/lock/workflow references.
+
+2026-09-03 23:09 PKT (UTC+05:00) | P01Q-003 | P01-06/P01-07/P01-08 | OFFLINE IMPLEMENTATION VERIFIED; LIVE ACCEPTANCE OPEN
+Work:
+  Completed the PostgreSQL queue replacement across runtime, API smoke adapter,
+  readiness/preflight, migration, generated contracts, dependencies, workflow,
+  Windows source scanning, instructions, architecture, and setup documentation.
+  Redis/Celery and their transitive broker packages are absent from active
+  manifests/lock/runtime paths. The generic queue layers and feature handlers are
+  explicitly separated in root/API/worker modularity instructions.
+Files:
+  apps/api/src/mask_api/job_queue/*; workers/{runtime,wiring,smoke_handler,
+  __main__}.py; apps/api/migrations/versions/0003_postgres_job_queue.py;
+  queue/smoke/health/config/preflight tests and adapters; .github/workflows/ci.yml;
+  scripts/scan-secrets.ps1; uv.lock; generated OpenAPI/TypeScript; current docs,
+  scoped AGENTS.md files, phase checklist, README.md, and progress.txt.
+Verification:
+  Final Python non-integration suite: 130 PASS, 21 real cases deselected; one
+  upstream Starlette/httpx deprecation and one restricted pytest-cache warning.
+  Web: 11 PASS; ESLint, Prettier, TypeScript/Next route generation PASS.
+  Ruff/format PASS (112 files); strict mypy PASS (56 source files); architecture
+  and backend OpenAPI snapshot PASS. Focused Windows runtime/workflow tests: 4 PASS.
+  uv 0.12.9 regenerated a 44-package lock; lock check PASS and obsolete broker
+  dependency search returned no matches. A default uv state path first failed
+  access; redirecting cache/managed-Python state to task-specific temp paths fixed
+  it without changing user/system configuration.
+  One focused pytest command referenced nonexistent test_ci_contract.py and ran no
+  tests; the corrected target passed. Initial direct pnpm exec Prettier resolution
+  failed, and the package-level formatter initially did not persist one file's
+  expected layout; direct checked-in Prettier binary formatting fixed it and the
+  complete web gate then passed. Neither failed attempt changed runtime behavior.
+Limitations/blockers:
+  Counts remain 16/151 and P01-06 stays IN_PROGRESS because all 21 real
+  PostgreSQL/service tests, concurrent-worker ownership, process Ctrl+C behavior,
+  operator PostgreSQL restart/persistence recovery, and clean provisioned Windows
+  startup are NOT RUN until D10 provides an isolated PostgreSQL/pgvector instance.
+  Windows Gitleaks download/execution, clean uv sync/root aliases, production
+  build, current dependency audits, hosted CI, remote, and branch protection are
+  also not newly accepted. No service, database, account, paid model, deployment,
+  or market research run was created.
+Next:
+  Owner/admin provisions D10's isolated native PostgreSQL/pgvector and roles;
+  technical lead applies 0003, starts worker/API/web, runs preflight and all 21
+  live cases, then records operator restart/shutdown evidence. P02-02 local
+  credential/session implementation may proceed independently as authorized.
+
+2026-09-03 23:16 PKT (UTC+05:00) | P02A-001 | P02-02 | IMPLEMENTATION STARTED
+Work:
+  User directed implementation to continue while deferring live database setup.
+  Selected the next independent slice: local credentials, hashed server sessions,
+  CSRF/session lifecycle, one-time owner bootstrap, and identity security events.
+  Re-read root/API instructions, modularity, authorization, Phase 2 checklist,
+  and current identity code. Routes remain unregistered until real persistence is
+  present and the authentication boundary passes its offline checks.
+Verification:
+  Confirmed maintained argon2-cffi 25.1.0 and Windows/Python 3.12 support from
+  official project/PyPI documentation. Implementation tests have not run yet.
+Limitations/blockers:
+  Live PostgreSQL remains deliberately deferred by the user. This permits code,
+  frozen migration, and offline/unit verification but not checkpoint completion,
+  real bootstrap/login, or enabling authenticated market routes. Counts stay
+  16/151 and P02-02 is IN_PROGRESS.
+Next:
+  Add narrow auth contracts/ports/security adapters and persistence models,
+  freeze Alembic 0004, then implement/test bootstrap and session lifecycle before
+  deciding whether the HTTP adapter is safe to register.
+
+2026-09-03 23:29 PKT (UTC+05:00) | P02A-002 | P02-02 | AUTH PERSISTENCE CORE WRITTEN
+Work:
+  Added narrow local-auth contracts/ports, Argon2id password manager, 256-bit
+  opaque session/CSRF token manager, login/session/bootstrap services, and
+  transactional SQLAlchemy authentication/bootstrap stores. Added identity-owned
+  credential, hashed session, and append-only security-event models plus frozen
+  Alembic 0004 and registry/head updates. Login session creation, password rehash,
+  lockout reset, rotation/revocation, and audit writes share transactions in the
+  concrete adapter. Market/auth routes remain unregistered.
+Verification:
+  Official PyPI/project metadata confirmed argon2-cffi 25.1.0 with Windows and
+  Python 3.12 support. The venv has no pip module, so a direct pip install failed
+  without changing it; pinned task uv then installed argon2-cffi and bindings,
+  regenerated a 48-package lock, and uv lock --check passed.
+  Focused Ruff/format PASS; strict mypy PASS for 14 identity source files.
+  Auth/Phase 2 model-to-frozen-DDL, offline upgrade/downgrade, grants, migration
+  head, route-absence, and prior schema contracts: 10 PASS. The first combined
+  test command returned progress dots without a final summary; exact rerun passed
+  10 with the existing upstream TestClient deprecation warning.
+Limitations/blockers:
+  Auth behavior/service/repository unit tests, bootstrap CLI, HTTP cookie/CSRF
+  adapter, integration fixtures, full regression, and documentation are still
+  pending. Alembic 0004 has not executed on PostgreSQL. Counts remain 16/151;
+  P02-02 stays IN_PROGRESS and no real account/session exists.
+Next:
+  Add exhaustive service/security/repository tests, correct any atomicity or
+  denial-path defects, implement the non-public bootstrap command, then assess
+  HTTP registration only after the concrete boundary is safe.
+
+2026-09-03 23:48 PKT (UTC+05:00) | P02A-003 | P02-02 | LOCAL AUTH SLICE OFFLINE-VERIFIED
+Work:
+  Completed the real local-auth code slice while honoring the user's decision to
+  defer live database setup. Added LocalAuthenticationService, normalized generic
+  login denial with unknown-account dummy Argon2 verification, bounded known-
+  account lockout, parameter rehash, hashed session/CSRF issuance, absolute-expiry
+  rotation, logout/revocation, and current-session adapter. Added atomic SQLAlchemy
+  operations for credential state + session + audit, one-time advisory-lock owner
+  bootstrap, typed wiring/settings, interactive no-password-argument CLI, and a
+  separately testable login/logout/rotate cookie adapter. It is not registered in
+  main.py, so the running application still exposes no auth or market routes.
+  Updated Alembic 0004, data/architecture/auth/development docs, Phase 2 checklist,
+  README, environment example, root command, dependency manifest, and uv lock.
+Verification:
+  New auth-focused coverage: 48 PASS across maintained Argon2id hashing, random
+  opaque tokens, service denials/races/rehash/lockout/expiry/rotation/logout/CSRF,
+  repository tenant/hash queries, bootstrap CLI, secure cookie/error mapping, and
+  frozen schema/offline migration contracts. Expanded non-integration Python suite:
+  182 PASS, 24 live cases deselected, one existing upstream TestClient warning.
+  Real integration collection: 24 cases, including 3 new auth persistence cases.
+  Ruff/format PASS (131 files); strict mypy PASS (67 source files); architecture
+  boundaries/import cycles PASS. Earlier focused identity/API/schema run: 90 PASS.
+  One import-order and several formatting findings were mechanically corrected.
+Limitations/blockers:
+  Alembic 0004, the 3 auth and 21 earlier real cases, empty-database bootstrap,
+  cookie behavior through the running app, persistence/restart, and security-event
+  inspection are NOT RUN until D10. Auth router registration and market routes are
+  intentionally blocked by that acceptance. Audited membership/role mutation is
+  not implemented. Counts remain 16/151 and P02-02 stays IN_PROGRESS. No database,
+  account, external provider, paid service, deployment, or market research ran.
+Next:
+  Implement audited, recent-auth-protected membership/role administration behind
+  the existing identity ports. Then prepare P02-03 tenant-scoped market use cases
+  without registering them until live authentication/database acceptance passes.
+
+2026-09-03 23:51 PKT (UTC+05:00) | P02A-004 | P02-02 | FINAL OFFLINE REGRESSION PASS
+Work:
+  Completed the P02-02 offline implementation checkpoint and synchronized active
+  documentation/tracker. Removed one unused import found by the final static gate;
+  no behavior changed. Auth routes remain intentionally outside main.py.
+Verification:
+  Focused identity/API/auth/Phase 2 regression: 112 PASS with the existing
+  upstream TestClient deprecation warning. Web suite rerun: 11 PASS. Ruff and
+  format PASS across 131 files; strict mypy PASS across 67 source files;
+  architecture and OpenAPI snapshot PASS. Generated TypeScript schema check,
+  uv 48-package lock check, tracker consistency, and narrow secret guard PASS.
+  Full non-integration Python result immediately before the final import cleanup
+  remains 182 PASS/24 deselected; removing an unused import cannot affect runtime.
+Limitations/blockers:
+  The 24 live cases and all database/bootstrap/browser/operator acceptance remain
+  NOT RUN by the user's instruction to finish database work later. This is not a
+  completed P02-02 master checkpoint; total completion remains 16/151.
+Next:
+  Continue actual code with audited recent-auth-protected membership/role changes,
+  followed by tenant-scoped P02-03 market services. Keep routes unregistered until
+  live PostgreSQL/auth acceptance is available.
+
+2026-09-04 00:30 PKT (UTC+05:00) | P03C-001 | P03-02/P03-03/P03-05/P03-06/P03-08 | IMPLEMENTATION STARTED
+Work:
+  User directed work away from authentication and database setup toward actual
+  scraper code. Selected two lean, reusable test collectors: RSS/Atom feeds and
+  explicitly permitted static HTML pages. The slice includes a current-policy
+  dispatch gate, common typed pipeline contracts, bounded HTTP behavior,
+  deterministic normalization/exact hashes, parser fixtures, and no AI calls.
+  Existing local-auth code remains intact and unregistered; no new auth work is
+  in scope for this attempt.
+Verification:
+  Re-read AGENTS.md, API/worker scoped instructions, MODULARITY.md,
+  SCRAPING_POLICY.md, COST_CONTROL.md, the supplied guide's Phase 3/collector
+  sections, and P03 tracker requirements. Implementation checks NOT RUN yet.
+Limitations/blockers:
+  No source has an approved registered policy and live collection is not
+  authorized, so tests will use local fixtures only. Per the user's sequencing,
+  database migrations/repositories and live PostgreSQL acceptance remain later;
+  therefore the affected master checkpoints cannot yet be marked complete.
+  Counts remain 16/151 complete and 135 remaining.
+Next:
+  Add the evidence module's pure contracts/policy/normalization layers, network
+  adapter, two collectors, orchestration service, and offline tests; then run the
+  focused and full static/regression suites and record exact results.
+
+2026-09-04 01:21 PKT (UTC+05:00) | P03C-002 | P03-02/P03-03/P03-05/P03-06/P03-08 | OFFLINE COLLECTOR SLICE VERIFIED
+Work:
+  Implemented the shared Phase 3 evidence module and two actual reusable parser
+  adapters: RSS/Atom and explicitly permitted static HTML. Added immutable source
+  policy, collection request, raw/parsed/normalized document, duplicate, batch,
+  and persistence contracts with organization/market/definition lineage. Added
+  pre-dispatch approval/review/effective-window/tenant/method/collector/auth gates;
+  exact-origin path/query URL controls; a TLS-verifying, redirect/cookie/proxy-
+  disabled public-address HTTP adapter; bounded sequential pipeline orchestration;
+  capped retry/backoff/jitter, Retry-After handling, request/document/byte/time
+  limits, cancellation and circuit breaking; raw-response retention on parse
+  failure; NFKC v1 normalization; exact hashes, occurrence keys, and duplicate
+  links. Added module-scoped modularity instructions and COLLECTORS.md. Existing
+  auth code was neither expanded nor removed and remains unregistered.
+Files:
+  apps/api/src/mask_api/modules/evidence/ (18 implementation/instruction files),
+  apps/api/tests/evidence/ (5 test modules and 7 parser fixtures),
+  apps/api/tests/conftest.py, docs/COLLECTORS.md, docs/MODULARITY.md,
+  docs/ARCHITECTURE.md, README.md, progress.txt. Database changes: none.
+Verification:
+  Initial evidence run found one overly exact fixture assertion: 33 PASS, 1 FAIL;
+  the assertion was corrected without weakening parser behavior. Final focused
+  evidence suite: 36 PASS. Full non-integration Python suite: 218 PASS,
+  24 integration cases deselected, one existing upstream TestClient warning.
+  Web suite: 11 PASS; total current automated tests: 229 PASS.
+  Ruff check PASS and format PASS across 155 files; strict mypy PASS across
+  83 source files; architecture/import-cycle check PASS; OpenAPI snapshot and
+  generated TypeScript schema checks PASS; local secret guard PASS. No package
+  or lockfile change was needed. Tests used local fixtures and fake narrow ports;
+  no live website, database, model, account, service, or deployment was touched.
+Limitations/blockers:
+  P03-01 migrations and concrete PostgreSQL source-policy/evidence adapters were
+  deliberately deferred by the user. Consequently persist behavior is verified
+  only at the typed seam, no source policy is registered, and neither worker nor
+  API collection wiring is enabled. Upload failure/migration/live smoke coverage
+  required by P03-04/P03-08 remains NOT RUN. The two collectors are reusable core
+  adapters, not P04-01 production-source approvals. No master checkpoint closes;
+  counts remain 16/151 complete and 135 remaining.
+Next:
+  While database work stays deferred, implement P03-04 bounded analyst upload and
+  manual-capture validation through the same contracts. Before any real scraping,
+  approve two named sources and add their current policy versions; later add the
+  Alembic evidence schema, transactional provider/writer, durable worker handler,
+  tenant-authorized API, and deliberately small live acceptance run.
+
+2026-09-04 19:48 PKT (UTC+05:00) | PUBLISH-001 | REPOSITORY PUBLICATION | IN_PROGRESS
+Work:
+  User requested creation of a GitHub repository and publication of the current
+  project. Scoped publication to this mask-market-intelligence Git root only,
+  excluding the parent attachment/work directories. Selected private visibility
+  because the canonical product scope is a private Windows MVP.
+Verification:
+  Existing repository is initialized on main with no commits and no remotes.
+  Git 2.53.0 and Git Credential Manager 2.7.3 are installed; configured commit
+  identity is ALiShahzainAbbasi / alishahzain123@gmail.com. Local secret guard
+  PASS. GitHub CLI is not installed. The in-app GitHub tab reached the official
+  sign-in page; no credentials were entered and no repository or push exists yet.
+Limitations/blockers:
+  GitHub authentication is required before the private remote can be created.
+  This publication task does not change the 16/151 product checkpoint count.
+Next:
+  Prepare and verify the local initial commit, then have the owner complete the
+  GitHub sign-in and create/push the private mask-market-intelligence repository.
+
+10. HISTORY ENTRY TEMPLATE
+------------------------------------------------------------------------
+DATE/TIME (timezone) | EVENT ID | CHECKPOINT ID(S) | STATUS
+Work:
+  Specific completed or partial work.
+Files:
+  Project-relative changed paths; migration IDs if applicable.
+Verification:
+  Exact commands/checks and results, including NOT RUN reasons.
+Limitations/blockers:
+  Remaining issue, owner, and safe next action; approval source if relevant.
+Next:
+  One resumable checkpoint/action.
