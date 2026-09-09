@@ -114,6 +114,19 @@ cluster and top-five aggregation, UNKNOWN/provisional sample rules, contradictio
 lineage, and a generated report schema. A later semantic provider remains an
 injected option and is not enabled by default.
 
+A12 adds `mask_api.modules.method_metrics`: typed, source-grounded metric and
+provenance contracts plus the exact formula-v1 M1/M4/M5/M6/M7 source-to-metric
+transforms and calculators. Every component transform (`linear`, `reverse_linear`,
+`log_scale`, `multiply`, `complement`, and the M5/M7 weighted/composite
+calculations) consumes only explicitly available normalized values; a missing
+required component keeps the whole method UNKNOWN and the weighted sum is never
+renormalized around it. M1/M5/M6 retain the v1 partial-completeness/sample rules
+and can be PROVISIONAL; M4/M7 have no such rule and are strictly UNKNOWN/COMPLETE.
+These calculators are not yet wired into the CLI's `MethodExecutor` protocol or
+into `official_data`/`search_intent` adapters; like A11's `PainIntelligenceService`,
+that composition is later work once source-to-metric mapping for each provider is
+approved.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

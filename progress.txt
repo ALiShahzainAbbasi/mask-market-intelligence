@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 02:51 PKT (UTC+05:00)
+Last updated: 2026-09-10 04:10 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -12,26 +12,26 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 ------------------------------------------------------------------------
 Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05 and A10-A11 are complete, A06 enforces source holds plus source-family/
+A01-A05, A10-A12 are complete, A06 enforces source holds plus source-family/
 persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 approved feeds/pages and later analyst inputs complete the lean set. Current task:
-A12 next—exact M1/M4/M5/M6/M7 source-to-metric transforms and deterministic v1
-calculators. A07 and A09 remain partial only because their live provider access is
-held; all unavailable/paid APIs remain skipped.
+A13 next—evidence-grounded workflow reconstruction, bottleneck metrics, and the
+exact M3 formula. A07 and A09 remain partial only because their live provider
+access is held; all unavailable/paid APIs remain skipped.
 Paid collection/model use remains disabled.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 25/171
-Remaining checkpoints: 146/171
-Checkpoint-count progress: 14.6%
+Completed checkpoints: 26/171
+Remaining checkpoints: 145/171
+Checkpoint-count progress: 15.2%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 7/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 8/20 (A01-A20).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -41,8 +41,8 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A12 with typed source-to-metric inputs and formula-driven
-M1/M4/M5/M6/M7 calculators, golden boundaries, UNKNOWN behavior, and provenance.
+Next checkpoint: start A13 with evidence-grounded workflow reconstruction,
+bottleneck metrics, and the exact M3 formula calculator.
 Paid/model network use stays disabled; A07/A09 remain held at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
@@ -79,12 +79,18 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-440 Python + 11 web tests PASS. Ruff/format over 244 files, strict mypy over 133 source files,
-architecture/import-cycle, OpenAPI/TypeScript and research-configuration schema
-drift, local secret guard, and current Gitleaks source scan PASS. P01-08 remains
-open for its broader historical/CI acceptance rather than a current finding. Auth and
-collection routes remain disabled. A05's 5 bounded official-source live tests
-PASS. No web/API/worker runtime, broad collection, or paid research ran.
+482 Python tests PASS (was 440; +42 A12 focused tests). Ruff/format over 260
+files, strict mypy over 142 source files, architecture/import-cycle, and
+research-configuration/OpenAPI schema drift PASS; local secret guard and
+current Gitleaks source scan PASS. Node.js/pnpm were not initially installed
+in this execution environment; after installing Node.js 24 LTS via winget and
+running pnpm through npx (corepack's global shim install failed on an
+unelevated `C:\Program Files\nodejs` write, so pnpm ran via `npx pnpm@11.19.0`
+instead), the full web suite (11 tests), web lint, web format:check, web
+typecheck, `pnpm schemas:check`, and `pnpm check:progress` all PASS. P01-08 remains open for its broader historical/CI
+acceptance rather than a current finding. Auth and collection routes remain
+disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
+runtime, broad collection, or paid research ran.
 
 2. STATUS AND COMPLETION RULES
 ------------------------------------------------------------------------
@@ -178,7 +184,7 @@ P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
 Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    |  7/20 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    |  8/20 | CLI-first Autonomous Research Build
 
 A01-A20 are counted in the overall checkpoint total but are not an additional
 original guide phase. This denominator change adds 20 source-defined functional
@@ -220,7 +226,7 @@ verification, contradiction preservation, and prompt-injection controls.
 [x] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
 cluster calculation, persona separation, and report section.
 
-[ ] A12 Build exact M1/M4/M5/M6/M7 source-to-metric transformations and v1
+[x] A12 Build exact M1/M4/M5/M6/M7 source-to-metric transformations and v1
 formula calculators with golden/UNKNOWN tests.
 
 [ ] A13 Build evidence-grounded workflow reconstruction, bottleneck metrics,
@@ -2404,6 +2410,78 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 04:10 PKT (UTC+05:00) | AUTONOMOUS-021 | A12 | DONE
+Work:
+  Implemented the modular offline A12 vertical slice: mask_api.modules.
+  method_metrics with typed, source-grounded SourcedMetric/MetricProvenance
+  contracts (observed/estimated/interview-confirmed states, geography/
+  population/period/currency/unit, evidence reference); a shared
+  MethodMetricResult/ComponentBreakdown contract reused by all five methods;
+  a transform dispatcher implementing linear, reverse_linear, log_scale,
+  multiply, complement, the M5 weighted_mean_sqrt top-5 competitor-gap
+  aggregation, and the M7 composite meta_fit calculation, all built on
+  mask_api.modules.scoring.math primitives; and one calculator per method
+  (m1.py-m7.py) that validates the loaded v1 MethodFormula shape, builds a
+  complete per-component breakdown (raw input, transformed score, weight,
+  weighted contribution, evidence references, status/reason), and applies
+  each method's exact v1 completeness/partial-completeness/sample rule. A
+  missing required component keeps the whole method UNKNOWN; M1's "at least
+  three of four optional components" partial-completeness rule is the only
+  place a weighted sum uses fewer than all configured components, and even
+  then only at each component's configured, never redistributed, weight. M5
+  rejects duplicate competitor-gap findings before they can inflate
+  unresolved_gap, and only its top 5 by score (weighted by sqrt(evidence
+  count)) are used. M7's two ratio components (buyer_identification,
+  contact_coverage) use safe_rate so a zero target_accounts denominator
+  stays UNKNOWN rather than dividing by zero. log_scale floors a zero/
+  negative raw value to score 0 instead of raising, since a legitimately
+  observed zero count is not an invalid input. Exported a JSON Schema for
+  the shared result contract.
+Files:
+  apps/api/src/mask_api/modules/method_metrics/{AGENTS.md,__init__.py,
+  contracts.py,provenance.py,transforms.py,m1.py,m4.py,m5.py,m6.py,m7.py};
+  apps/api/tests/method_metrics/{test_transforms.py,test_m1_calculation.py,
+  test_m4_calculation.py,test_m5_calculation.py,test_m6_calculation.py,
+  test_m7_calculation.py};
+  configs/schemas/method_metrics/method-metric-result-v1.schema.json;
+  scripts/export-research-schemas.py;
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md}; README.md; progress.txt.
+Verification:
+  A12 focused suite PASS: 42 tests, including golden weighted-sum results
+  for all five methods, UNKNOWN/PROVISIONAL boundary cases, the M1 "at
+  least three of four" partial-completeness rule, M5's duplicate-
+  competitor-gap rejection and top-5-of-6 ranking, M7's zero-denominator
+  and geography-mismatch cases, and log_scale's zero/negative-value floor.
+  Full offline Python suite PASS: 482 passed (was 440), 30 integration
+  tests deselected. Ruff lint PASS and Ruff format --check PASS over 260
+  files; strict mypy --strict PASS over 142 source files; architecture/
+  import-cycle check PASS; `research:schemas:check` and `export-openapi.py
+  --check` (Python side of schemas:check) PASS with no drift in any
+  existing schema; local secret guard and pinned Gitleaks source scan
+  PASS; `git diff --check` reported no whitespace errors. Node.js/pnpm
+  were initially absent from this execution environment; after installing
+  Node.js 24 LTS via winget (pnpm run through `npx pnpm@11.19.0` because
+  corepack's global shim install failed on an unelevated write under
+  `C:\Program Files\nodejs`), `pnpm --filter @mask/web test` (11 tests),
+  `lint`, `format:check`, `typecheck`, `pnpm schemas:check`, and
+  `pnpm check:progress` (26/171 completed, 145 remaining, matching this
+  entry's hand-recalculated totals) all PASS.
+Limitations/blockers:
+  These calculators are not yet wired into the CLI's MethodExecutor
+  protocol or into official_data/search_intent source adapters; like A11's
+  PainIntelligenceService, that composition needs an approved source-to-
+  metric mapping per provider and is later work, not an A12 blocker. pnpm
+  itself is not durably installed as a global shim in this environment
+  (corepack's shim step needs elevation); future sessions must run it via
+  `npx pnpm@11.19.0` or complete `corepack enable` with admin rights.
+Next:
+  Implement A13: evidence-grounded workflow reconstruction, bottleneck
+  metrics, and the exact M3 formula calculator, following A12's module
+  pattern (typed contracts, a transform dispatcher reusing scoring.math,
+  one calculator file, golden/UNKNOWN tests). Re-run the pnpm-based web/
+  progress checks on a Node-enabled environment before relying on their
+  A12 status.
+
 2026-09-10 02:51 PKT (UTC+05:00) | AUTONOMOUS-020 | A11 | DONE
 Work:
   Built the modular offline M2 pain-intelligence vertical slice. Added an A10-only

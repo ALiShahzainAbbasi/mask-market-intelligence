@@ -1,0 +1,221 @@
+{
+  "$defs": {
+    "ComponentBreakdown": {
+      "additionalProperties": false,
+      "description": "One formula component's raw input, transform output, weight, and lineage.",
+      "properties": {
+        "component": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Component",
+          "type": "string"
+        },
+        "evidence_references": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "raw_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Value"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "status": {
+          "$ref": "#/$defs/ComponentStatus"
+        },
+        "transformed_score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transformed Score"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "maximum": 1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Weight"
+        },
+        "weighted_contribution": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weighted Contribution"
+        }
+      },
+      "required": [
+        "component",
+        "status",
+        "weight"
+      ],
+      "title": "ComponentBreakdown",
+      "type": "object"
+    },
+    "ComponentStatus": {
+      "enum": [
+        "available",
+        "missing"
+      ],
+      "title": "ComponentStatus",
+      "type": "string"
+    },
+    "MethodId": {
+      "enum": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "title": "MethodId",
+      "type": "string"
+    },
+    "MethodMetricStatus": {
+      "enum": [
+        "unknown",
+        "provisional",
+        "complete"
+      ],
+      "title": "MethodMetricStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The exact, reproducible v1 result of one M1/M4/M5/M6/M7 calculation.",
+  "properties": {
+    "breakdown": {
+      "items": {
+        "$ref": "#/$defs/ComponentBreakdown"
+      },
+      "minItems": 1,
+      "title": "Breakdown",
+      "type": "array"
+    },
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "inputs_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Inputs Sha256",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "method_id": {
+      "$ref": "#/$defs/MethodId"
+    },
+    "provisional_reasons": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Provisional Reasons",
+      "type": "array"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "status": {
+      "$ref": "#/$defs/MethodMetricStatus"
+    },
+    "unknown_reasons": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unknown Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "method_id",
+    "market_id",
+    "formula_version",
+    "inputs_sha256",
+    "status",
+    "breakdown"
+  ],
+  "title": "MethodMetricResult",
+  "type": "object"
+}

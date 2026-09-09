@@ -11,6 +11,7 @@ from typing import Any
 
 from mask_api.modules.analysis.contracts import AnalysisSchemaId
 from mask_api.modules.analysis.schemas import strict_json_schema
+from mask_api.modules.method_metrics.contracts import MethodMetricResult
 from mask_api.modules.pain_intelligence.contracts import M2Result
 from mask_api.research_runner.contracts import MarketConfiguration, SourceProfile
 
@@ -19,6 +20,11 @@ TARGETS: dict[Path, Callable[[], dict[str, Any]]] = {
     ROOT / "configs" / "schemas" / "market.schema.json": MarketConfiguration.model_json_schema,
     ROOT / "configs" / "schemas" / "source-profile.schema.json": SourceProfile.model_json_schema,
     ROOT / "configs" / "schemas" / "pain" / "m2-result-v1.schema.json": M2Result.model_json_schema,
+    ROOT
+    / "configs"
+    / "schemas"
+    / "method_metrics"
+    / "method-metric-result-v1.schema.json": MethodMetricResult.model_json_schema,
 }
 for schema_id in AnalysisSchemaId:
     target = ROOT / "configs" / "schemas" / "analysis" / f"{schema_id.value}.schema.json"
