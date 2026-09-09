@@ -127,6 +127,18 @@ into `official_data`/`search_intent` adapters; like A11's `PainIntelligenceServi
 that composition is later work once source-to-metric mapping for each provider is
 approved.
 
+A13 adds `mask_api.modules.workflow_intelligence` and a ninth analysis schema,
+`workflow-step-v1`. It consumes A10-accepted workflow-step extraction the same
+way A11 consumes A10-accepted pain extraction, but groups evidence by an exact
+normalized step-name hash instead of embeddings/clustering, since a
+reconstructed workflow step has a natural identity. Per-step component means
+feed the exact v1 M3 transforms (log_scale for volume/labor burden, linear for
+failure rate/manuality, identity for consequence/automation potential); any
+missing component on any step keeps the whole result UNKNOWN. The market score
+is the same max-plus-sqrt(evidence-count)-weighted-top-five aggregation A11
+uses for M2. `WorkflowIntelligenceService` is not yet wired into the CLI's
+`MethodExecutor` protocol, matching A11/A12's precedent.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

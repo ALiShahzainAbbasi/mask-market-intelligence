@@ -38,6 +38,7 @@ class AnalysisType(StrEnum):
     SEARCH_INTENT = "search_intent"
     INTERVIEW = "interview"
     CLUSTER_NAMING = "cluster_naming"
+    WORKFLOW_STEP = "workflow_step"
 
 
 class AnalysisSchemaId(StrEnum):
@@ -49,6 +50,7 @@ class AnalysisSchemaId(StrEnum):
     SEARCH_INTENT_V1 = "search-intent-v1"
     INTERVIEW_V1 = "interview-v1"
     CLUSTER_NAMING_V1 = "cluster-naming-v1"
+    WORKFLOW_STEP_V1 = "workflow-step-v1"
 
 
 class AnalysisStatus(StrEnum):
@@ -111,6 +113,7 @@ class AnalysisRequest(AnalysisValue):
             AnalysisType.SEARCH_INTENT: AnalysisSchemaId.SEARCH_INTENT_V1,
             AnalysisType.INTERVIEW: AnalysisSchemaId.INTERVIEW_V1,
             AnalysisType.CLUSTER_NAMING: AnalysisSchemaId.CLUSTER_NAMING_V1,
+            AnalysisType.WORKFLOW_STEP: AnalysisSchemaId.WORKFLOW_STEP_V1,
         }[self.analysis_type]
         if self.schema_id != expected:
             raise ValueError("analysis type and schema ID do not match")

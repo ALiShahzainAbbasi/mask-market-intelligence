@@ -1,0 +1,508 @@
+{
+  "$defs": {
+    "EvidencePersona": {
+      "enum": [
+        "owner",
+        "executive",
+        "manager",
+        "employee",
+        "customer",
+        "vendor",
+        "unknown"
+      ],
+      "title": "EvidencePersona",
+      "type": "string"
+    },
+    "M3ComponentScores": {
+      "additionalProperties": false,
+      "properties": {
+        "automation_potential": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Automation Potential"
+        },
+        "business_consequence": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Consequence"
+        },
+        "failure_rate": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Rate"
+        },
+        "labor_burden": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Labor Burden"
+        },
+        "manuality": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Manuality"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume"
+        }
+      },
+      "title": "M3ComponentScores",
+      "type": "object"
+    },
+    "M3ComponentValues": {
+      "additionalProperties": false,
+      "properties": {
+        "automation_potential": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Automation Potential"
+        },
+        "business_consequence": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Consequence"
+        },
+        "failure_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Rate"
+        },
+        "labor_burden": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Labor Burden"
+        },
+        "manuality": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Manuality"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume"
+        }
+      },
+      "title": "M3ComponentValues",
+      "type": "object"
+    },
+    "M3Status": {
+      "enum": [
+        "unknown",
+        "complete"
+      ],
+      "title": "M3Status",
+      "type": "string"
+    },
+    "WorkflowBottleneckMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "bottleneck_score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bottleneck Score"
+        },
+        "component_sample_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Component Sample Counts",
+          "type": "object"
+        },
+        "component_scores": {
+          "$ref": "#/$defs/M3ComponentScores"
+        },
+        "component_values": {
+          "$ref": "#/$defs/M3ComponentValues"
+        },
+        "contradiction_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contradiction Ids",
+          "type": "array"
+        },
+        "evidence_count": {
+          "minimum": 1,
+          "title": "Evidence Count",
+          "type": "integer"
+        },
+        "missing_components": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Components",
+          "type": "array"
+        },
+        "representative_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "title": "Representative Evidence Ids",
+          "type": "array"
+        },
+        "source_family_count": {
+          "minimum": 1,
+          "title": "Source Family Count",
+          "type": "integer"
+        },
+        "step_key": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Step Key",
+          "type": "string"
+        },
+        "step_name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Step Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_key",
+        "step_name",
+        "evidence_count",
+        "source_family_count",
+        "component_values",
+        "component_scores",
+        "component_sample_counts",
+        "missing_components",
+        "representative_evidence_ids",
+        "contradiction_ids"
+      ],
+      "title": "WorkflowBottleneckMetrics",
+      "type": "object"
+    },
+    "WorkflowReportSection": {
+      "additionalProperties": false,
+      "properties": {
+        "bottlenecks": {
+          "items": {
+            "$ref": "#/$defs/WorkflowBottleneckMetrics"
+          },
+          "title": "Bottlenecks",
+          "type": "array"
+        },
+        "contradiction_count": {
+          "minimum": 0,
+          "title": "Contradiction Count",
+          "type": "integer"
+        },
+        "earliest_source_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Earliest Source Date"
+        },
+        "latest_source_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Latest Source Date"
+        },
+        "market_id": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "persona_distribution": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/EvidencePersona"
+          },
+          "title": "Persona Distribution",
+          "type": "object"
+        },
+        "source_family_distribution": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Source Family Distribution",
+          "type": "object"
+        },
+        "total_input_evidence": {
+          "minimum": 0,
+          "title": "Total Input Evidence",
+          "type": "integer"
+        },
+        "unique_steps": {
+          "minimum": 0,
+          "title": "Unique Steps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "market_id",
+        "total_input_evidence",
+        "unique_steps",
+        "source_family_distribution",
+        "persona_distribution",
+        "earliest_source_date",
+        "latest_source_date",
+        "contradiction_count",
+        "bottlenecks"
+      ],
+      "title": "WorkflowReportSection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bottlenecks": {
+      "items": {
+        "$ref": "#/$defs/WorkflowBottleneckMetrics"
+      },
+      "title": "Bottlenecks",
+      "type": "array"
+    },
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "input_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Input Sha256",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "report": {
+      "$ref": "#/$defs/WorkflowReportSection"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "status": {
+      "$ref": "#/$defs/M3Status"
+    },
+    "top_bottleneck_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "title": "Top Bottleneck Ids",
+      "type": "array"
+    },
+    "unknown_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unknown Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "market_id",
+    "formula_version",
+    "input_sha256",
+    "status",
+    "top_bottleneck_ids",
+    "unknown_reasons",
+    "bottlenecks",
+    "report"
+  ],
+  "title": "M3Result",
+  "type": "object"
+}

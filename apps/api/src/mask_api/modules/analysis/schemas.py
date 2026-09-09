@@ -196,6 +196,29 @@ class ClusterNamingOutput(StructuredOutput):
     confidence: float = Field(ge=0, le=1)
 
 
+class WorkflowStepRecord(StructuredOutput):
+    step_name: str = Field(min_length=1, max_length=200)
+    role: str = Field(min_length=1, max_length=200)
+    system: str | None = Field(max_length=200)
+    input_description: str | None = Field(max_length=1_000)
+    output_description: str | None = Field(max_length=1_000)
+    events_per_month: float | None = Field(ge=0)
+    labor_hours_per_month: float | None = Field(ge=0)
+    waiting_time_minutes: float | None = Field(ge=0)
+    failure_rate_0_1: float | None = Field(ge=0, le=1)
+    consequence_description: str | None = Field(max_length=1_000)
+    consequence_score_0_10: float | None = Field(ge=0, le=10)
+    workaround: str | None = Field(max_length=1_000)
+    automation_potential_0_10: float | None = Field(ge=0, le=10)
+    manual_share_0_1: float | None = Field(ge=0, le=1)
+    evidence_span: str = Field(min_length=1, max_length=4_000)
+    confidence: float = Field(ge=0, le=1)
+
+
+class WorkflowStepOutput(StructuredOutput):
+    records: tuple[WorkflowStepRecord, ...] = Field(max_length=50)
+
+
 _OUTPUT_MODELS: dict[AnalysisSchemaId, type[StructuredOutput]] = {
     AnalysisSchemaId.RELEVANCE_V1: RelevanceOutput,
     AnalysisSchemaId.PERSONA_V1: PersonaOutput,
@@ -205,6 +228,7 @@ _OUTPUT_MODELS: dict[AnalysisSchemaId, type[StructuredOutput]] = {
     AnalysisSchemaId.SEARCH_INTENT_V1: SearchIntentOutput,
     AnalysisSchemaId.INTERVIEW_V1: InterviewOutput,
     AnalysisSchemaId.CLUSTER_NAMING_V1: ClusterNamingOutput,
+    AnalysisSchemaId.WORKFLOW_STEP_V1: WorkflowStepOutput,
 }
 
 

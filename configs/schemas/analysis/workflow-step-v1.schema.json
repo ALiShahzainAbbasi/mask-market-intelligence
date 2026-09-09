@@ -1,0 +1,217 @@
+{
+  "$defs": {
+    "WorkflowStepRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "automation_potential_0_10": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Automation Potential 0 10"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "consequence_description": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Consequence Description"
+        },
+        "consequence_score_0_10": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Consequence Score 0 10"
+        },
+        "events_per_month": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Events Per Month"
+        },
+        "evidence_span": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Evidence Span",
+          "type": "string"
+        },
+        "failure_rate_0_1": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Failure Rate 0 1"
+        },
+        "input_description": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Input Description"
+        },
+        "labor_hours_per_month": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Labor Hours Per Month"
+        },
+        "manual_share_0_1": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Manual Share 0 1"
+        },
+        "output_description": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Output Description"
+        },
+        "role": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "step_name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Step Name",
+          "type": "string"
+        },
+        "system": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "System"
+        },
+        "waiting_time_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Waiting Time Minutes"
+        },
+        "workaround": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Workaround"
+        }
+      },
+      "required": [
+        "step_name",
+        "role",
+        "system",
+        "input_description",
+        "output_description",
+        "events_per_month",
+        "labor_hours_per_month",
+        "waiting_time_minutes",
+        "failure_rate_0_1",
+        "consequence_description",
+        "consequence_score_0_10",
+        "workaround",
+        "automation_potential_0_10",
+        "manual_share_0_1",
+        "evidence_span",
+        "confidence"
+      ],
+      "title": "WorkflowStepRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "records": {
+      "items": {
+        "$ref": "#/$defs/WorkflowStepRecord"
+      },
+      "maxItems": 50,
+      "title": "Records",
+      "type": "array"
+    }
+  },
+  "required": [
+    "records"
+  ],
+  "title": "WorkflowStepOutput",
+  "type": "object"
+}
