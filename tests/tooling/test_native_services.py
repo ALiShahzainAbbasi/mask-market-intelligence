@@ -7,6 +7,8 @@ from pydantic import SecretStr
 
 from scripts import check_services as checks
 
+PROJECT = "abcdefghijklmnopqrst"
+
 
 def settings() -> Settings:
     return Settings(
@@ -16,6 +18,25 @@ def settings() -> Settings:
         dev_token="synthetic-test-value-" * 3,
         database_url="postgresql+psycopg://mask_app@127.0.0.1:5433/mask",
         migration_database_url="postgresql+psycopg://mask_migrator@127.0.0.1:5433/mask",
+    )
+
+
+def supabase_settings(*, hosted_integration_enabled: bool) -> Settings:
+    return Settings(
+        _env_file=None,
+        environment="development",
+        database_target="supabase",
+        hosted_integration_enabled=hosted_integration_enabled,
+        enable_dev_routes=True,
+        dev_token="synthetic-test-value-" * 3,
+        database_url=(
+            f"postgresql+psycopg://mask_app.{PROJECT}:private@"
+            "aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
+        ),
+        migration_database_url=(
+            f"postgresql+psycopg://postgres:private@db.{PROJECT}.supabase.co:5432/"
+            "postgres?sslmode=require"
+        ),
     )
 
 
@@ -31,8 +52,8 @@ def settings() -> Settings:
     ],
 )
 def test_preflight_rejects_remote_or_credentialed_api(url: str) -> None:
-    with pytest.raises(ValueError, match="local development"):
-        checks.require_local_test_config(settings(), url)
+    with pytest.raises(ValueError, match="loopback API"):
+        checks.require_integration_test_config(settings(), url)
 
 
 @pytest.mark.parametrize(
@@ -47,10 +68,22 @@ def test_preflight_rejects_remote_or_credentialed_api(url: str) -> None:
     ],
 )
 def test_preflight_rejects_unsafe_service_targets(change: dict[str, object]) -> None:
-    with pytest.raises(ValueError, match="local development"):
-        checks.require_local_test_config(
+    with pytest.raises(ValueError, match="development|Local integration|loopback API"):
+        checks.require_integration_test_config(
             settings().model_copy(update=change), "http://127.0.0.1:8000"
         )
+
+
+def test_hosted_preflight_requires_explicit_opt_in() -> None:
+    with pytest.raises(ValueError, match="explicit opt-in"):
+        checks.require_integration_test_config(
+            supabase_settings(hosted_integration_enabled=False),
+            "http://127.0.0.1:8000",
+        )
+    checks.require_integration_test_config(
+        supabase_settings(hosted_integration_enabled=True),
+        "http://127.0.0.1:8000",
+    )
 
 
 def configure(monkeypatch: pytest.MonkeyPatch, ready: bool) -> Mock:

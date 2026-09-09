@@ -1,0 +1,20 @@
+{
+  "query": {
+    "original": "HVAC field service software pricing",
+    "more_results_available": false
+  },
+  "web": {
+    "results": [
+      {
+        "title": "Duplicate result",
+        "url": "https://example.com/hvac/operations",
+        "description": "The same canonical URL appears again."
+      },
+      {
+        "title": "HVAC Pricing Study",
+        "url": "https://example.org/research/hvac-pricing",
+        "description": "Independent pricing evidence."
+      }
+    ]
+  }
+}

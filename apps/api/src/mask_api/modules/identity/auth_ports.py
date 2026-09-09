@@ -30,6 +30,10 @@ class TokenManager(Protocol):
     def matches(self, token: SecretStr, expected_digest: str) -> bool: ...
 
 
+class SessionMutationGuard(Protocol):
+    def validate_csrf(self, session_token: SecretStr, csrf_token: SecretStr) -> None: ...
+
+
 class AuthenticationStore(Protocol):
     def find(self, organization_id: UUID, normalized_email: str) -> CredentialRecord | None: ...
 

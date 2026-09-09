@@ -32,3 +32,11 @@ class PasswordPolicyViolation(Exception):
 
 class BootstrapAlreadyCompleted(Exception):
     """The one-time owner bootstrap cannot run on a non-empty identity store."""
+
+
+class MembershipNotFound(Exception):
+    """The tenant-scoped membership target does not exist."""
+
+
+class LastAdministratorRequired(Exception):
+    """A role change would leave the organization without an active administrator."""

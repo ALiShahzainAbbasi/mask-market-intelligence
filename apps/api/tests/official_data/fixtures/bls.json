@@ -1,0 +1,15 @@
+{
+  "status": "REQUEST_SUCCEEDED",
+  "message": [],
+  "Results": {
+    "series": [
+      {
+        "seriesID": "CES2023800001",
+        "data": [
+          {"year": "2025", "period": "A01", "periodName": "Annual", "value": "125.5"},
+          {"year": "2024", "period": "A01", "periodName": "Annual", "value": "N/A"}
+        ]
+      }
+    ]
+  }
+}

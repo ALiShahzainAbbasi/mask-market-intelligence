@@ -192,6 +192,7 @@ def test_exact_feed_duplicates_do_not_inflate_unique_count(source_policy) -> Non
     assert result.batch.metrics.documents_parsed == 2
     assert result.batch.metrics.unique_documents == 1
     assert result.batch.metrics.duplicate_occurrences == 1
+    assert result.batch.metrics.distinct_source_families == 1
     assert len(result.batch.documents) == 2
 
 

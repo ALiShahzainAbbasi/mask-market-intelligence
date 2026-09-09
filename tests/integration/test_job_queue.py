@@ -5,15 +5,16 @@ from uuid import uuid4
 
 import pytest
 from mask_api.config import Settings
+from mask_api.database import create_db_engine
 from mask_api.job_queue.contracts import EnqueueJob, JobFailure
 from mask_api.job_queue.domain import JobStatus
 from mask_api.job_queue.errors import JobOwnershipLost
 from mask_api.job_queue.models import JobRecord
 from mask_api.job_queue.repository import SQLAlchemyJobQueue
-from sqlalchemy import create_engine, update
+from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
-from scripts.check_services import require_local_test_config
+from scripts.check_services import require_integration_test_config
 
 pytestmark = pytest.mark.integration
 
@@ -21,8 +22,8 @@ pytestmark = pytest.mark.integration
 @pytest.fixture
 def queue() -> SQLAlchemyJobQueue:
     settings = Settings()
-    require_local_test_config(settings, "http://127.0.0.1:8000")
-    engine = create_engine(settings.database_url.get_secret_value(), pool_pre_ping=True)
+    require_integration_test_config(settings, "http://127.0.0.1:8000")
+    engine = create_db_engine(settings)
     sessions = sessionmaker(bind=engine, expire_on_commit=False)
     try:
         yield SQLAlchemyJobQueue(sessions)

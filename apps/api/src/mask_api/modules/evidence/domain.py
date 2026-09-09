@@ -31,3 +31,13 @@ class EvidenceAccessClass(StrEnum):
     PUBLIC = "public"
     INTERNAL = "internal"
     RESTRICTED = "restricted"
+
+
+class EvidencePersona(StrEnum):
+    OWNER = "owner"
+    EXECUTIVE = "executive"
+    MANAGER = "manager"
+    EMPLOYEE = "employee"
+    CUSTOMER = "customer"
+    VENDOR = "vendor"
+    UNKNOWN = "unknown"

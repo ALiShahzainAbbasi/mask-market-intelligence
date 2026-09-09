@@ -13,7 +13,9 @@ from sqlalchemy import (
     UniqueConstraint,
     Uuid,
     func,
+    text,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from mask_api.modules.identity.domain import IdentityEventOutcome, IdentityEventType
@@ -87,7 +89,15 @@ class IdentitySecurityEvent(UUIDPrimaryKey, Base):
             ["users.organization_id", "users.id"],
             name="fk_identity_event_tenant_user",
         ),
+        ForeignKeyConstraint(
+            ["organization_id", "subject_user_id"],
+            ["users.organization_id", "users.id"],
+            name="fk_identity_event_subject",
+        ),
         CheckConstraint("length(btrim(reason_code)) > 0", name="ck_identity_event_reason"),
+        CheckConstraint(
+            "jsonb_typeof(details_json) = 'object'", name="ck_identity_event_details_object"
+        ),
         Index("ix_identity_event_tenant_time", "organization_id", "occurred_at"),
         Index("ix_identity_event_correlation", "correlation_id"),
     )
@@ -100,11 +110,15 @@ class IdentitySecurityEvent(UUIDPrimaryKey, Base):
     )
     organization_id: Mapped[UUID | None] = mapped_column(Uuid)
     user_id: Mapped[UUID | None] = mapped_column(Uuid)
+    subject_user_id: Mapped[UUID | None] = mapped_column(Uuid)
     session_id: Mapped[UUID | None] = mapped_column(
         Uuid, ForeignKey("server_sessions.id", name="fk_identity_event_session")
     )
     correlation_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
     reason_code: Mapped[str] = mapped_column(String(64), nullable=False)
+    details_json: Mapped[dict[str, object]] = mapped_column(
+        JSONB, nullable=False, server_default=text("'{}'::jsonb")
+    )
     occurred_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -11,11 +11,24 @@ from mask_api.modules.evidence.contracts import (
     ParsedDocument,
     SourcePolicy,
 )
-from mask_api.modules.evidence.domain import CollectorKind
+from mask_api.modules.evidence.domain import CollectorKind, EvidencePersona
 
 NORMALIZER_VERSION = "text-nfkc-v1"
+PERSONA_NORMALIZER_VERSION = "declared-persona-v1"
 _HORIZONTAL_SPACE = re.compile(r"[^\S\r\n]+")
 _EXCESS_NEWLINES = re.compile(r"\n{3,}")
+_PERSONA_TERMS: dict[EvidencePersona, re.Pattern[str]] = {
+    EvidencePersona.OWNER: re.compile(r"\b(?:owner|founder|co-founder|proprietor)\b", re.I),
+    EvidencePersona.EXECUTIVE: re.compile(
+        r"\b(?:ceo|cfo|coo|cto|chief [a-z ]+ officer|president|vice president|vp)\b", re.I
+    ),
+    EvidencePersona.MANAGER: re.compile(r"\b(?:manager|director|supervisor)\b", re.I),
+    EvidencePersona.EMPLOYEE: re.compile(
+        r"\b(?:employee|technician|installer|mechanic|dispatcher|coordinator)\b", re.I
+    ),
+    EvidencePersona.CUSTOMER: re.compile(r"\b(?:customer|client|homeowner|buyer)\b", re.I),
+    EvidencePersona.VENDOR: re.compile(r"\b(?:vendor|supplier|consultant|agency)\b", re.I),
+}
 
 
 def normalize_text(value: str) -> str:
@@ -54,18 +67,21 @@ def normalize_document(
     )
     occurrence_key = hashlib.sha256(occurrence_material.encode("utf-8")).hexdigest()
     author = normalize_text(document.author_persona_hint or "") or None
+    retained_author = author if policy.capture_author else None
     return NormalizedDocument(
         occurrence_key=occurrence_key,
         organization_id=request.organization_id,
         market_id=request.market_id,
         market_definition_version_id=request.market_definition_version_id,
         source_id=policy.source_id,
+        source_family=policy.source_family,
         source_policy_version_id=policy.id,
         source_policy_version=policy.version,
         source_url=document.source_url,
         external_id=document.external_id,
         title=normalize_text(document.title or "") or None,
-        author_persona_hint=author if policy.capture_author else None,
+        author_persona_hint=retained_author,
+        author_persona=classify_declared_persona(retained_author),
         published_at=document.published_at,
         collected_at=collected_at,
         raw_content=document.raw_content,
@@ -81,6 +97,7 @@ def normalize_document(
         collector_version=collector_version,
         parser_version=parser_version,
         normalizer_version=NORMALIZER_VERSION,
+        persona_normalizer_version=PERSONA_NORMALIZER_VERSION,
     )
 
 
@@ -101,6 +118,7 @@ def exact_deduplicate(
                 duplicate_occurrence_key=document.occurrence_key,
                 canonical_occurrence_key=first.occurrence_key,
                 content_hash=document.content_hash,
+                duplicate_source_family=document.source_family,
             )
         )
     return tuple(canonical), tuple(duplicates)
@@ -108,3 +126,11 @@ def exact_deduplicate(
 
 def batch_idempotency_key(run_id: UUID, policy_version_id: UUID) -> str:
     return hashlib.sha256(f"{run_id}\x1f{policy_version_id}".encode()).hexdigest()
+
+
+def classify_declared_persona(value: str | None) -> EvidencePersona:
+    """Classify only an explicitly supplied public role hint; ambiguity stays UNKNOWN."""
+    if not value:
+        return EvidencePersona.UNKNOWN
+    matches = [persona for persona, pattern in _PERSONA_TERMS.items() if pattern.search(value)]
+    return matches[0] if len(matches) == 1 else EvidencePersona.UNKNOWN

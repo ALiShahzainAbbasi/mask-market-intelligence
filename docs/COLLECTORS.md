@@ -58,6 +58,14 @@ and checksum, normalized text and content hash, metadata, access/retention class
 and collector/parser/normalizer versions. Raw bytes are excluded from normal error
 representations but remain available to the persistence boundary.
 
+A06 adds explicit `source_family` lineage and a versioned conservative persona
+normalizer. It labels only declared role hints using the approved
+`owner | executive | manager | employee | customer | vendor | unknown` taxonomy.
+Names, missing hints, and hints matching multiple personas remain `unknown`.
+Duplicate links retain the duplicate occurrence's source family, and collection
+metrics count distinct families after exact deduplication so repeated material
+cannot masquerade as source diversity.
+
 ## Safety and cost behavior
 
 - Only `allowed` policy versions dispatch. Conditional, blocked, review-required,
@@ -88,6 +96,10 @@ deliberately small source-approved smoke test. Robots and terms are currently
 approval records, not an automated permission override; a material change pauses
 collection for review.
 
+Provider/account adapters that are not currently available are tracked in
+`SOURCE_AVAILABILITY.md`. Their hold does not weaken the policy gate or authorize
+an unofficial workaround.
+
 ## Adding a source-specific collector
 
 Implement the `Collector` protocol, use an explicit `CollectorKind`, document its
@@ -103,4 +115,3 @@ python -m pytest -p no:cacheprovider apps/api/tests/evidence -q
 python -m ruff check apps/api/src/mask_api/modules/evidence apps/api/tests/evidence
 python -m mypy apps/api/src/mask_api/modules/evidence
 ```
-

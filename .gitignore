@@ -18,3 +18,4 @@ reports/
 *.tsbuildinfo
 .DS_Store
 work/
+outputs/runs/

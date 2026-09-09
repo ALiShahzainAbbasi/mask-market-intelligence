@@ -1,0 +1,220 @@
+profile_version: v2
+profile_id: default_us_public
+
+# Every network source is opt-in. A run must also satisfy policy, credential,
+# and budget checks before its adapter is called.
+sources:
+  census_cbp:
+    source_family: government_statistics
+    name: US Census County Business Patterns
+    methods: [M1]
+    access: official_api
+    evidence_use: Establishment counts, employment bands, payroll, and geography
+    reference: https://www.census.gov/programs-surveys/cbp/data/datasets.html
+    policy_status: allowed
+    default_enabled: false
+    credential_required: true
+    cost_class: free
+    operational_status: available
+  bls:
+    source_family: government_statistics
+    name: US Bureau of Labor Statistics
+    methods: [M1, M4]
+    access: official_api
+    evidence_use: Employment, wages, industry growth, and labor-cost inputs
+    reference: https://www.bls.gov/developers/
+    policy_status: allowed
+    default_enabled: false
+    credential_required: false
+    cost_class: free
+    operational_status: available
+  bea:
+    source_family: government_statistics
+    name: US Bureau of Economic Analysis
+    methods: [M1, M4]
+    access: official_api
+    evidence_use: Regional and industry economic-capacity context
+    reference: https://apps.bea.gov/api/
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: free
+    operational_status: available
+  sec_edgar:
+    source_family: government_filings
+    name: SEC EDGAR
+    methods: [M1, M4, M5]
+    access: official_api
+    evidence_use: Company, competitive, pricing, risk, and spend evidence
+    reference: https://www.sec.gov/search-filings/edgar-application-programming-interfaces
+    policy_status: allowed
+    default_enabled: false
+    credential_required: false
+    cost_class: free
+    operational_status: available
+  sam_gov:
+    source_family: government_procurement
+    name: SAM.gov
+    methods: [M3, M4, M5, M6]
+    access: official_api
+    evidence_use: Procurement demand, requirements, incumbents, and pricing evidence
+    reference: https://open.gsa.gov/api/get-opportunities-public-api/
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: free
+    operational_status: available
+  google_ads_keyword_planner:
+    source_family: search_advertising
+    name: Google Ads Keyword Planner
+    methods: [M6]
+    access: official_account_api
+    evidence_use: Search volume, CPC, competition, trend, and buying-intent evidence
+    reference: https://developers.google.com/google-ads/api/docs/keyword-planning/overview
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: mixed
+    operational_status: approval_pending
+  youtube:
+    source_family: video_discussion
+    name: YouTube Data API
+    methods: [M2, M3, M5]
+    access: official_api
+    evidence_use: Public pain, workflow, alternative, and dissatisfaction evidence
+    reference: https://developers.google.com/youtube/v3
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: mixed
+    operational_status: credential_pending
+  google_places:
+    source_family: local_business_reviews
+    name: Google Places API
+    methods: [M2, M7]
+    access: commercial_api
+    evidence_use: Buyer discovery, review pain, and geographic accessibility evidence
+    reference: https://developers.google.com/maps/documentation/places/web-service/overview
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: paid
+    operational_status: paid_hold
+  reddit:
+    source_family: community_discussion
+    name: Reddit approved API
+    methods: [M2, M3]
+    access: approved_api
+    evidence_use: Public pain, workaround, workflow, and buying-intent discussion
+    reference: https://www.reddit.com/dev/api/
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: mixed
+    operational_status: approval_pending
+  rss_atom:
+    source_family: published_feeds
+    name: RSS and Atom feeds
+    methods: [M2, M3, M4, M5, M6, M7, M9]
+    access: permitted_collector
+    evidence_use: Permitted public source discovery and article evidence
+    reference: Registered feed URLs only
+    policy_status: conditional
+    default_enabled: false
+    credential_required: false
+    cost_class: free
+    operational_status: available
+  static_html:
+    source_family: public_web
+    name: Registered static HTML pages
+    methods: [M2, M3, M4, M5, M6, M7, M9]
+    access: permitted_collector
+    evidence_use: Permitted public pricing, workflow, product, and buyer evidence
+    reference: Registered URLs only
+    policy_status: conditional
+    default_enabled: false
+    credential_required: false
+    cost_class: free
+    operational_status: available
+  brave_search:
+    source_family: search_discovery
+    name: Brave Search API
+    methods: [M2, M3, M4, M5, M6, M7, M9]
+    access: commercial_api
+    evidence_use: Discovery only; downstream pages retain their own provenance
+    reference: https://api.search.brave.com/app/documentation
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: paid
+    operational_status: paid_hold
+  meta_ad_library:
+    source_family: advertising_transparency
+    name: Meta Ad Library API
+    methods: [M5, M7]
+    access: approved_api
+    evidence_use: Active advertiser and positioning evidence
+    reference: https://www.facebook.com/ads/library/api/
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: mixed
+    operational_status: approval_pending
+  firmographics:
+    source_family: licensed_firmographics
+    name: Licensed firmographic and contact provider
+    methods: [M1, M7, M8]
+    access: commercial_api
+    evidence_use: Target accounts, employee bands, buyer identity, and reachable channels
+    reference: Provider selected and approved at runtime
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: paid
+    operational_status: paid_hold
+  validation_accounts:
+    source_family: primary_validation
+    name: Owner-approved outreach, CRM, advertising, and payment accounts
+    methods: [M8, M10]
+    access: official_account_api
+    evidence_use: Qualified responses and real funnel telemetry only
+    reference: Separately approved account adapters
+    policy_status: conditional
+    default_enabled: false
+    credential_required: true
+    cost_class: paid
+    operational_status: paid_hold
+
+signal_routes:
+  firm_counts_and_economics:
+    primary: [census_cbp, bls, bea]
+    fallback: [firmographics, sec_edgar]
+    failure_rule: Keep unavailable values UNKNOWN and record attempted sources.
+  pain_and_workflows:
+    primary: [reddit, youtube, google_places, rss_atom, static_html]
+    fallback: [brave_search, sam_gov]
+    failure_rule: Keep the method incomplete when sample, diversity, or provenance rules fail.
+  competitors_and_pricing:
+    primary: [sec_edgar, static_html, rss_atom]
+    fallback: [brave_search, sam_gov, meta_ad_library]
+    failure_rule: Never infer missing prices or traction.
+  search_demand:
+    primary: [google_ads_keyword_planner]
+    fallback: [sam_gov, rss_atom, static_html]
+    failure_rule: M6 remains UNKNOWN without qualified keyword metrics.
+  buyer_access:
+    primary: [firmographics, google_places]
+    fallback: [meta_ad_library, static_html, rss_atom]
+    failure_rule: Never invent a buyer, contact channel, or procurement estimate.
+  productization_fit:
+    primary: [static_html, rss_atom]
+    fallback: [brave_search, sec_edgar]
+    failure_rule: M9 remains UNKNOWN without source-grounded capability registry evidence.
+  primary_research:
+    primary: [validation_accounts]
+    fallback: [firmographics]
+    failure_rule: M8 remains UNKNOWN until qualified real respondent evidence exists.
+  live_validation:
+    primary: [validation_accounts]
+    fallback: []
+    failure_rule: M10 remains UNKNOWN unless owner-approved real campaign telemetry exists.

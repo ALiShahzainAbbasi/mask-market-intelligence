@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from mask_api.config import Settings, get_settings
 from mask_api.modules.health.router import router as health_router
+from mask_api.modules.identity.auth_router import create_auth_router
 from mask_api.modules.smoke.router import create_smoke_router
 from mask_api.transport.errors import install_error_handlers
 from mask_api.transport.middleware import install_http_middleware
@@ -23,6 +24,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     install_error_handlers(app)
     install_http_middleware(app)
     app.include_router(health_router)
+    if settings.enable_auth_routes:
+        app.include_router(create_auth_router(settings))
     if settings.enable_dev_routes:
         app.include_router(create_smoke_router(settings))
     return app

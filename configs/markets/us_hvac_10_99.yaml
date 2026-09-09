@@ -1,0 +1,36 @@
+market_id: us_hvac_10_99
+name: United States HVAC contractors with 10-99 employees
+geography:
+  country: US
+  regions: []
+industry_codes:
+  naics: [238220]
+company_band:
+  employees_min: 10
+  employees_max: 99
+buyer_titles:
+  - Owner
+  - President
+  - General Manager
+  - Operations Manager
+seed_terms:
+  - HVAC contractor operations
+  - HVAC field service management
+  - HVAC dispatch software
+seed_problems:
+  - technician scheduling and dispatch
+  - missed calls and slow lead response
+  - estimating and follow-up
+research_window_days: 365
+language: en-US
+run_budget:
+  max_requests: 100
+  max_documents: 500
+  max_total_bytes: 52428800
+  max_duration_seconds: 3600
+  max_paid_cost_usd: "0"
+validation:
+  enabled: false
+  max_budget_usd: "0"
+source_policy_profile: default_us_public
+formula_version: v1

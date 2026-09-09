@@ -356,6 +356,7 @@ dependencies = [
     { name = "pgvector" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic-settings" },
+    { name = "pyyaml" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
 ]
@@ -368,6 +369,7 @@ requires-dist = [
     { name = "pgvector", specifier = "==0.5.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.5" },
     { name = "pydantic-settings", specifier = "==2.15.0" },
+    { name = "pyyaml", specifier = "==6.0.3" },
     { name = "sqlalchemy", specifier = "==2.0.52" },
     { name = "uvicorn", specifier = "==0.52.4" },
 ]

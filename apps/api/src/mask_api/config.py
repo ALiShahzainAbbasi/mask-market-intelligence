@@ -12,10 +12,17 @@ class Settings(BaseSettings):
         env_prefix="MASK_", env_file=".env", extra="ignore", hide_input_in_errors=True
     )
     environment: Literal["development", "test", "staging", "production"] = "development"
+    database_target: Literal["local", "supabase"] = "local"
+    database_schema: Literal["mask"] = "mask"
     database_url: SecretStr
     migration_database_url: SecretStr | None = None
+    database_pool_size: int = Field(default=3, ge=1, le=10)
+    database_max_overflow: int = Field(default=2, ge=0, le=10)
+    database_pool_recycle_seconds: int = Field(default=300, ge=60, le=3600)
+    hosted_integration_enabled: bool = False
     dev_token: SecretStr | None = None
     enable_dev_routes: bool = False
+    enable_auth_routes: bool = False
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     dependency_timeout_seconds: int = Field(default=2, ge=1, le=5)
     queue_poll_seconds: float = Field(default=1.0, ge=0.1, le=30)
@@ -29,8 +36,17 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_settings(self) -> "Settings":
-        if not self.database_url.get_secret_value().startswith("postgresql+psycopg://"):
-            raise ValueError("MASK_DATABASE_URL must use postgresql+psycopg")
+        from mask_api.persistence.targets import database_endpoint, validate_supabase_endpoints
+
+        database_endpoint(self.database_url)
+        if self.migration_database_url is not None:
+            database_endpoint(self.migration_database_url)
+        if self.database_target == "supabase":
+            if self.migration_database_url is None:
+                raise ValueError("Supabase requires MASK_MIGRATION_DATABASE_URL")
+            validate_supabase_endpoints(self.database_url, self.migration_database_url)
+        elif self.hosted_integration_enabled:
+            raise ValueError("Hosted integration is only valid for the Supabase target")
         if self.job_lease_seconds <= self.worker_heartbeat_seconds:
             raise ValueError("Job lease must exceed the worker heartbeat interval")
         if self.worker_stale_seconds < self.worker_heartbeat_seconds * 2:

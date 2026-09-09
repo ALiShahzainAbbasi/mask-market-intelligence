@@ -12,21 +12,42 @@ from pydantic import SecretStr
 
 from mask_api.config import Settings
 from mask_api.modules.identity.auth_contracts import LoginRequest
-from mask_api.modules.identity.auth_http_contracts import LoginBody, SessionResponse
+from mask_api.modules.identity.auth_http_contracts import (
+    CurrentSessionResponse,
+    LoginBody,
+    MemberRolesResponse,
+    ReplaceRolesBody,
+    SessionResponse,
+)
 from mask_api.modules.identity.auth_services import LocalAuthenticationService
 from mask_api.modules.identity.errors import (
+    AccessDenied,
     AuthenticationRequired,
     IdentityUnavailable,
     InvalidCredentials,
     InvalidCsrfToken,
+    LastAdministratorRequired,
     LoginRateLimited,
+    MembershipNotFound,
+    RecentAuthenticationRequired,
 )
-from mask_api.modules.identity.wiring import get_local_authentication_service
+from mask_api.modules.identity.membership_contracts import ReplaceMemberRoles
+from mask_api.modules.identity.membership_services import MembershipAdministrationService
+from mask_api.modules.identity.services import IdentityService
+from mask_api.modules.identity.wiring import (
+    get_identity_service,
+    get_local_authentication_service,
+    get_membership_administration_service,
+)
 
 logger = logging.getLogger("mask")
 SESSION_COOKIE = "mask_session"
 CSRF_COOKIE = "mask_csrf"
 Service = Annotated[LocalAuthenticationService, Depends(get_local_authentication_service)]
+Identity = Annotated[IdentityService, Depends(get_identity_service)]
+MembershipAdmin = Annotated[
+    MembershipAdministrationService, Depends(get_membership_administration_service)
+]
 
 
 def _safe_event(event: str, request: Request) -> None:
@@ -109,6 +130,14 @@ def _map_auth_error(error: Exception) -> HTTPException:
         return HTTPException(429, "Login temporarily unavailable")
     if isinstance(error, AuthenticationRequired):
         return HTTPException(401, "Authentication required")
+    if isinstance(error, AccessDenied):
+        return HTTPException(403, "Access denied")
+    if isinstance(error, RecentAuthenticationRequired):
+        return HTTPException(403, "Recent authentication required")
+    if isinstance(error, MembershipNotFound):
+        return HTTPException(404, "Member not found")
+    if isinstance(error, LastAdministratorRequired):
+        return HTTPException(409, "An active administrator is required")
     if isinstance(error, InvalidCsrfToken):
         return HTTPException(403, "CSRF validation failed")
     return HTTPException(503, "Identity service unavailable")
@@ -118,6 +147,65 @@ def create_auth_router(settings: Settings) -> APIRouter:
     router = APIRouter(prefix="/auth", tags=["authentication"])
     secure = settings.environment not in {"development", "test"}
     max_age = settings.auth_session_hours * 60 * 60
+
+    @router.get("/session", response_model=CurrentSessionResponse)
+    def current_session(
+        request: Request,
+        identity: Identity,
+        session_cookie: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
+    ) -> CurrentSessionResponse:
+        try:
+            actor = identity.authenticate(_require_session(session_cookie))
+        except (AuthenticationRequired, AccessDenied, IdentityUnavailable) as error:
+            _safe_event("session_denied", request)
+            raise _map_auth_error(error) from None
+        return CurrentSessionResponse(
+            organization_id=actor.organization_id,
+            user_id=actor.user_id,
+            authenticated_at=actor.authenticated_at,
+            roles=tuple(sorted(actor.roles, key=lambda role: role.value)),
+        )
+
+    @router.patch("/members/{target_user_id}/roles", response_model=MemberRolesResponse)
+    def replace_member_roles(
+        target_user_id: UUID,
+        payload: ReplaceRolesBody,
+        request: Request,
+        service: MembershipAdmin,
+        session_cookie: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
+        csrf_cookie: Annotated[str | None, Cookie(alias=CSRF_COOKIE)] = None,
+        csrf_header: Annotated[str | None, Header(alias="X-CSRF-Token")] = None,
+    ) -> MemberRolesResponse:
+        session_token = _require_session(session_cookie)
+        csrf_token = _require_csrf(csrf_cookie, csrf_header)
+        try:
+            changed = service.replace_roles(
+                ReplaceMemberRoles(
+                    session_token=session_token,
+                    csrf_token=csrf_token,
+                    target_user_id=target_user_id,
+                    roles=payload.roles,
+                    reason=payload.reason,
+                    correlation_id=UUID(request.state.correlation_id),
+                )
+            )
+        except (
+            AuthenticationRequired,
+            AccessDenied,
+            RecentAuthenticationRequired,
+            MembershipNotFound,
+            LastAdministratorRequired,
+            IdentityUnavailable,
+        ) as error:
+            _safe_event("membership_roles_denied", request)
+            raise _map_auth_error(error) from None
+        _safe_event("membership_roles_replaced", request)
+        return MemberRolesResponse(
+            organization_id=changed.organization_id,
+            user_id=changed.target_user_id,
+            previous_roles=tuple(sorted(changed.previous_roles, key=lambda role: role.value)),
+            roles=tuple(sorted(changed.roles, key=lambda role: role.value)),
+        )
 
     @router.post("/login", response_model=SessionResponse)
     def login(

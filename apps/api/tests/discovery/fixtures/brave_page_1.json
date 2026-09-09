@@ -1,0 +1,25 @@
+{
+  "query": {
+    "original": "HVAC field service software pricing",
+    "more_results_available": true
+  },
+  "web": {
+    "type": "search",
+    "results": [
+      {
+        "type": "search_result",
+        "title": "HVAC Operations Guide",
+        "url": "https://example.com/hvac/operations",
+        "description": "A workflow and pricing guide.",
+        "age": "2 days ago",
+        "page_fetched": "2026-09-08T10:30:00Z"
+      },
+      {
+        "type": "search_result",
+        "title": "Unsafe result is ignored",
+        "url": "https://user:password@example.com/private"
+      }
+    ]
+  },
+  "extra_future_field": {"safe_to_ignore": true}
+}

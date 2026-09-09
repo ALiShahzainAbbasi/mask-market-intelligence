@@ -11,6 +11,8 @@ from mask_api.modules.identity.auth_services import (
     LocalAuthenticationService,
     OwnerBootstrapService,
 )
+from mask_api.modules.identity.membership_repository import SQLAlchemyMembershipRoleStore
+from mask_api.modules.identity.membership_services import MembershipAdministrationService
 from mask_api.modules.identity.repository import SQLAlchemyMembershipReader
 from mask_api.modules.identity.security import Argon2idPasswordManager, Sha256TokenManager
 from mask_api.modules.identity.services import IdentityService
@@ -67,5 +69,15 @@ def get_owner_bootstrap_service() -> OwnerBootstrapService:
     return OwnerBootstrapService(
         store=SQLAlchemyOwnerBootstrapStore(get_session_factory()),
         passwords=get_password_manager(),
+        clock=utc_now,
+    )
+
+
+@lru_cache
+def get_membership_administration_service() -> MembershipAdministrationService:
+    return MembershipAdministrationService(
+        identity=get_identity_service(),
+        csrf=get_local_authentication_service(),
+        store=SQLAlchemyMembershipRoleStore(get_session_factory()),
         clock=utc_now,
     )

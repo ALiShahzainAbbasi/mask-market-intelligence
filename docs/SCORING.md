@@ -1,7 +1,12 @@
 # Scoring, Confidence, Stage Gates, and Vetoes
 
-Status: Phase 0 canonical specification  
+Status: canonical specification; A01 numerical rules approved by the
+owner-supplied Autonomous Market Intelligence Engine Build Specification v1
 Rule: all calculations are deterministic backend operations; no LLM calculates or approves a score.
+
+The executable v1 formula contract is `configs/formulas/v1.yaml`. This document
+explains behavior; the validated version and canonical hash recorded by each run
+identify the exact calculation contract.
 
 ## 1. Approved overall weights
 
@@ -55,23 +60,15 @@ Scores outside 0–10 are invalid. Rounding is presentation-only: calculations r
 
 ## 4. Internal method calculations
 
-### 4.1 M1 proposal
+### 4.1 Approved v1 method formulas
 
-The brief proposes these configurable subweights:
+The owner-supplied autonomous build specification approves exact component
+weights, transforms, aggregation, completeness, and sample rules for M1-M10. The
+complete machine-readable contract is `configs/formulas/v1.yaml`; implementations
+must validate and execute that contract rather than duplicate constants in UI or
+LLM prompts.
 
-| Component | Default subweight |
-| --- | ---: |
-| Serviceable buyer pool | 30% |
-| Buyer economics | 25% |
-| Growth | 15% |
-| Fragmentation | 15% |
-| Geographic attractiveness | 15% |
-
-Each component must be normalized deterministically to 0–10 using a versioned transform whose units, caps, and boundary values are documented before activation. Until those transforms are approved, the formula is a proposal and the M1 computed score remains unavailable; reviewers can use an evidenced manual rubric.
-
-### 4.2 M2 Pain Opportunity proposal
-
-Normalize eligible cluster components to 0–10, then calculate:
+M2 normalizes eligible cluster components to 0–10, then calculates:
 
 ```text
 Pain Opportunity =
@@ -82,11 +79,17 @@ Pain Opportunity =
 + Dissatisfaction × 0.15
 ```
 
-Purchase intent is extracted on 0–4 and normalized by `value / 4 × 10`. Severity, economic impact, and dissatisfaction are already 1–10 when present. Frequency normalization, cluster-to-market aggregation, minimum sample requirements, and treatment of multiple mentions per document must be approved and versioned before the M2 computed score is enabled. The subweights are an implementation proposal, not a change to M2's overall 15% weight.
+Purchase intent is extracted on 0–4 and multiplied by 2.5. Severity, economic
+impact, and dissatisfaction remain distinct inputs. The v1 contract requires at
+least 100 relevant unique items to compute M2; fewer than 500 items or fewer than
+three source families is provisional/incomplete. Its market aggregation is 50%
+maximum cluster score plus 50% evidence-count-weighted mean of the top five.
 
-### 4.3 M3–M10
-
-Phase 0 defines required criteria but has no approved numerical subweights from the supplied methodology. The system must not invent them. Each computed score stays `null` until an approved deterministic rubric is added to a scoring configuration. Manual reviewed scores remain possible only with evidence, a stated rubric, reviewer identity, and the `manual rubric pending` label.
+M1 and M3-M10 use their exact v1 transforms and completeness rules from the same
+configuration. Approval of a formula does not make a score available: M8 and M10,
+for example, remain UNKNOWN without qualified real respondent or funnel evidence.
+No implementation may fill a missing input with zero or use an LLM to calculate
+the result.
 
 ## 5. Input scales
 

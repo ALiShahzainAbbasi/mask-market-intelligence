@@ -1,0 +1,34 @@
+{
+  "results": [
+    {
+      "text": "field service software pricing",
+      "closeVariants": ["field services software price"],
+      "keywordMetrics": {
+        "avgMonthlySearches": "1000",
+        "competition": "HIGH",
+        "competitionIndex": "82",
+        "averageCpcMicros": "2750000",
+        "lowTopOfPageBidMicros": "1250000",
+        "highTopOfPageBidMicros": "6500000",
+        "monthlySearchVolumes": [
+          {"year": "2026", "month": "FEBRUARY", "monthlySearches": "1100"},
+          {"year": "2026", "month": "JANUARY", "monthlySearches": "900"}
+        ]
+      }
+    },
+    {
+      "text": "legacy dispatch alternatives to spreadsheets",
+      "closeVariants": [],
+      "keywordMetrics": {
+        "avgMonthlySearches": "40",
+        "competition": "LOW",
+        "competitionIndex": "17",
+        "monthlySearchVolumes": []
+      }
+    },
+    {
+      "text": "unclassified niche phrase",
+      "closeVariants": []
+    }
+  ]
+}

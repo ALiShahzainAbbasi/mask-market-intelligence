@@ -3,11 +3,12 @@ title = "MASK source secret scanning"
 useDefault = true
 
 [allowlist]
-description = "Dependency, build, and Git internals (not application source)"
+description = "Ignored local secrets, dependency, build, and Git internals"
 paths = [
+  '''(^|/)\.env(?:\..*)?$''',
+  '''(^|/)\.pytest_cache/''',
   '''(^|/)node_modules/''',
   '''(^|/)\.venv/''',
   '''(^|/)\.next/''',
   '''(^|/)\.git/''',
 ]
-

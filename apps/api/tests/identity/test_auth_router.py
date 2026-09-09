@@ -8,15 +8,22 @@ from fastapi.testclient import TestClient
 from mask_api.config import Settings
 from mask_api.modules.identity.auth_contracts import IssuedSession
 from mask_api.modules.identity.auth_router import create_auth_router
-from mask_api.modules.identity.contracts import SessionRecord
+from mask_api.modules.identity.contracts import AuthenticatedActor, SessionRecord
+from mask_api.modules.identity.domain import Role
 from mask_api.modules.identity.errors import (
     AuthenticationRequired,
     IdentityUnavailable,
     InvalidCredentials,
     InvalidCsrfToken,
     LoginRateLimited,
+    MembershipNotFound,
 )
-from mask_api.modules.identity.wiring import get_local_authentication_service
+from mask_api.modules.identity.membership_contracts import MemberRolesChanged
+from mask_api.modules.identity.wiring import (
+    get_identity_service,
+    get_local_authentication_service,
+    get_membership_administration_service,
+)
 from mask_api.transport.errors import install_error_handlers
 from mask_api.transport.middleware import install_http_middleware
 from pydantic import SecretStr
@@ -54,12 +61,18 @@ def client(
     service: Mock,
     *,
     environment: str = "test",
+    identity: Mock | None = None,
+    membership: Mock | None = None,
 ) -> TestClient:
     app = FastAPI()
     install_error_handlers(app)
     install_http_middleware(app)
     app.include_router(create_auth_router(settings(environment)))
     app.dependency_overrides[get_local_authentication_service] = lambda: service
+    if identity is not None:
+        app.dependency_overrides[get_identity_service] = lambda: identity
+    if membership is not None:
+        app.dependency_overrides[get_membership_administration_service] = lambda: membership
     return TestClient(app)
 
 
@@ -91,6 +104,108 @@ def test_login_sets_strict_cookies_and_never_returns_secrets() -> None:
     assert "HttpOnly" in session_cookie and "SameSite=strict" in session_cookie
     assert "HttpOnly" not in csrf_cookie and "SameSite=strict" in csrf_cookie
     assert "Secure" not in session_cookie
+
+
+def test_current_session_resolves_server_identity_and_sorts_roles() -> None:
+    service = Mock()
+    identity = Mock()
+    identity.authenticate.return_value = AuthenticatedActor(
+        organization_id=ORG_ID,
+        user_id=USER_ID,
+        session_id=SESSION_ID,
+        authenticated_at=NOW,
+        roles=frozenset({Role.RESEARCHER, Role.ADMIN}),
+    )
+    with client(service, identity=identity) as browser:
+        browser.cookies.set("mask_session", "opaque-session-token")
+        response = browser.get("/auth/session")
+    assert response.status_code == 200
+    assert response.json() == {
+        "organization_id": str(ORG_ID),
+        "user_id": str(USER_ID),
+        "authenticated_at": "2026-09-03T20:00:00Z",
+        "roles": ["admin", "researcher"],
+    }
+    identity.authenticate.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ("error", "status"),
+    [
+        (AuthenticationRequired("private token"), 401),
+        (IdentityUnavailable("private database"), 503),
+    ],
+)
+def test_current_session_denials_are_sanitized(error: Exception, status: int) -> None:
+    service = Mock()
+    identity = Mock()
+    identity.authenticate.side_effect = error
+    with client(service, identity=identity) as browser:
+        browser.cookies.set("mask_session", "opaque-session-token")
+        response = browser.get("/auth/session")
+    assert response.status_code == status
+    assert "private" not in response.text
+
+
+def test_role_replacement_requires_csrf_and_returns_sorted_audit_result() -> None:
+    auth = Mock()
+    membership = Mock()
+    membership.replace_roles.return_value = MemberRolesChanged(
+        organization_id=ORG_ID,
+        target_user_id=USER_ID,
+        previous_roles=frozenset({Role.RESEARCHER}),
+        roles=frozenset({Role.REVIEWER, Role.RESEARCHER}),
+    )
+    with client(auth, membership=membership) as browser:
+        browser.cookies.set("mask_session", "opaque-session-token")
+        browser.cookies.set("mask_csrf", "opaque-csrf-token")
+        response = browser.patch(
+            f"/auth/members/{USER_ID}/roles",
+            headers={"X-CSRF-Token": "opaque-csrf-token"},
+            json={
+                "roles": ["reviewer", "researcher"],
+                "reason": "Assign review responsibility",
+            },
+        )
+    assert response.status_code == 200
+    assert response.json() == {
+        "organization_id": str(ORG_ID),
+        "user_id": str(USER_ID),
+        "previous_roles": ["researcher"],
+        "roles": ["researcher", "reviewer"],
+    }
+    command = membership.replace_roles.call_args.args[0]
+    assert command.target_user_id == USER_ID
+    assert command.csrf_token.get_secret_value() == "opaque-csrf-token"
+
+
+def test_role_replacement_missing_csrf_never_calls_service() -> None:
+    auth = Mock()
+    membership = Mock()
+    with client(auth, membership=membership) as browser:
+        browser.cookies.set("mask_session", "opaque-session-token")
+        response = browser.patch(
+            f"/auth/members/{USER_ID}/roles",
+            json={"roles": ["researcher"], "reason": "Keep research access"},
+        )
+    assert response.status_code == 403
+    membership.replace_roles.assert_not_called()
+
+
+def test_unknown_member_error_is_sanitized() -> None:
+    auth = Mock()
+    membership = Mock()
+    membership.replace_roles.side_effect = MembershipNotFound("private member")
+    with client(auth, membership=membership) as browser:
+        browser.cookies.set("mask_session", "opaque-session-token")
+        browser.cookies.set("mask_csrf", "opaque-csrf-token")
+        response = browser.patch(
+            f"/auth/members/{USER_ID}/roles",
+            headers={"X-CSRF-Token": "opaque-csrf-token"},
+            json={"roles": ["researcher"], "reason": "Assign research access"},
+        )
+    assert response.status_code == 404
+    assert "private" not in response.text
 
 
 def test_production_login_marks_both_cookies_secure() -> None:

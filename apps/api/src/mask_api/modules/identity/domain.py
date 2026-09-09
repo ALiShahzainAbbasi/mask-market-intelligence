@@ -29,6 +29,7 @@ class IdentityEventType(StrEnum):
     LOGIN_THROTTLED = "login_throttled"
     SESSION_ROTATED = "session_rotated"
     SESSION_REVOKED = "session_revoked"
+    ROLES_CHANGED = "roles_changed"
 
 
 class IdentityEventOutcome(StrEnum):

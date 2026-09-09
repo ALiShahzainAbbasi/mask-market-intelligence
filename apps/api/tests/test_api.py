@@ -44,6 +44,17 @@ def test_probe_failure_is_sanitized() -> None:
 def test_development_routes_absent_by_default(settings: Settings) -> None:
     with TestClient(create_app(settings)) as client:
         assert client.post("/dev/jobs/smoke", json={}).status_code == 404
+        assert client.get("/auth/session").status_code == 404
+
+
+def test_auth_routes_require_explicit_registration(settings: Settings) -> None:
+    enabled = Settings(
+        **{**settings.model_dump(), "enable_auth_routes": True},
+        _env_file=None,
+    )
+    app = create_app(enabled)
+    assert "/auth/session" in app.openapi()["paths"]
+    assert "/auth/login" in app.openapi()["paths"]
 
 
 def test_development_routes_require_secret(settings: Settings) -> None:

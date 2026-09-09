@@ -24,7 +24,12 @@ Pure domain rules and ports do not know FastAPI, SQLAlchemy, PostgreSQL locking/
 - modules/smoke/: infrastructure smoke contracts, ports, service, queue adapter, routing, and wiring.
 - modules/identity/: organization/user/role/authentication models, explicit permission policy, internal identity/auth contracts and ports, authorization and local-auth services, Argon2id/token adapters, transactional repositories, inactive HTTP adapter, and bootstrap composition. The HTTP adapter remains outside main.py until live acceptance; see AUTHORIZATION.md.
 - modules/markets/: market definition/hypothesis/research-plan vocabulary and persistence; services and HTTP adapters are added only as their checkpoints begin.
-- modules/evidence/: immutable source-policy and document contracts, pure policy/normalization rules, source parsers, a typed collection service, and explicit HTTP/persistence boundaries. Source parsers consume fetched bytes and never open sockets or write storage; the HTTP adapter and future PostgreSQL adapters stay at the edge. See COLLECTORS.md and the module-scoped AGENTS.md.
+- modules/evidence/: immutable source-policy and document contracts, pure policy/text/persona normalization and source-family dedupe rules, source parsers, a typed collection service, and explicit HTTP/persistence boundaries. Source parsers consume fetched bytes and never open sockets or write storage; the HTTP adapter and future PostgreSQL adapters stay at the edge. See COLLECTORS.md and the module-scoped AGENTS.md.
+- modules/discovery/: pure bounded method-aware query planning plus optional search-provider edge adapters. Provider credentials, policy approval, transport, cost, and response parsing stay outside query generation; discovered URLs are candidates, not approved evidence.
+- modules/official_data/: validated fixed-scope request builders, pure fixture-backed parsers, source-neutral observations/records, and a separately injected bounded official-API transport. Credentials are isolated from stored provenance; scoring and persistence remain outside the adapter.
+- modules/search_intent/: credential-free search-metrics contracts, pure versioned intent taxonomy, Google Ads request/response mapping, cache port/local artifact adapter, and a fail-closed injected provider edge. Credentials and customer identity stay in a future transport; M6 calculation stays in scoring.
+- modules/scoring/: deterministic, version-independent numeric primitives and later formula/gate evaluators. It must not import collectors, AI providers, HTTP, SQLAlchemy, or presentation code.
+- research_runner/: strict versioned configuration contracts and the CLI application boundary. The future runner coordinates public module ports; it does not duplicate source, persistence, extraction, scoring, or report rules.
 - job_queue/: generic domain/contracts, queue port, SQLAlchemy model/repository adapter, and composition wiring. Feature services depend only on the port; feature handlers and services never import its model/repository.
 - config.py, database.py, and health.py: single-purpose infrastructure adapters. Keep settings, connection factories, readiness probes, and queue mechanics out of feature policy.
 - persistence/: metadata registration and schema revision, isolated from request handlers.
@@ -48,6 +53,8 @@ Server Components own server-only API/session access. Client Components own inte
 ## Worker ownership
 
 Workers obtain a claimed typed envelope through queue wiring, call feature services, and emit safe correlation-aware logs. The PostgreSQL queue adapter owns claim/lease/heartbeat SQL; feature repositories own business state and idempotent output. The runner and handlers must not import ORM models, issue SQL directly, or duplicate API use cases.
+
+The CLI may explicitly select a `LocalArtifactStore` adapter through the same typed persistence boundary used by the research use case. That adapter is a named execution target, never an automatic fallback when PostgreSQL or API wiring fails.
 
 ## Verification and change checklist
 

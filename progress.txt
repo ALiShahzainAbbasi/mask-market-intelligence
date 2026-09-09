@@ -1,27 +1,37 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-04 20:29 PKT (UTC+05:00)
+Last updated: 2026-09-10 01:06 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
-Source of requirements: supplied MASK AI Complete Development Guide and docs/
+Source of requirements: supplied MASK AI Complete Development Guide, the
+Autonomous Market Intelligence Engine Build Specification v1, and docs/
 
 1. CURRENT POSITION
 ------------------------------------------------------------------------
-Current phase: P03 - evidence/source collector implementation; P01/P02 live acceptance is deliberately deferred.
-Current implementation status: IN_PROGRESS - the source-policy gate, common collector pipeline, bounded HTTP adapter, deterministic normalization/deduplication, and two fixture-backed collectors are offline-verified; database/live integration remains.
-Current task: P03 collector code slice is complete; next independent database-deferred work is P03-04 safe upload/manual-capture validation.
-Local authentication code remains implemented but unregistered; no authenticated market workflow, live collection, AI analysis, or scoring is implemented.
+Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
+Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
+A01-A05 are complete, A06 enforces source holds plus source-family/persona
+normalization for free collectors, and A07's offline deterministic foundation is
+implemented. Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded
+live smoke; approved feeds/pages and later analyst inputs complete the lean set.
+Current task: A07 remains partial only because Google Ads live access is held;
+YouTube and every other unavailable/paid account API remain skipped by owner decision.
+Paid collection/model use remains disabled.
+Local authentication remains application-owned and disabled at the HTTP boundary;
+Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
+the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 16/151
-Remaining checkpoints: 135/151
-Checkpoint-count progress: 10.6%
+Completed checkpoints: 23/171
+Remaining checkpoints: 148/171
+Checkpoint-count progress: 13.5%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
-Implementation/operational checkpoints complete: 5/140 (Phases 1-24).
-Phase 1: IN_PROGRESS (5/10 verified). Phase 2: IN_PROGRESS (0/7 verified).
+Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
+Autonomous functional-build checkpoints complete: 5/20 (A01-A20).
+Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
 IMPORTANT: Checkpoints are not equal effort. This percentage measures
@@ -30,19 +40,19 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: P03-04 safe analyst upload/manual capture; P03-01 persistence and P01-05/P01-06/P02-01 live database checks remain deferred under D10 and the user's sequencing.
+Next checkpoint: begin A09's offline provider port and structured extraction
+contracts, then A10 grounding validation, while keeping paid/model/network use
+disabled until separately approved credentials and budgets exist.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
-Independent Phase 2 development may now proceed with P01 checks still open;
+The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
 this is a sequencing change, not acceptance of missing live-service/CI or security checks.
 No production deployment, paid services, outreach, or research is authorized.
 
 Resume prerequisites and sequence:
-1. Technical lead: apply the implemented Alembic 0003 queue migration to the
-   isolated database and verify atomic claims, leases, retries, heartbeat,
-   recovery, idempotency, safe logs, and bounded shutdown (P01-06).
-2. Owner/admin: provision one isolated native Windows PostgreSQL 17/pgvector
-   instance with separate application/migration roles (D10). No container,
-   Redis, Linux, WSL, VM, paid provider, or hosted runner is required.
+1. Implement A01-A17 as the CLI-first functional vertical slice. Keep unsupported
+   inputs UNKNOWN and keep every score deterministic and formula-versioned.
+2. Implement A02 LocalArtifactStore through the same typed persistence ports;
+   it is an explicit CLI target, never a silent API/worker database fallback.
 3. Technical lead: from this project root, use pinned Node/pnpm/Python/uv;
    pnpm install --frozen-lockfile; uv sync --frozen; pnpm run setup.
    setup preserves the existing ignored .env; privately configure actual service
@@ -52,35 +62,28 @@ Resume prerequisites and sequence:
    pnpm check:services; pnpm test; pnpm lint; pnpm typecheck; pnpm schemas:check.
    Inspect worker logs/shutdown and operator service-restart recovery separately;
    resolve real-service findings before closing P01-05/P01-06/P01-07/P01-10.
-5. Implement the offline Phase 3 source-policy/collector core and two bounded,
-   fixture-backed collectors. Do not dispatch live collection until a source and
-   current policy version are registered and approved.
-6. After D10, apply Alembic 0004, run bootstrap/auth/session/CSRF acceptance,
-   and only then register auth/market routes; role administration remains later work.
+5. Extend the existing Phase 3 source-policy/collector core through A04-A10. Do
+   not dispatch live collection until a source and current policy version are
+   registered and approved.
+6. After the Supabase migration/auth persistence checks pass, apply Alembic 0004,
+   run bootstrap/auth/session/CSRF acceptance, and register only the auth routes;
+   market routes still require P02-03 resource authorization and audit behavior.
 7. Run the complete local Windows release suite. Hosted CI/branch protection is
    deferred until an owner-approved remote exists and is not a private-MVP blocker.
-8. Update this tracker after every attempt. The latest user request permits
-   early Phase 3 development; Phases 1-3 cannot be signed off until
+8. Update this tracker after every attempt. The latest user request activates
+   A01-A20; Phases 1-3 cannot be signed off until
    their dependencies/acceptance pass. Do not claim mocks as live integration.
 
-Current local verification: 229 tests PASS (218 Python current + 11 web),
-including 36 evidence/collector cases;
-24 real PostgreSQL/service integration cases are collected, deselected, and NOT
-RUN. Python Ruff/format (155 files), strict mypy (83 source files),
-architecture/import-cycle, auth/queue model-to-frozen migration SQL, generated
-OpenAPI/TypeScript schemas, and Windows runtime/tooling checks PASS.
-The 48-package uv lock pins argon2-cffi 25.1.0 and passed lock verification.
-Dedicated auth coverage includes 48 password/token/service/repository/bootstrap/
-HTTP/schema cases; auth and collection routes remain absent from the main OpenAPI
-by design. Collector coverage verifies policy/tenant/URL gates, public-DNS and
-response controls, two parser families and fixtures, raw/normalized lineage,
-duplicates, retries, limits, cancellation, circuit breaking, and safe persistence
-failures without making live requests.
-Python execution used the existing isolated venv; a full clean uv sync/root-alias
-run remains NOT RUN. The pinned Windows Gitleaks script has not executed.
-Production build, current JS dependency audit, and live PostgreSQL/worker/auth
-checks retain earlier or NOT RUN status; no frontend product route was added.
-No runtime server was started this session; nothing was deployed.
+Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
+Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
+TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
+and local-auth persistence passed 18 focused live tests. Full offline regression:
+402 Python + 11 web tests PASS. Ruff/format, strict mypy over 115 source files,
+architecture/import-cycle, OpenAPI/TypeScript and research-configuration schema
+drift, and the local secret guard PASS. The Windows Gitleaks run executed but reported three redacted findings;
+their exact files/types still require triage, so P01-08 remains open. Auth and
+collection routes remain disabled. A05's 5 bounded official-source live tests
+PASS. No web/API/worker runtime, broad collection, or paid research ran.
 
 2. STATUS AND COMPLETION RULES
 ------------------------------------------------------------------------
@@ -148,8 +151,8 @@ market research.
 
 ID  | Status         | Done  | Phase
 P00 | DONE           | 11/11 | Freeze the Research Specification
-P01 | IN_PROGRESS    |  5/10 | Repository & Development Environment
-P02 | IN_PROGRESS    |  0/ 7 | Authentication, Market Registry & Research Workspace
+P01 | IN_PROGRESS    |  6/10 | Repository & Development Environment
+P02 | IN_PROGRESS    |  1/ 7 | Authentication, Market Registry & Research Workspace
 P03 | IN_PROGRESS    |  0/ 8 | Evidence & Source Engine
 P04 | NOT_STARTED    |  0/ 9 | Sentiment & Commercial Pain Intelligence
 P05 | NOT_STARTED    |  0/ 5 | Quantitative Market Intelligence (M1)
@@ -172,6 +175,76 @@ P21 | NOT_STARTED    |  0/ 7 | Security, Operations & Production Readiness
 P22 | NOT_STARTED    |  0/ 5 | First Real System Test: 3-5 Markets
 P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
+
+Autonomous functional build track (new scope from the 2026-09-09 specification):
+A   | IN_PROGRESS    |  5/20 | CLI-first Autonomous Research Build
+
+A01-A20 are counted in the overall checkpoint total but are not an additional
+original guide phase. This denominator change adds 20 source-defined functional
+tasks without deleting, renumbering, or silently accepting any P00-P24 work.
+
+AUTONOMOUS FUNCTIONAL BUILD CHECKPOINTS
+------------------------------------------------------------------------
+[x] A01 Autonomous specification/configuration: add the execution-mode document,
+formula configuration v1, strict market YAML schema, method source profiles,
+version/hash loaders, and deterministic shared math tests.
+
+[x] A02 Implement a LocalArtifactStore adapter for raw, normalized, evidence,
+metrics, report, and lineage outputs without duplicating business logic.
+
+[x] A03 Implement the one-command ResearchRunner CLI with method selection,
+resume/idempotency, manifests, budgets, and fail-soft partial completion.
+
+[x] A04 Add deterministic source-discovery queries and an optional Brave Search
+adapter with explicit policy, key, budget, and provenance controls.
+
+[x] A05 Add fixture-backed Census CBP, BLS, BEA, SEC, and SAM.gov adapters plus
+credential-gated live smoke tests.
+
+[~] A06 Add permitted YouTube, Google Places, approved Reddit, RSS/Atom, and
+static-HTML adapters with source-family dedupe and persona-aware normalization.
+
+[~] A07 Add a Google Ads Keyword Planner adapter, cache, historical metrics,
+CPC/competition handling, and the versioned intent taxonomy.
+
+[ ] A08 Add a licensed firmographic/contact provider port and adapter profile for
+target-account, buyer-identification, and contact-coverage metrics.
+
+[ ] A09 Add an LLM provider port and OpenAI Responses API Structured Outputs
+adapter; keep model choices and all business scoring outside the adapter.
+
+[ ] A10 Add exact-span and numeric-grounding validation, high-impact second-pass
+verification, contradiction preservation, and prompt-injection controls.
+
+[ ] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
+cluster calculation, persona separation, and report section.
+
+[ ] A12 Build exact M1/M4/M5/M6/M7 source-to-metric transformations and v1
+formula calculators with golden/UNKNOWN tests.
+
+[ ] A13 Build evidence-grounded workflow reconstruction, bottleneck metrics,
+and the exact M3 formula.
+
+[ ] A14 Build capability-registry ingestion, integration discovery, complexity,
+and the exact deterministic M9 fit formula.
+
+[ ] A15 Build confidence/completeness, minimum samples, method statuses, UNKNOWN
+rules, contradiction effects, and automatic veto detection.
+
+[ ] A16 Build approved overall weighting, fixed gate profiles, immutable score
+snapshots, deterministic recommendations, and compatibility checks.
+
+[ ] A17 Generate report.json, HTML, PDF, CSV source manifest, score/confidence
+breakdowns, unknowns, raw/normalized/evidence/metrics outputs, and formula appendix.
+
+[ ] A18 Build budget- and compliance-gated automated M8 research invitations,
+interviewer/landing flow, respondent qualification, and exact M8 calculation.
+
+[ ] A19 Build explicitly budget-enabled M10 experiment adapters, landing/CRM
+telemetry, hard spending stops, and exact M10 calculation.
+
+[ ] A20 Run three materially different markets through M1-M7/M9; enable M8/M10
+only for finalists with separately configured credentials, consent, and budget.
 
 5. PHASE CHECKPOINTS
 ========================================================================
@@ -221,7 +294,7 @@ Exit condition: A clean Windows environment starts web/API/PostgreSQL/pgvector/n
 
 [x] P01-04 Scaffold FastAPI settings, safe errors, structured logs, OpenAPI, liveness/readiness, and test setup. Evidence: API/contract unit tests, Ruff, mypy pass; real PostgreSQL/worker integration is separately pending P01-05/P01-06/P01-10.
 
-[!] P01-05 Configure PostgreSQL/pgvector, SQLAlchemy, Alembic, initial infrastructure migration, and vector round-trip test. Code/offline SQL checks pass; actual migration/role/vector/downgrade-upgrade acceptance requires provisioned native PostgreSQL (D10).
+[x] P01-05 Configure PostgreSQL/pgvector, SQLAlchemy, Alembic, initial infrastructure migration, and vector round-trip test. Supabase PostgreSQL 17 is live under D14 at Alembic 0006 with pgvector 0.8.2; restricted runtime/migration identities, TLS, bounded pooling, private schema, vector operation, grants, and safe hosted acceptance pass.
 
 [~] P01-06 Configure the PostgreSQL-backed native Windows worker, typed jobs, status reporting, leases/heartbeats, idempotency, bounded retries, recovery, and graceful shutdown. Generic queue schema/adapter, Alembic 0003, native concurrency-1 runner, safe retry/logging behavior, and offline/unit contracts pass. Real PostgreSQL concurrent-claim, recovery, round-trip, and operator shutdown/restart acceptance remain D10.
 
@@ -241,9 +314,9 @@ Completed checkpoints: 0/7
 Dependencies: Phase 1; approved organization and role model.
 Exit condition: An authenticated researcher can create a market and see an empty ten-method workspace without tenant leakage.
 
-[!] P02-01 Add organization, user, role, market, definition-version, hypothesis, and research-plan migrations. Seven feature-owned models and Alembic 0002 are written; offline model/DDL/upgrade/downgrade checks pass. Actual PostgreSQL constraint/grant/migration/reflection tests require a provisioned native test service (D10). No business endpoints enabled.
+[x] P02-01 Add organization, user, role, market, definition-version, hypothesis, and research-plan migrations. Alembic 0001-0006 is applied to Supabase; hosted reflection, grants, private-schema isolation, append-only definitions, and tenant constraints pass. No market business endpoint is enabled.
 
-[~] P02-02 Implement authentication/session handling and server-enforced organization/role permissions. Authorization core plus local Argon2id credentials, hashed PostgreSQL sessions, transactional login/rotation/revocation/audit, bounded account lockout, CSRF cookie adapter, Alembic 0004, composition wiring, and interactive one-time bootstrap CLI are offline-tested. Auth HTTP adapter remains unregistered; audited role administration and live PostgreSQL/bootstrap/browser acceptance remain. No login or market route is enabled.
+[~] P02-02 Implement authentication/session handling and server-enforced organization/role permissions. Existing local Argon2id credentials, hashed PostgreSQL sessions, login/rotation/revocation, lockout, CSRF, and bootstrap remain. An explicit auth-route toggle, current-session endpoint, persisted-CSRF mutation guard, tenant-derived recent-auth role administration, and Alembic 0006 role-change audit are partially implemented and focused-tested. Documentation, repository/live tests, Supabase migration/bootstrap, browser acceptance, and final route activation remain; market routes are still absent.
 
 [ ] P02-03 Implement market create/read/update/archive APIs and validated definitions, owner, reviewer, and hypotheses.
 
@@ -758,6 +831,7 @@ D10 | Owner: Project owner/system administrator; technical lead for verification
       instance with separate restricted application and migration roles; record
       actual versions/readiness. Redis/Linux/WSL/VM/containers are not required.
       Hosted CI is deferred; do not publish code without separate approval.
+      Superseded for database hosting by D14; retained as historical context.
 
 D11 | Owner: Project owner + technical lead | APPROVED 2026-09-03
     | Needed by: P02-02 authentication and authenticated market API/UI
@@ -786,6 +860,18 @@ D13 | Owner: Project owner | APPROVED 2026-09-03
       lineage, deterministic scoring, authorization, or audit requirements.
       Target architecture/docs are aligned; replacement code and live acceptance
       remain under P01-06/P01-07/P01-08/P01-10 and P02-02.
+
+D14 | Owner: Project owner | APPROVED 2026-09-08
+    | The user selected Supabase as the database. Use its managed PostgreSQL and
+      pgvector service through TLS from the native Windows API/worker; Docker,
+      WSL, Redis, Celery, and a Linux runtime remain excluded. Keep Alembic,
+      SQLAlchemy, the durable PostgreSQL queue, tenant-scoped repositories, and
+      application-owned local authentication. Do not add Supabase Auth, browser
+      database access, public service-role credentials, or a second persistence
+      path without a separate requirement. Use distinct runtime and migration
+      credentials where the selected Supabase plan permits; keep secrets local.
+      Hosted destructive database-cycle tests must target a dedicated disposable
+      project/database and are not authorized against shared or production data.
 
 8. DEFERRED / OPTIONAL BACKLOG (NOT IN BASELINE COUNTS)
 ------------------------------------------------------------------------
@@ -1781,8 +1867,626 @@ Next:
   Commit and push this final README/tracker publication record, verify remote main
   matches local HEAD, then resume P03-04 when requested.
 
+2026-09-08 23:18 PKT (UTC+05:00) | SUPABASE-001 | D14 / P01-05 / P02-01 / P02-02 | IN_PROGRESS
+Work:
+  User selected Supabase as the database and asked to finish database,
+  authentication, and related foundations before continuing feature code. Recorded
+  D14: Supabase provides managed PostgreSQL/pgvector while the API, web, worker,
+  Alembic, queue, and application-owned authentication remain Windows-native and
+  modular. Supabase Auth and direct browser database access are outside this choice.
+Verification:
+  Existing ignored .env key names were inspected without printing values. Both
+  MASK_DATABASE_URL and MASK_MIGRATION_DATABASE_URL still target the previous
+  local 127.0.0.1:5433 service and do not explicitly request TLS. No Supabase
+  credential is configured, no database connection or migration was attempted,
+  and counts remain 16/151 complete.
+Limitations/blockers:
+  Live acceptance requires private Supabase application and migration URLs. The
+  existing destructive database-cycle harness must remain blocked from a shared
+  hosted database; this work will add a safe Supabase-compatible acceptance path
+  rather than weakening that protection. No real account will be bootstrapped
+  until the target database and migration result are verified.
+Next:
+  Add a Supabase deployment ADR, TLS/connection-mode validation, safe hosted
+  migration and integration profiles, documentation/tests, and then run the
+  complete offline quality suite. Execute live migration/auth acceptance only
+  after the owner privately configures the approved Supabase URLs.
+
+2026-09-08 23:48 PKT (UTC+05:00) | SUPABASE-002 | D14 / P01-05 / P02-01 / P02-02 | IN_PROGRESS / PLAN HANDOFF
+Work:
+  Implemented the offline Supabase/auth foundation: explicit local/Supabase
+  target validation, TLS and safe connection-mode requirements, bounded runtime
+  pooling, migration isolation, a private mask schema, least-privilege role
+  provisioning, hosted-test guards, and migrations 0005/0006. Added an explicit
+  auth-route toggle, current-session endpoint, persisted CSRF validation, and a
+  tenant-derived administrator role-update flow with last-admin protection and
+  transactional audit data. Paused further expansion to present an evidence-based
+  execution plan as requested.
+Files:
+  apps/api/src/mask_api/config.py, apps/api/src/mask_api/database.py,
+  apps/api/src/mask_api/persistence/targets.py,
+  apps/api/src/mask_api/modules/identity/, apps/api/src/mask_api/persistence/,
+  apps/api/migrations/versions/0005_private_application_schema.py,
+  apps/api/migrations/versions/0006_membership_role_audit.py,
+  apps/api/tests/, scripts/check_services.py,
+  scripts/provision_supabase_role.py, package.json, progress.txt.
+Verification:
+  Installed uv 0.12.9 and created the frozen environment with the available
+  bundled Python 3.12.14. Focused affected suite PASS: 163 tests; changed-scope
+  Ruff PASS. Initial focused runs exposed two implementation defects and two
+  stale assertion patterns; each was corrected before the final passing run.
+  No Supabase connection, migration, bootstrap, or live authentication flow was
+  run. Full Python/web regression, mypy, OpenAPI/schema generation, architecture,
+  and final secret checks remain NOT RUN for this partial slice.
+Limitations/blockers:
+  No Supabase project URLs are configured; ignored .env still points to the old
+  local target. The deployment ADR, environment examples, and operational docs
+  are not synchronized, and the live role-store integration case is still
+  missing. The verified interpreter is one patch newer than the pinned 3.12.13.
+  Changes are uncommitted and unpushed. No master checkpoint closes, so counts
+  remain 16/151 complete and 135 remaining.
+Next:
+  Review the phased plan with the owner, finish and fully verify the offline
+  Supabase/auth slice, then configure a dedicated Supabase project privately and
+  execute safe migration, permission, authentication, and role-audit acceptance.
+
+2026-09-09 00:40 PKT (UTC+05:00) | SUPABASE-003 | D14 / P01-05 / P02-01 | REVIEW_PENDING / CONNECTION PAUSED
+Work:
+  Began the owner-requested live Supabase connection. Re-read the project and
+  Windows/modularity constraints, inspected only redacted environment status,
+  confirmed both configured database URLs still target 127.0.0.1:5433, opened
+  the official Supabase dashboard, and selected GitHub sign-in. Stopped before
+  GitHub's Supabase OAuth authorization action and preserved the browser page.
+Files:
+  progress.txt only. No secret, environment, database, account, or source-code
+  value was changed during this connection attempt.
+Verification:
+  Official Supabase sign-in redirected to GitHub's authorization page for the
+  signed-in ALiShahzainAbbasi account. The visible request grants Supabase
+  read-only access to GitHub email addresses and redirects through
+  auth.supabase.io. No authorization was granted, no project was selected or
+  created, no credential was retrieved, and no database connection was run.
+Limitations/blockers:
+  Computer-control confirmation policy requires explicit owner confirmation
+  immediately before sharing the GitHub email data and granting this OAuth
+  access. The application cannot receive a Supabase connection URL until that
+  login completes and an existing dedicated development project is identified.
+  Counts remain 16/151 complete and 135 remaining.
+Next:
+  With explicit owner confirmation, authorize Supabase on GitHub, inspect the
+  available projects, and continue the least-privilege connection without
+  printing or committing credentials.
+
+2026-09-09 01:09 PKT (UTC+05:00) | SUPABASE-004 | D14 / P01-05 / P02-01 | REVIEW_PENDING / PROJECT CREATION PAUSED
+Work:
+  Continued after the owner's explicit GitHub OAuth approval. Completed the
+  Supabase dashboard sign-in, inspected the existing Free-plan organization and
+  project list, and opened the new-project form after no usable project appeared.
+  Reviewed current Supabase connection, Data API, and breaking-change guidance:
+  this persistent Windows backend should use direct IPv6 where available or
+  session-mode port 5432 on IPv4, require TLS, and keep the Data API disabled.
+Files:
+  progress.txt only. The ignored .env, database, cloud project state, and source
+  code remain unchanged.
+Verification:
+  Dashboard session is authenticated for the owner's GitHub-backed account. The
+  organization reports a Free plan; its project page displayed no project card.
+  The new-project form is open and exposes project name, generated database
+  password, region, Data API, automatic table exposure, automatic RLS, and the
+  final Create new project action. No project or database credential was created.
+Limitations/blockers:
+  Creating the project is an external cloud side effect that generates persistent
+  database access credentials. Computer-control policy requires explicit owner
+  confirmation at this final action stage. A region and generated password have
+  not yet been selected, and the application cannot be connected before creation
+  completes. Counts remain 16/151 complete and 135 remaining.
+Next:
+  With explicit owner confirmation, create a Free-plan project named MASK Market
+  Intelligence in the nearest available South Asia region, disable the Data API
+  and automatic exposure, retain the credential privately, then configure .env,
+  provision mask_app, migrate, and run safe live acceptance.
+
+2026-09-09 19:55 PKT (UTC+05:00) | SUPABASE-005 | D14 / P01-05 / P02-01 | REVIEW_PENDING / PASSWORD HANDOFF
+Work:
+  After explicit owner approval, created the dedicated Free-plan MASK Market
+  Intelligence Supabase project in South Asia (Mumbai), disabled the Data API and
+  automatic table exposure, and waited for Healthy status. Verified this Windows
+  host can reach the project's direct IPv6 endpoint, selected direct port 5432,
+  and staged separate postgres migration and mask_app runtime credentials in the
+  ignored local .env with explicit TLS. The initial generated database password
+  was not recoverable after project creation, so a replacement was generated via
+  a one-shot loopback-only bridge and filled into Supabase's reset dialog.
+Files:
+  Ignored .env updated privately; progress.txt updated. A temporary untracked
+  helper exists outside the project at work/supabase-secret-bridge.py until the
+  connection handoff completes. Source code and committed configuration: unchanged.
+Verification:
+  Supabase dashboard shows project mtcmciyipxxiwfidrtxh Healthy on NANO compute
+  in ap-south-1. Data API and automatic exposure were visibly disabled at project
+  creation. Direct DNS resolved to IPv6 and TCP port 5432 PASS; session-pooler TCP
+  also PASS but is not selected. Redacted Settings validation PASS: target
+  supabase, official matching direct hosts, runtime role mask_app, migration role
+  postgres, sslmode=require for both, hosted safe tests enabled, auth routes off.
+  Git confirms .env is ignored. No secret was printed. No live SQL, role creation,
+  migration, integration test, or authentication bootstrap has run yet.
+Limitations/blockers:
+  The computer-control safety policy forbids automating the final submit action
+  of a password change. The owner must click the visible Reset password button;
+  until then the staged migration credential intentionally cannot authenticate.
+  The asynchronously loaded organization was later found to contain the unrelated
+  Nexa Fund backend project; it was not changed. Counts remain 16/151 complete
+  and 135 remaining.
+Next:
+  Owner clicks Reset password and reports completion. Then verify postgres login,
+  provision and verify mask_app, migrate through 0006, and run non-destructive
+  Supabase schema/permission/TLS/integration acceptance.
+
+2026-09-09 20:31 PKT (UTC+05:00) | SUPABASE-006 | P01-05 / P02-01 | COMPLETE
+Work:
+  Connected the Windows application to the dedicated Supabase project, provisioned
+  the restricted mask_app login, applied Alembic 0001-0006, and switched the
+  runtime to the IPv4 session pooler after one transient direct-IPv6 timeout.
+  Corrected ORM flush ordering so a new server session exists before its audit
+  event, made TLS readiness inspect the client-to-endpoint connection, normalized
+  PostgreSQL Enum CHECK reflection acceptance, and made role provisioning support
+  safe Supabase-compatible runtime-password rotation.
+Files:
+  Ignored .env; apps/api/src/mask_api/database.py, health.py, identity/auth_repository.py;
+  scripts/provision_supabase_role.py; integration/database-target tests; migrations
+  0005/0006 formatting; progress.txt and progress checker.
+Verification:
+  PostgreSQL 17.6, TLS, pgvector 0.8.2, Alembic 0006, 12 private mask tables,
+  restricted mask_app flags, no runtime CREATE privileges, and no mask schema
+  usage for anon/authenticated/service_role verified. Live non-destructive suite:
+  18 PASS. Offline suite: 248 Python + 11 web PASS. Ruff/format PASS; mypy PASS
+  over 88 files; architecture, OpenAPI, generated TypeScript schema, and local
+  secret guard PASS. The dashboard password dialog was closed.
+Limitations/blockers:
+  A failed low-level connection traceback exposed the generated mask_app-only
+  runtime credential; it was immediately replaced and the new credential verified.
+  The Supabase admin password was not exposed by the traceback. Windows Gitleaks
+  ran and reported three redacted findings that still require file/type triage,
+  so P01-08 remains open. API/worker/browser auth bootstrap was not run, and
+  P02-02 remains in progress. Counts become 18/151 before the new A01-A20 scope.
+Next:
+  Implement A01 from the new autonomous build specification; separately triage
+  Gitleaks without printing secrets and continue P02-02 only when useful.
+
+2026-09-09 20:31 PKT (UTC+05:00) | AUTONOMOUS-001 | A01-A20 | A01 IN_PROGRESS
+Work:
+  Accepted the owner-supplied Autonomous Market Intelligence Engine Build
+  Specification v1 as the functional formula/procedure source. Added the 20
+  source-defined A01-A20 checkpoints without removing or renumbering the original
+  151 checkpoints. Started A01: versioned formulas, strict market configuration,
+  source profiles, shared deterministic math, documentation, and tests.
+Files:
+  progress.txt and scripts/check-progress.mjs. Source DOCX remains read-only.
+Verification:
+  Extracted all 228 paragraphs and 25 tables with bundled document tooling.
+  The specification contains exact M1-M10, confidence, gate, veto, source, and
+  acceptance rules. DOCX raster rendering is unavailable because the resolved
+  workspace dependency bundle contains no LibreOffice executable; content-level
+  extraction succeeded and no DOCX output is being authored.
+Limitations/blockers:
+  A01 implementation and tests are active. Paid APIs, LLM calls, collection,
+  outreach, and campaign spending remain disabled. Overall tracker denominator
+  changes from 151 to 171; 18 are complete and 153 remain.
+Next:
+  Finish A01, run focused/full static tests, update docs and tracker, then begin
+  A02 LocalArtifactStore through explicit CLI persistence wiring.
+
+2026-09-09 20:57 PKT (UTC+05:00) | AUTONOMOUS-002 | A01 | DONE
+Work:
+  Implemented the first functional checkpoint from the owner-supplied build
+  specification. Added strict frozen market, formula, source-profile, confidence,
+  gate, veto, completeness, and sample contracts; canonical validated-content
+  SHA-256 loaders; exact v1 M1-M10 configuration; an opt-in US public-source
+  profile; a Windows-ready HVAC sample market; generated market JSON Schema;
+  and Decimal implementations of clamp10, linear, reverse_linear, log_scale,
+  ratio_score, decay, weighted_mean, and safe_rate. UNKNOWN remains distinct
+  from zero, invalid domains fail explicitly, and all network/paid sources are
+  disabled by default. Documented the CLI/module contract and reconciled the
+  earlier provisional scoring text with the newly approved v1 rules.
+Files:
+  AGENTS.md; README.md; apps/api/pyproject.toml;
+  apps/api/src/mask_api/modules/evidence/AGENTS.md;
+  apps/api/src/mask_api/modules/scoring/{__init__.py,math.py};
+  apps/api/src/mask_api/research_runner/{__init__.py,configuration.py,contracts.py};
+  apps/api/tests/{research_runner,scoring}/; configs/formulas/v1.yaml;
+  configs/markets/us_hvac_10_99.yaml;
+  configs/sources/default_us_public.yaml;
+  configs/schemas/market.schema.json; docs/AUTONOMOUS_RESEARCH_MODE.md;
+  docs/MODULARITY.md; docs/SCORING.md; package.json;
+  scripts/export-research-schemas.py; progress.txt; uv.lock.
+Verification:
+  `uv sync --frozen` PASS (47 packages checked). Focused A01 suite PASS: 28.
+  Full offline Python suite PASS: 276 passed, 25 integration tests deselected;
+  web suite PASS: 11. Ruff lint/format PASS over 176 files; web ESLint/Prettier
+  PASS; strict mypy PASS over 93 source files; web type generation/TypeScript
+  PASS; architecture/import-cycle check PASS; OpenAPI/TypeScript schema drift
+  PASS; research JSON Schema drift PASS; local secret guard PASS. The only test
+  warning specific to the environment is denied pytest cache writing; test
+  execution/results are unaffected.
+Limitations/blockers:
+  No database schema or runtime wiring changed, so the 18 previously passing
+  Supabase live tests were not rerun for A01. Windows Gitleaks was not rerun;
+  its prior three redacted findings remain an explicit P01-08 triage item. A01
+  defines/validates formulas but does not yet calculate whole methods; those
+  implementations remain A11-A16. No network, LLM, outreach, campaign, or paid
+  research ran.
+Next:
+  Implement A02 LocalArtifactStore behind an explicit artifact persistence port,
+  with atomic bounded writes, safe run paths, lineage, and offline tests. Then
+  implement A03 ResearchRunner CLI against that port.
+
+2026-09-09 20:58 PKT (UTC+05:00) | AUTONOMOUS-003 | A02 | IN_PROGRESS
+Work:
+  Started the explicit local artifact persistence checkpoint after A01 passed.
+  Scope is a typed port plus filesystem adapter for bounded atomic raw,
+  normalized, evidence, metric, report, manifest, lineage, and log artifacts.
+  It must reject path traversal and never activate as a database fallback.
+Files:
+  progress.txt. The temporary workspace-only Supabase secret bridge helper was
+  deleted after connection setup; it was outside the repository.
+Verification:
+  Predecessor A01 and tracker checks PASS (19/171 complete).
+Limitations/blockers:
+  A02 code and acceptance tests are active. No database, network, or paid service
+  is required or authorized for this adapter.
+Next:
+  Define the artifact contracts/port, implement atomic local writes, add hostile
+  path/limit/idempotency tests, and rerun the full static suite.
+
+2026-09-09 21:09 PKT (UTC+05:00) | AUTONOMOUS-004 | A02 | DONE
+Work:
+  Implemented a typed `ArtifactStore` port and explicit `LocalArtifactStore`
+  adapter. The adapter writes exact bytes atomically into fixed raw, normalized,
+  evidence, metrics, reports, manifests, lineage, and logs namespaces. It returns
+  content SHA-256 receipts, makes identical writes idempotent, rejects immutable
+  conflicts, emits deterministic JSON, blocks absolute/traversal/backslash/drive/
+  Windows-device/ambiguous paths, and enforces positive file/count/run byte hard
+  limits. Run outputs are ignored by Git. No API/worker fallback wiring was added.
+Files:
+  .gitignore; README.md;
+  apps/api/src/mask_api/research_runner/{__init__.py,artifacts.py,ports.py,local_artifacts.py};
+  apps/api/tests/research_runner/test_local_artifacts.py;
+  docs/AUTONOMOUS_RESEARCH_MODE.md; progress.txt.
+Verification:
+  Focused research-runner suite PASS: 38. Full offline Python suite PASS:
+  305 passed, 25 integration tests deselected; web suite PASS: 11. Ruff
+  lint/format PASS over 180 files; strict mypy PASS over 96 source files;
+  web ESLint/Prettier/type generation/TypeScript PASS; architecture/import-cycle
+  PASS; OpenAPI/TypeScript and research-schema drift checks PASS. Tests cover all
+  eight artifact kinds, exact binary preservation, deterministic JSON, listing,
+  idempotency, conflict, hostile paths, Windows reserved names, byte/count limits,
+  missing artifacts, invalid roots/limits, and failed atomic-write cleanup.
+Limitations/blockers:
+  A02 is a local filesystem adapter only; A03 must compose it explicitly. It does
+  not replace Supabase or evidence database persistence. The environmental pytest
+  cache permission warning remains non-blocking. Database integration was not
+  rerun because A02 has no SQL/runtime wiring. No network or paid operation ran.
+Next:
+  Implement A03 command parsing and ResearchRunner orchestration with config hash
+  manifest, selected-method validation, resume behavior, hard budgets, explicit
+  LocalArtifactStore composition, and fail-soft partial run summaries.
+
+2026-09-09 21:25 PKT (UTC+05:00) | AUTONOMOUS-005 | A03 | IN_PROGRESS
+Work:
+  Started the one-command ResearchRunner slice. The runner will load/hash the A01
+  contracts, compose A02 local persistence explicitly, validate method selection,
+  write append-only run/method manifests, enforce a shared hard budget ledger,
+  resume only compatible output directories, and isolate method failures so
+  honest partial results survive.
+Files:
+  progress.txt.
+Verification:
+  A01-A02 predecessor checks PASS; 20/171 checkpoints complete.
+Limitations/blockers:
+  Source executors remain separate A04-A10 work. An uninstalled or disabled
+  method must stay UNKNOWN rather than generate placeholder evidence or scores.
+Next:
+  Add runner/budget/result contracts, CLI parsing/composition, fake-executor and
+  subprocess acceptance tests, then execute the documented command locally.
+
+2026-09-09 21:39 PKT (UTC+05:00) | AUTONOMOUS-006 | A03 | DONE
+Work:
+  Implemented `python -m mask_api.research_runner run <market> --methods <all|list>
+  --output <run-dir>`. The application validates matching market/formula/source
+  profiles, canonicalizes method order, writes immutable configuration lineage
+  and append-only checkpoints, resumes compatible interrupted/terminal runs,
+  rejects incompatible/non-manifest output, isolates executor failures, and keeps
+  M8/M10 UNKNOWN when live validation is disabled. Added a shared atomic budget
+  ledger for requests, documents, bytes, duration, and paid USD cost; an attempted
+  overage is rejected before usage changes and stops later dispatch. No raw
+  exception text is persisted.
+Files:
+  README.md; apps/api/src/mask_api/research_runner/{__init__.py,__main__.py,
+  budgets.py,contracts.py,execution.py,runner.py};
+  apps/api/tests/research_runner/{test_budgets.py,test_runner.py};
+  configs/markets/us_hvac_10_99.yaml; configs/schemas/market.schema.json;
+  docs/AUTONOMOUS_RESEARCH_MODE.md; progress.txt.
+Verification:
+  Focused research-runner suite PASS: 57. Full offline Python suite PASS:
+  324 passed, 25 integration tests deselected; web suite PASS: 11. Ruff
+  lint/format PASS over 186 files; strict mypy PASS over 100 source files;
+  web ESLint/Prettier/type generation/TypeScript PASS; architecture/import-cycle,
+  OpenAPI/TypeScript drift, research-schema drift, frozen dependency sync, and
+  local secret guard PASS. Executed the exact documented CLI with all methods:
+  it created checkpoint 12 as `partial` because no source executors are installed;
+  the second execution safely resumed the same checkpoint with exit code 2.
+Limitations/blockers:
+  A03 deliberately does not pretend to scrape: uninstalled executors produce
+  `method.executor_unavailable` and UNKNOWN results. Actual permitted discovery
+  and source adapters begin in A04-A08. No database integration rerun was needed;
+  A03 is local orchestration only. No live network, paid API, LLM, outreach, or
+  campaign ran. Environmental pytest cache and Starlette/httpx deprecation
+  warnings remain non-blocking.
+Next:
+  Build A04 deterministic query generation and an optional Brave Search adapter
+  that is disabled without explicit source enablement, credential, current policy,
+  and positive cost budget; retain discovery provenance for A05-A10 collectors.
+
+2026-09-09 21:40 PKT (UTC+05:00) | AUTONOMOUS-007 | A04 | IN_PROGRESS
+Work:
+  Started deterministic source discovery and the optional Brave Search edge
+  adapter. Discovery queries will derive only from validated market terms,
+  problems, buyers, geography, and method-specific intent templates. The network
+  adapter will remain separate, bounded, credential-injected, and provenance-rich.
+Files:
+  progress.txt.
+Verification:
+  A03 completed with the documented CLI smoke/resume behavior.
+Limitations/blockers:
+  Live Brave execution requires a user-provided credential plus explicit paid
+  source/budget enablement; neither is assumed. Official API behavior is being
+  verified before implementing the adapter.
+Next:
+  Confirm the current official endpoint/header/response contract, implement pure
+  query generation plus transport port/parser, and add fixture-only acceptance.
+
+2026-09-09 21:52 PKT (UTC+05:00) | AUTONOMOUS-008 | A04 | DONE
+Work:
+  Implemented bounded deterministic discovery-query plans for M1-M7/M9 from
+  validated market terms/problems/buyers/geography, with stable IDs, canonical
+  ordering, exact dedupe, source-term lineage, and provider query-size limits.
+  M8/M10 intentionally generate no public-search queries. Added the optional
+  Brave Web Search adapter behind injected transport, source/profile checks,
+  explicit enable/policy/key gates, positive paid budget/request cost, worst-case
+  preflight capacity, strict safe search, fixed origin/API version, bounded pages,
+  no ambient proxy/cookies/redirects, raw response preservation/hash, URL safety,
+  rank/query/page/time provenance, exact usage accounting, and safe error classes.
+Files:
+  README.md; apps/api/src/mask_api/modules/discovery/{__init__.py,contracts.py,
+  query_planner.py,brave.py}; apps/api/src/mask_api/research_runner/budgets.py;
+  apps/api/tests/discovery/ including two JSON fixtures; docs/DISCOVERY.md;
+  docs/MODULARITY.md; progress.txt.
+Verification:
+  Official Brave documentation confirmed endpoint, required subscription-token
+  header, 600-character/75-word query limits, count max 20, offset max 9,
+  `more_results_available`, and optional dated Api-Version header. Focused A04/
+  budget suite PASS: 27. Full offline Python suite PASS: 344 passed, 25 integration
+  tests deselected; web PASS: 11. Ruff/format PASS over 193 files; strict mypy PASS
+  over 104 source files; web lint/format/types, architecture/import-cycle,
+  OpenAPI/TypeScript drift, research-schema drift, and local secret guard PASS.
+Limitations/blockers:
+  The Brave adapter is not composed into a method executor and cannot run without
+  explicit policy approval, injected key, positive cost estimate, and positive
+  paid run budget. No subscription/key was created and no live/paid request ran.
+  Discovery results remain candidates, not evidence, until a registered downstream
+  source policy permits collection.
+Next:
+  Implement A05 official government adapters and normalized metric observations;
+  keep keyless sources usable and BEA/SAM credential paths disabled without keys.
+
+2026-09-09 21:52 PKT (UTC+05:00) | AUTONOMOUS-009 | A05 | IN_PROGRESS
+Work:
+  Started fixture-backed official US data adapters for Census CBP, BLS, BEA, SEC
+  EDGAR, and SAM.gov. Shared behavior will cover fixed official origins, explicit
+  request contracts, credential injection where required, budget reservation,
+  raw response/hash provenance, typed observations, and safe parser failures.
+Files:
+  progress.txt.
+Verification:
+  A04/full static suite PASS before A05 start.
+Limitations/blockers:
+  Credential-gated live smoke tests can only run when the user supplies official
+  keys and explicitly enables them. Fixture acceptance does not claim live data.
+Next:
+  Verify official endpoint/field contracts, then implement and test each parser
+  without network calls.
+
+2026-09-09 22:29 PKT (UTC+05:00) | AUTONOMOUS-010 | A05 | IN_PROGRESS
+Work:
+  Implemented modular official-data contracts, validated request builders,
+  source-neutral observation/record parsers, a fixed-origin urllib transport,
+  and an opt-in adapter for Census CBP, BLS, BEA Regional, SEC EDGAR submissions,
+  and SAM.gov opportunities. Dispatch now requires a matching official_api
+  profile plus explicit enablement and policy approval; required credentials stay
+  in SecretStr fields and stored provenance records only credential field names.
+  Added current API bounds including explicit Census NAICS vintage, registered/
+  unregistered BLS caps, SEC contact User-Agent, and SAM one-year/page bounds.
+  Exact raw bytes/hash/parser version are retained; invalid rows stay issues,
+  exact duplicates do not inflate normalized results, and empty valid responses
+  do not invent data. The SAM parser excludes point-of-contact data and echoed
+  links while retaining bounded procurement and award fields.
+Files:
+  .env.example; README.md; configs/sources/default_us_public.yaml;
+  apps/api/src/mask_api/modules/official_data/{__init__.py,contracts.py,errors.py,
+  parsers.py,requests.py,transport.py}; apps/api/tests/official_data/ including
+  five JSON fixtures and request/parser/transport/live-smoke tests;
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md,OFFICIAL_DATA.md}; progress.txt.
+Verification:
+  Current official Census, BLS, BEA, SEC, and SAM documentation checked for
+  endpoint, authentication/contact, parameter, pagination, and query limits.
+  Focused A05 offline suite PASS: 32; credential-gated live suite SKIPPED: 5 as
+  designed. Full offline Python PASS: 376 passed, 30 integration tests deselected;
+  web PASS: 11. Ruff/format PASS over 204 files; strict mypy PASS over 110 source
+  files; web ESLint/Prettier/type generation/TypeScript, architecture/import-cycle,
+  OpenAPI/TypeScript drift, research-schema drift, git diff whitespace, and local
+  secret guard PASS. Windows Gitleaks reran and again reported three redacted
+  findings; this remains the pre-existing P01-08 triage item.
+Limitations/blockers:
+  A05 is not DONE because its acceptance requires a deliberately small live run.
+  The environment has no authorized Census/BLS/BEA/SAM keys, source-policy/run
+  flags, or official contact email; no live call was attempted. Adapters are not
+  yet composed into method executors because exact source-to-formula transforms
+  are A11-A12, and API/worker persistence remains Phase 3. Fixtures are not market
+  evidence. No paid API/model, broad crawl, outreach, or campaign ran.
+Next:
+  Owner: locally provide MASK_OFFICIAL_CONTACT_EMAIL and applicable official API
+  keys, then explicitly set MASK_OFFICIAL_POLICY_APPROVED=1 and
+  MASK_RUN_LIVE_OFFICIAL_SMOKE=1 for the five-call harness. After it passes,
+  mark A05 DONE and begin A06 permitted discussion/web source adapters.
+
+2026-09-09 22:55 PKT (UTC+05:00) | AUTONOMOUS-011 | A05 / A06 | REVIEW_PENDING / IN_PROGRESS
+Work:
+  Owner directed that APIs which are not freely available be put on hold and not
+  block forward coding. Recorded A05 live acceptance as REVIEW_PENDING rather
+  than falsely complete, and started A06 on the zero-paid-cost permitted paths.
+  The source profile will record operational availability separately from policy
+  and cost so disabled paid/credential sources cannot be activated accidentally.
+Files:
+  progress.txt.
+Verification:
+  A05 offline implementation remains at 32 passing tests; full offline suites and
+  static gates from AUTONOMOUS-010 remain PASS. No source/API call was made.
+Limitations/blockers:
+  A05's live government smoke awaits optional credentials. Google Places and
+  Brave are paid and held. YouTube and approved Reddit need account credentials/
+  approval and are held until available. SEC, RSS/Atom, static HTML, and bounded
+  keyless BLS capability remain usable under an approved current source policy.
+Next:
+  Add executable source availability states, source-family lineage/dedupe, and
+  conservative declared-persona normalization; reuse the tested RSS/Atom and
+  static-HTML collectors without creating duplicate network/parser stacks.
+
+2026-09-09 23:07 PKT (UTC+05:00) | AUTONOMOUS-012 | A06 | IN_PROGRESS
+Work:
+  Added executable source operational states: available, credential_pending,
+  approval_pending, and paid_hold. The default lean profile now keeps Google
+  Places, Brave, firmographics, and validation accounts on paid hold; keeps
+  account-dependent APIs pending; and leaves SEC, bounded keyless BLS, RSS/Atom,
+  and registered static HTML available but still disabled/policy-gated. Brave and
+  official adapters reject held sources before network access. Extended the
+  common evidence contract with source-family lineage, duplicate-family links,
+  distinct-family metrics, and the approved seven-value persona taxonomy. Added
+  deterministic declared-persona-v1 normalization: only an explicit unambiguous
+  public role hint is classified; names, absent hints, and mixed roles stay
+  UNKNOWN. Reused the existing bounded RSS/Atom and static-HTML collectors.
+Files:
+  README.md; configs/sources/default_us_public.yaml and generated source schema;
+  apps/api/src/mask_api/modules/{discovery/brave.py,evidence/contracts.py,
+  evidence/domain.py,evidence/normalization.py,evidence/services.py,
+  official_data/transport.py}; apps/api/src/mask_api/research_runner/contracts.py;
+  apps/api/tests/{conftest.py,discovery/test_brave.py,evidence/test_normalization.py,
+  evidence/test_service.py,official_data/test_live_official_smoke.py,
+  official_data/test_transport.py,research_runner/test_configuration.py};
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,COLLECTORS.md,MODULARITY.md,
+  SOURCE_AVAILABILITY.md}; progress.txt.
+Verification:
+  A06 evidence/config focused suite PASS: 46. Combined collector/discovery/
+  official/runner suite PASS: 148 with 5 live tests deselected. Full offline
+  Python PASS: 379 passed, 30 integration tests deselected; web PASS: 11.
+  Ruff/format PASS over 205 files; strict mypy PASS over 110 source files; web
+  ESLint/Prettier/type generation/TypeScript, architecture/import-cycle,
+  OpenAPI/TypeScript drift, and regenerated research-schema drift PASS.
+Limitations/blockers:
+  A06 is not complete because YouTube and Reddit adapters require unavailable
+  credentials/provider approval and Google Places is paid; owner explicitly put
+  these on hold. RSS/Atom and static HTML require actual registered, approved,
+  current source-policy records before live use. No crawler, API/worker route,
+  source request, paid service, model call, outreach, or campaign was activated.
+Next:
+  Continue the no-paid path with A07 intent-taxonomy and cache contracts while
+  holding Google Ads Keyword Planner network access, or proceed to A09/A10 local
+  extraction validation if the taxonomy alone cannot satisfy M6 metrics.
+
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 01:06 PKT (UTC+05:00) | AUTONOMOUS-014 | A05 | DONE
+Work:
+  Owner supplied local Census, BEA, and SAM.gov credentials, approved their use,
+  and directed YouTube and other unavailable providers to remain skipped. Stored
+  the three values only in an ignored local environment file. Ran one bounded
+  live query for each supplied API plus keyless BLS and SEC EDGAR. Replaced the
+  discontinued BEA CAEMP25N smoke query with one active CAINC4 county query and
+  made the parser recognize BEA's current top-level error envelope. Marked the
+  three credentialed source states available in source profile v2 and documented
+  the exact lean source set and intended research uses without recording secrets.
+Files:
+  Local ignored .env.official.local (not tracked); .gitleaks.toml;
+  configs/sources/default_us_public.yaml and generated source schema;
+  apps/api/src/mask_api/modules/official_data/parsers.py;
+  apps/api/tests/official_data/{test_live_official_smoke.py,test_parsers.py,
+  test_transport.py}; docs/{OFFICIAL_DATA.md,SOURCE_AVAILABILITY.md}; README.md;
+  progress.txt.
+Verification:
+  Authorized live official suite PASS: 5/5 in 40.95 seconds—one Census CBP,
+  keyless BLS, BEA Regional, SEC EDGAR, and SAM.gov request. The first BEA
+  attempt safely failed because its old table was discontinued; the corrected
+  bounded query passed. Local Git contact identity supplied the required
+  user-agent contact and was not committed. Local secret guard PASS. Gitleaks
+  source scan PASS after excluding ignored local environment files while the Git
+  aware guard continues to inspect every tracked/non-ignored source file.
+Limitations/blockers:
+  Official adapters are not yet composed into API/worker jobs or persisted as
+  market evidence; those remain Phase 3/A11-A12 work. Live smoke responses were
+  validation only, not retained research evidence. No broad collection ran.
+Next:
+  Keep these five official sources opt-in and bounded; wire their exact
+  source-to-metric transforms under A11-A12 after extraction validation.
+
+2026-09-10 01:06 PKT (UTC+05:00) | AUTONOMOUS-015 | A07 | IN_PROGRESS
+Work:
+  Implemented source-neutral historical-metrics contracts; exact micros and
+  currency-aware CPC/bid amounts; monthly volume and competition normalization;
+  `keyword-intent-v1`; Google Ads request mapping and fixture parser; a typed
+  cache port with immutable 30-day default local artifact records; short native
+  Windows paths with full internal hash validation; and a fail-closed injected
+  provider adapter. Added module-scoped modularity instructions. No intent weight
+  or M6 score was invented.
+Files:
+  apps/api/src/mask_api/modules/search_intent/{AGENTS.md,__init__.py,cache.py,
+  contracts.py,google_ads.py,taxonomy.py};
+  apps/api/tests/search_intent/{fixtures/google_ads_historical.json,
+  test_cache.py,test_google_ads.py,test_taxonomy.py};
+  apps/api/src/mask_api/research_runner/artifacts.py;
+  docs/{MODULARITY.md,SEARCH_INTENT.md}; README.md; progress.txt.
+Verification:
+  A07 focused suite PASS: 21. Official-parser plus A07 suite PASS: 35. Full
+  offline Python PASS: 402 passed, 30 integration tests deselected; web PASS: 11.
+  Ruff/format PASS over 215 files; strict mypy PASS over 115 source files;
+  architecture/import-cycle, OpenAPI/TypeScript drift, research-schema drift,
+  local Git-aware secret guard, and redacted Gitleaks source scan PASS.
+Limitations/blockers:
+  A07 is not DONE because Google Ads account/developer-token approval and live
+  acceptance remain intentionally held. The concrete credential transport is not
+  bundled or composed. Fixtures are not market evidence, and M6 formula mapping
+  remains A12. YouTube, Reddit, Meta, Google Places, Brave, and firmographics
+  also remain skipped/held. No paid or model call ran.
+Next:
+  Proceed to A09's offline structured extraction/provider port and A10 grounding
+  validation while paid/model network use stays disabled.
+
+2026-09-09 23:18 PKT (UTC+05:00) | AUTONOMOUS-013 | A07 | IN_PROGRESS
+Work:
+  Owner kept all paid and credential-dependent APIs on hold and directed work to
+  continue. Started the offline A07 foundation: versioned intent taxonomy,
+  historical-metrics contracts/parser/cache, and a provider boundary that must
+  reject live Google Ads access while its source status remains held.
+Files:
+  progress.txt.
+Verification:
+  NOT RUN yet; checkpoint implementation has just started. Reviewed the current
+  Google Ads Keyword Planning and historical-metrics field documentation. No
+  provider request was made and no key was read or stored.
+Limitations/blockers:
+  Google Ads live acceptance remains credential/approval pending by owner
+  decision. Offline contracts and fixture-backed behavior can proceed safely.
+Next:
+  Implement the modular A07 contracts, taxonomy, cache, held adapter, fixture
+  parser, tests, and module-boundary documentation; run focused and full gates.
+
 DATE/TIME (timezone) | EVENT ID | CHECKPOINT ID(S) | STATUS
 Work:
   Specific completed or partial work.

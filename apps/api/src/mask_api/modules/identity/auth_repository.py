@@ -191,7 +191,12 @@ class SQLAlchemyAuthenticationStore:
                     current.password_hash = replacement_hash
                     current.password_changed_at = occurred_at
                 persisted = _new_session_model(new_session)
-                session.add_all((persisted, _event_model(event)))
+                # The security event references the newly-created server session.
+                # Flush the session row first because independent ORM mappers do
+                # not imply unit-of-work ordering from table foreign keys alone.
+                session.add(persisted)
+                session.flush()
+                session.add(_event_model(event))
                 session.flush()
                 return _stored_session(persisted)
         except (SQLAlchemyError, ValueError):
@@ -258,7 +263,9 @@ class SQLAlchemyAuthenticationStore:
                 current.revoked_at = revoked_at
                 current.revocation_reason = "rotated"
                 persisted = _new_session_model(replacement)
-                session.add_all((persisted, _event_model(event)))
+                session.add(persisted)
+                session.flush()
+                session.add(_event_model(event))
                 session.flush()
                 return _stored_session(persisted)
         except (SQLAlchemyError, ValueError):

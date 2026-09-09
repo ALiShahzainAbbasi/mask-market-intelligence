@@ -30,6 +30,7 @@ def source_policy() -> SourcePolicy:
         source_id=uuid4(),
         version="policy-v1",
         source_name="Fixture source",
+        source_family="published_feeds",
         base_url="https://research.example.test/",
         status=SourcePolicyStatus.ALLOWED,
         collection_method=CollectionMethod.SCRAPE,

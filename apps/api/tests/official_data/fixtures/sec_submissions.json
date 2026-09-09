@@ -1,0 +1,13 @@
+{
+  "cik": "123456",
+  "name": "Example HVAC Software Inc.",
+  "filings": {
+    "recent": {
+      "accessionNumber": ["0000123456-25-000001", "0000123456-24-000002"],
+      "filingDate": ["2025-03-01", "2024-11-05"],
+      "reportDate": ["2024-12-31", "2024-09-30"],
+      "form": ["10-K", "10-Q"],
+      "primaryDocument": ["annual.htm", "quarterly.htm"]
+    }
+  }
+}

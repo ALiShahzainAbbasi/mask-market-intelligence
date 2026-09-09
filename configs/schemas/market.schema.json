@@ -1,0 +1,231 @@
+{
+  "$defs": {
+    "CompanyBand": {
+      "additionalProperties": false,
+      "properties": {
+        "employees_max": {
+          "minimum": 1,
+          "title": "Employees Max",
+          "type": "integer"
+        },
+        "employees_min": {
+          "minimum": 1,
+          "title": "Employees Min",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "employees_min",
+        "employees_max"
+      ],
+      "title": "CompanyBand",
+      "type": "object"
+    },
+    "Geography": {
+      "additionalProperties": false,
+      "properties": {
+        "country": {
+          "pattern": "^[A-Z]{2}$",
+          "title": "Country",
+          "type": "string"
+        },
+        "regions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Regions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "country"
+      ],
+      "title": "Geography",
+      "type": "object"
+    },
+    "IndustryCodes": {
+      "additionalProperties": false,
+      "properties": {
+        "naics": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Naics",
+          "type": "array"
+        }
+      },
+      "required": [
+        "naics"
+      ],
+      "title": "IndustryCodes",
+      "type": "object"
+    },
+    "RunBudgetConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "max_documents": {
+          "default": 500,
+          "maximum": 1000000,
+          "minimum": 0,
+          "title": "Max Documents",
+          "type": "integer"
+        },
+        "max_duration_seconds": {
+          "default": 3600,
+          "maximum": 604800,
+          "minimum": 1,
+          "title": "Max Duration Seconds",
+          "type": "integer"
+        },
+        "max_paid_cost_usd": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Max Paid Cost Usd"
+        },
+        "max_requests": {
+          "default": 100,
+          "maximum": 100000,
+          "minimum": 0,
+          "title": "Max Requests",
+          "type": "integer"
+        },
+        "max_total_bytes": {
+          "default": 52428800,
+          "maximum": 10737418240,
+          "minimum": 1,
+          "title": "Max Total Bytes",
+          "type": "integer"
+        }
+      },
+      "title": "RunBudgetConfiguration",
+      "type": "object"
+    },
+    "ValidationBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "max_budget_usd": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Max Budget Usd"
+        }
+      },
+      "title": "ValidationBudget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "buyer_titles": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Buyer Titles",
+      "type": "array"
+    },
+    "company_band": {
+      "$ref": "#/$defs/CompanyBand"
+    },
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "geography": {
+      "$ref": "#/$defs/Geography"
+    },
+    "industry_codes": {
+      "$ref": "#/$defs/IndustryCodes"
+    },
+    "language": {
+      "pattern": "^[a-z]{2}(?:-[A-Z]{2})?$",
+      "title": "Language",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "research_window_days": {
+      "maximum": 3650,
+      "minimum": 1,
+      "title": "Research Window Days",
+      "type": "integer"
+    },
+    "run_budget": {
+      "$ref": "#/$defs/RunBudgetConfiguration"
+    },
+    "seed_problems": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Seed Problems",
+      "type": "array"
+    },
+    "seed_terms": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Seed Terms",
+      "type": "array"
+    },
+    "source_policy_profile": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Source Policy Profile",
+      "type": "string"
+    },
+    "validation": {
+      "$ref": "#/$defs/ValidationBudget"
+    }
+  },
+  "required": [
+    "market_id",
+    "name",
+    "geography",
+    "industry_codes",
+    "company_band",
+    "buyer_titles",
+    "seed_terms",
+    "seed_problems",
+    "research_window_days",
+    "language",
+    "source_policy_profile",
+    "formula_version"
+  ],
+  "title": "MarketConfiguration",
+  "type": "object"
+}

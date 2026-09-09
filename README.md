@@ -2,7 +2,12 @@
 
 Private GitHub repository: <https://github.com/ALiShahzainAbbasi/mask-market-intelligence>
 
-Phase 0 is the accepted baseline. Phase 1/2 live database acceptance is deferred, while the user has authorized Phase 3 collector code. The modular monolith now includes the earlier identity/market/authentication core plus a policy-gated evidence pipeline and two offline-tested collectors for RSS/Atom and permitted static HTML. Auth and collection routes remain unregistered until their database, tenant, and live acceptance requirements pass, so the running app does not yet expose sign-in, market, or collection workflows.
+Phase 0 is the accepted baseline. Supabase PostgreSQL/pgvector and the private
+application role are live, while the CLI-first A01-A20 functional build proceeds
+independently of optional authentication/UI work. A01 establishes the exact
+versioned M1-M10 formulas, strict market/source configuration, reproducible
+hashing, and deterministic shared math. Auth and collection routes remain
+unregistered until their tenant and live acceptance requirements pass.
 
 The system is designed to answer: which market should MASK AI target, why, how confident are we, what supports and contradicts the conclusion, and what remains to be proven?
 
@@ -31,6 +36,11 @@ Start with [`progress.txt`](progress.txt) for the full Phase 0–24 roadmap, che
 11. [`docs/phases/PHASE_2_CHECKLIST.md`](docs/phases/PHASE_2_CHECKLIST.md) — identity, tenant-scoped market schema, authentication, registry UI, and end-to-end acceptance.
 12. [`docs/COST_CONTROL.md`](docs/COST_CONTROL.md) — mandatory lean research limits, paid-model hard stops, and deferred scope.
 13. [`docs/COLLECTORS.md`](docs/COLLECTORS.md) — implemented collector boundaries, pipeline, safety limits, fixtures, and remaining live-integration work.
+14. [`docs/AUTONOMOUS_RESEARCH_MODE.md`](docs/AUTONOMOUS_RESEARCH_MODE.md) — CLI-first functional track, versioned configuration, module boundaries, outputs, and hard safety/cost rules.
+15. [`docs/DISCOVERY.md`](docs/DISCOVERY.md) — deterministic method-aware query plans and the disabled-by-default Brave Search discovery boundary.
+16. [`docs/OFFICIAL_DATA.md`](docs/OFFICIAL_DATA.md) — fixed-scope official US API adapters, credentials, hard limits, provenance, and live-smoke gates.
+17. [`docs/SOURCE_AVAILABILITY.md`](docs/SOURCE_AVAILABILITY.md) — explicit available, credential/approval-pending, and paid-hold source behavior.
+18. [`docs/SEARCH_INTENT.md`](docs/SEARCH_INTENT.md) — versioned keyword-intent taxonomy, historical-metrics contracts/cache, and the held Google Ads boundary.
 
 ## Precedence
 
@@ -38,13 +48,14 @@ The research methodology and approved overall weights are business policy. Engin
 
 ## Current status
 
-- Phase 0: baseline accepted for infrastructure work; numerical proposals remain pending.
-- Phase 1: 5/10 checkpoints complete. The PostgreSQL-backed Windows queue/worker implementation is written and offline-tested; real PostgreSQL lease/recovery and operator acceptance remain open before its checkpoints can close.
-- Phase 2: in progress; identity/market schema, authorization, local credential/session services, transactional repositories, Alembic 0004, bootstrap CLI, and inactive auth HTTP adapter are written. Live migration, bootstrap, browser registration, and market authorization remain; no Phase 2 checkpoint is complete.
+- Phase 0: baseline accepted; the autonomous specification now supplies the approved v1 numerical formulas.
+- Phase 1: 6/10 checkpoints complete. The native Windows setup, PostgreSQL queue/worker, and Supabase-backed database migration path are implemented; remaining hosted/operational acceptance stays tracked separately.
+- Phase 2: 1/7 checkpoints complete. Supabase PostgreSQL 17/pgvector is at Alembic 0006 with private `mask` tables and a least-privilege runtime role. Local auth code exists but its HTTP boundary remains disabled and is not a functional-track blocker.
 - Phase 3: in progress; immutable source-policy/document contracts, policy and URL gates, bounded public-HTTP fetching, RSS/Atom and static-HTML parsers, versioned normalization, exact duplicate lineage, finite retry/circuit/cancellation behavior, and a typed persistence boundary are offline-tested. No real source or database adapter is wired, so no Phase 3 checkpoint is complete.
-- Modularity: thin API composition, feature routers, injectable services/ports, pure policies, source parsers separated from network/persistence, shared worker use cases, module-scoped instructions, and executable architecture checks. Overall roadmap remains 16/151 complete; partial schema/identity/collector work is not counted as a finished checkpoint.
-- Current local checks: 229 tests pass (218 Python + 11 web), including 36 collector-focused cases, with Python/web lint/format, strict types across 83 Python source files, architecture, generated API/TS contracts, offline migrations, setup-preservation, queue/worker behavior, and local-auth contracts passing. Twenty-four real PostgreSQL/service cases remain unrun. The 48-package lock remains unchanged and verified from the prior auth slice.
+- Autonomous functional track: A01-A05 are complete. The fixed-scope Census CBP, keyless BLS, BEA Regional, SEC EDGAR, and SAM.gov adapters passed one deliberately small live check each. A06's free collector path and A07's offline search-intent foundation are implemented but remain partial while skipped providers stay on hold.
+- Modularity: thin composition roots, injectable ports, pure scoring/query/taxonomy rules, provider transports separated from planning/persistence, explicit CLI adapter boundaries, module-scoped instructions, and executable architecture checks. Overall roadmap is 23/171 complete after A05; partial work is not counted as complete.
+- Current local checks: all 5 official-data live smokes pass; the A07 focused offline suite passes with 35 tests. The complete regression counts and static gates are recorded in `progress.txt`. Supabase acceptance remains recorded there; no paid research ran.
 - Native service preflight reports missing/unready services and exits nonzero. It does not require a container runtime or silently substitute mocks. This is a local scaffold, not a deployed or production-ready application.
-- Next code while database work is deferred: P03-04 safe upload/manual-capture validation. Later P03 work must add the evidence migrations, transactional PostgreSQL policy/evidence adapters, tenant-authorized job wiring, and small approved live-source smoke tests. No remote, paid provider, account, live collection, or deployment was created.
+- Next code: continue through A09/A10 local extraction and grounding while Google Ads, YouTube, Reddit, Meta, Google Places, Brave, and firmographics remain held. Census, BEA, SAM.gov, keyless BLS, SEC EDGAR, approved feeds/pages, and later validated analyst inputs are the lean source set. No paid provider, outreach, campaign, or deployment was activated.
 - Running-app authentication, market CRUD/UI, live scrapers, integrations, AI analysis, and scoring are not enabled. Collector code exists as an offline-tested shared service, but a real approved source policy and persistence adapter are mandatory before worker or API composition.
 - Live checkpoint status: [`progress.txt`](progress.txt). The existing Phase 0 ZIP is a historical snapshot, not the live tracker.

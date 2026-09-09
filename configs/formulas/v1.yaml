@@ -1,0 +1,432 @@
+formula_version: v1
+
+overall_weights:
+  M1: "0.10"
+  M2: "0.15"
+  M3: "0.15"
+  M4: "0.15"
+  M5: "0.10"
+  M6: "0.08"
+  M7: "0.08"
+  M8: "0.10"
+  M9: "0.05"
+  M10: "0.04"
+
+method_formulas:
+  M1:
+    name: Quantitative Market Analysis
+    overall_weight: "0.10"
+    components:
+      buyer_pool:
+        raw_input: serviceable_businesses
+        weight: "0.30"
+        transform: {kind: log_scale, low: "500", high: "100000"}
+      growth:
+        raw_input: growth_cagr
+        weight: "0.20"
+        transform: {kind: linear, low: "-0.05", high: "0.10"}
+      fragmentation:
+        raw_input: fragmentation_share
+        weight: "0.15"
+        transform: {kind: linear, low: "0.30", high: "0.90"}
+      economic_capacity:
+        raw_input: annual_payroll_per_serviceable_establishment_usd
+        weight: "0.20"
+        transform: {kind: log_scale, low: "100000", high: "5000000"}
+      target_band_match:
+        raw_input: target_band_share
+        weight: "0.15"
+        transform:
+          kind: linear
+          low: "0.05"
+          high: "0.40"
+          special_case: intentionally_all_firms_is_10
+    aggregation:
+      kind: weighted_sum
+      expression: 0.30*B + 0.20*G + 0.15*F + 0.20*E + 0.15*T
+    completeness:
+      required_all: [serviceable_businesses]
+      required_at_least_count: 3
+      required_at_least_from: [growth_cagr, fragmentation_share, annual_payroll_per_serviceable_establishment_usd, target_band_share]
+      unknown_rule: serviceable_businesses unavailable
+      incomplete_rule: fewer than three optional components available
+
+  M2:
+    name: Sentiment and Commercial Pain Analysis
+    overall_weight: "0.15"
+    components:
+      frequency:
+        raw_input: unique_cluster_documents / all_relevant_unique_documents
+        weight: "0.25"
+        transform: {kind: linear, low: "0.02", high: "0.20"}
+      severity:
+        raw_input: mean_verified_severity
+        weight: "0.25"
+        transform: {kind: identity}
+      economic_impact:
+        raw_input: mean_verified_economic_impact
+        weight: "0.20"
+        transform: {kind: identity}
+      purchase_intent:
+        raw_input: mean_purchase_intent_0_4
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "2.5"}
+      dissatisfaction:
+        raw_input: mean_solution_dissatisfaction
+        weight: "0.15"
+        transform: {kind: identity}
+    aggregation:
+      kind: max_and_weighted_top
+      expression: 0.50*max(top_clusters) + 0.50*weighted_mean(top_5_cluster_scores, sqrt(unique_document_count))
+      max_weight: "0.50"
+      mean_weight: "0.50"
+      top_n: 5
+    completeness:
+      required_all: [frequency, severity, economic_impact, purchase_intent, dissatisfaction]
+      unknown_rule: fewer than 100 relevant unique items or any component unavailable
+      incomplete_rule: fewer than 500 items or fewer than three source families
+    sample: {unknown_below: 100, provisional_below: 500, full_target: 500, unit: relevant_unique_documents}
+
+  M3:
+    name: Workflow and Bottleneck Analysis
+    overall_weight: "0.15"
+    components:
+      volume:
+        raw_input: events_per_month
+        weight: "0.15"
+        transform: {kind: log_scale, low: "10", high: "10000"}
+      labor_burden:
+        raw_input: labor_hours_per_month
+        weight: "0.20"
+        transform: {kind: log_scale, low: "10", high: "1000"}
+      failure_rate:
+        raw_input: failure_rate
+        weight: "0.15"
+        transform: {kind: linear, low: "0.00", high: "0.20"}
+      business_consequence:
+        raw_input: mean_verified_consequence_score
+        weight: "0.25"
+        transform: {kind: identity}
+      automation_potential:
+        raw_input: mean_evidence_grounded_automation_potential
+        weight: "0.15"
+        transform: {kind: identity}
+      manuality:
+        raw_input: manual_share
+        weight: "0.10"
+        transform: {kind: linear, low: "0.20", high: "1.00"}
+    aggregation:
+      kind: max_and_weighted_top
+      expression: 0.60*max(bottleneck_scores) + 0.40*weighted_mean(top_5_bottlenecks, sqrt(evidence_count))
+      max_weight: "0.60"
+      mean_weight: "0.40"
+      top_n: 5
+    completeness:
+      required_all: [events_per_month, labor_hours_per_month, failure_rate, consequence_score, automation_potential, manual_share]
+      unknown_rule: any required component lacks explicit sourced values
+
+  M4:
+    name: Economic Pain and Existing Spend
+    overall_weight: "0.15"
+    components:
+      annual_burden:
+        raw_input: annual_problem_cost_usd
+        weight: "0.40"
+        transform: {kind: log_scale, low: "5000", high: "250000"}
+      existing_paid_spend:
+        raw_input: annual_existing_paid_spend_usd
+        weight: "0.30"
+        transform: {kind: log_scale, low: "1000", high: "100000"}
+      paid_workaround_penetration:
+        raw_input: verified_paid_workaround_share
+        weight: "0.15"
+        transform: {kind: linear, low: "0.05", high: "0.50"}
+      commercial_intent:
+        raw_input: mean_m2_purchase_intent_0_4
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "2.5"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.40*B + 0.30*E + 0.15*W + 0.15*I
+    completeness:
+      required_all: [annual_problem_cost_usd, annual_existing_paid_spend_usd, verified_paid_workaround_share, mean_m2_purchase_intent_0_4]
+      unknown_rule: any required monetary/provenance component unavailable
+
+  M5:
+    name: Competitive Intelligence
+    overall_weight: "0.10"
+    components:
+      competitor_proof:
+        raw_input: active_relevant_competitor_count
+        weight: "0.25"
+        transform: {kind: log_scale, low: "2", high: "50"}
+      pricing_proof:
+        raw_input: median_annualized_customer_price_usd
+        weight: "0.20"
+        transform: {kind: log_scale, low: "500", high: "50000"}
+      unresolved_gap:
+        raw_input: top_5_gap_scores_and_evidence_counts
+        weight: "0.30"
+        transform:
+          kind: weighted_mean_sqrt
+          expression: weighted_mean(top_5_gap_scores, sqrt(evidence_count))
+      differentiation_space:
+        raw_input: median_offer_similarity_0_1
+        weight: "0.15"
+        transform: {kind: complement, multiplier: "10"}
+      traction_proof:
+        raw_input: verified_reference_count
+        weight: "0.10"
+        transform: {kind: log_scale, low: "3", high: "100"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.25*C + 0.20*P + 0.30*G + 0.15*D + 0.10*T
+    completeness:
+      required_all: [active_relevant_competitor_count, median_annualized_customer_price_usd, top_5_gap_scores_and_evidence_counts, median_offer_similarity_0_1, verified_reference_count]
+      unknown_rule: any required component unavailable
+      incomplete_rule: pricing not published for enough competitors
+    sample: {provisional_below: 20, full_target: 20, unit: competitors_or_alternatives}
+
+  M6:
+    name: Search and Buying Intent
+    overall_weight: "0.08"
+    components:
+      weighted_demand:
+        raw_input: sum_monthly_searches_times_intent_weight
+        weight: "0.30"
+        transform: {kind: log_scale, low: "100", high: "100000"}
+      commercial_cpc:
+        raw_input: volume_weighted_solution_plus_cpc_usd
+        weight: "0.25"
+        transform: {kind: log_scale, low: "1", high: "50"}
+      high_intent_mix:
+        raw_input: high_intent_volume_share
+        weight: "0.20"
+        transform: {kind: multiply, multiplier: "10"}
+      trend:
+        raw_input: weighted_12_month_volume_growth
+        weight: "0.15"
+        transform: {kind: linear, low: "-0.20", high: "0.30"}
+      switching_demand:
+        raw_input: competitor_switching_volume_share
+        weight: "0.10"
+        transform: {kind: linear, low: "0.01", high: "0.15"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.30*V + 0.25*C + 0.20*I + 0.15*T + 0.10*S
+    completeness:
+      required_all: [weighted_monthly_volume, weighted_avg_cpc_usd, high_intent_share, growth, switching_share]
+      unknown_rule: any required keyword metric unavailable
+    sample: {provisional_below: 100, full_target: 100, unit: qualified_keywords}
+
+  M7:
+    name: Buyer Accessibility and Channel Fit
+    overall_weight: "0.08"
+    components:
+      buyer_identification:
+        raw_input: accounts_with_economic_buyer / target_accounts
+        weight: "0.25"
+        transform: {kind: multiply, multiplier: "10"}
+      contact_coverage:
+        raw_input: accounts_with_valid_reachable_channel / target_accounts
+        weight: "0.20"
+        transform: {kind: multiply, multiplier: "10"}
+      channel_diversity:
+        raw_input: viable_channel_count
+        weight: "0.15"
+        transform: {kind: linear, low: "1", high: "5"}
+      sales_cycle_simplicity:
+        raw_input: median_days_to_decision
+        weight: "0.15"
+        transform: {kind: reverse_linear, low: "30", high: "180"}
+      procurement_simplicity:
+        raw_input: procurement_complexity_index_0_10
+        weight: "0.15"
+        transform: {kind: complement, multiplier: "10"}
+      meta_fit:
+        raw_input: active_relevant_advertisers_and_account_social_presence_rate
+        weight: "0.10"
+        transform:
+          kind: composite
+          expression: 0.50*linear(active_relevant_advertisers,0,10) + 0.50*linear(account_social_presence_rate,0.10,0.60)
+    aggregation:
+      kind: weighted_sum
+      expression: 0.25*I + 0.20*C + 0.15*D + 0.15*S + 0.15*P + 0.10*M
+    completeness:
+      required_all: [buyer_identification_rate, contact_coverage_rate, viable_channel_count, median_days_to_decision, procurement_complexity_index, meta_fit_inputs]
+      unknown_rule: any required component unavailable
+
+  M8:
+    name: Automated Primary Customer Research
+    overall_weight: "0.10"
+    components:
+      pain_confirmation:
+        raw_input: mean_top_3_pain_confirmation_1_5
+        weight: "0.30"
+        transform: {kind: linear, low: "1", high: "5"}
+      urgency:
+        raw_input: mean_urgency_1_5
+        weight: "0.20"
+        transform: {kind: linear, low: "1", high: "5"}
+      existing_spend:
+        raw_input: paid_current_solution_or_spend_share
+        weight: "0.20"
+        transform: {kind: multiply, multiplier: "10"}
+      buyer_authority:
+        raw_input: direct_or_shared_budget_authority_share
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "10"}
+      action_intent:
+        raw_input: willingness_4_plus_or_pilot_demo_share
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "10"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.30*C + 0.20*U + 0.20*E + 0.15*A + 0.15*I
+    completeness:
+      required_all: [pain_confirmation, urgency, existing_spend, buyer_authority, action_intent]
+      unknown_rule: fewer than 10 qualified real responses or any component unavailable
+      incomplete_rule: 10-29 qualified responses is provisional
+    sample: {unknown_below: 10, provisional_below: 30, full_target: 30, unit: qualified_respondents}
+
+  M9:
+    name: MASK AI and Productization Fit
+    overall_weight: "0.05"
+    components:
+      technical_fit:
+        raw_input: importance_weighted_required_capabilities_covered
+        weight: "0.20"
+        transform:
+          kind: weighted_coverage
+          expression: 10*sum(required_weight*covered_0_1)/sum(required_weight)
+      integration_fit:
+        raw_input: supported_platform_prevalence
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "10"}
+      standardization:
+        raw_input: workflow_template_similarity_0_1
+        weight: "0.15"
+        transform: {kind: multiply, multiplier: "10"}
+      recurring_revenue_potential:
+        raw_input: recurring_solution_value_share
+        weight: "0.15"
+        transform: {kind: linear, low: "0.20", high: "0.80"}
+      proof_potential:
+        raw_input: comparable_internal_project_count
+        weight: "0.10"
+        transform: {kind: log_scale, low: "1", high: "10"}
+      delivery_simplicity:
+        raw_input: delivery_complexity_index_0_10
+        weight: "0.10"
+        transform: {kind: complement, multiplier: "10"}
+      expansion_potential:
+        raw_input: adjacent_high_value_workflow_count
+        weight: "0.15"
+        transform: {kind: linear, low: "1", high: "6"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.20*T + 0.15*I + 0.15*S + 0.15*R + 0.10*P + 0.10*D + 0.15*E
+    completeness:
+      required_all: [technical_fit, integration_fit, standardization, recurring_revenue_potential, proof_potential, delivery_simplicity, expansion_potential]
+      unknown_rule: any required capability or component lacks source-grounded registry evidence
+
+  M10:
+    name: Automated Real World Market Validation
+    overall_weight: "0.04"
+    components:
+      qualified_lead_rate:
+        raw_input: qualified_leads / leads
+        weight: "0.15"
+        transform: {kind: linear, low: "0.10", high: "0.50"}
+      meeting_to_opportunity:
+        raw_input: qualified_opportunities / meetings
+        weight: "0.20"
+        transform: {kind: linear, low: "0.20", high: "0.60"}
+      paid_conversion:
+        raw_input: paid_pilots_or_sales / qualified_opportunities
+        weight: "0.20"
+        transform: {kind: linear, low: "0.05", high: "0.30"}
+      pricing_acceptance:
+        raw_input: proposals_not_rejected_on_price / proposals
+        weight: "0.15"
+        transform: {kind: linear, low: "0.30", high: "0.80"}
+      gross_profit_cac:
+        raw_input: expected_first_year_gross_profit_per_customer / cac
+        weight: "0.20"
+        transform: {kind: log_scale, low: "1", high: "5"}
+      sales_cycle_speed:
+        raw_input: median_days_first_qualified_interaction_to_paid
+        weight: "0.10"
+        transform: {kind: reverse_linear, low: "30", high: "180"}
+    aggregation:
+      kind: weighted_sum
+      expression: 0.15*Q + 0.20*O + 0.20*C + 0.15*P + 0.20*G + 0.10*S
+    completeness:
+      required_all: [qualified_lead_rate, meeting_to_opportunity, paid_conversion, pricing_acceptance, gross_profit_cac, sales_cycle_speed]
+      unknown_rule: no real campaign/funnel data, zero denominator, or any component unavailable
+      incomplete_rule: smaller samples are telemetry only until 30 qualified leads or 10 qualified opportunities
+    sample:
+      full_target_any_of: {qualified_leads: 30, qualified_opportunities: 10}
+      unit: real_validation_funnel
+
+confidence:
+  weights:
+    source_diversity: "0.25"
+    sample_adequacy: "0.25"
+    evidence_quality: "0.20"
+    recency: "0.10"
+    cross_source_agreement: "0.20"
+  evidence_quality_levels: {L1: "2", L2: "4", L3: "7", L4: "9", L5: "10"}
+  low_below: "50"
+  high_at_least: "75"
+  expression: 10*(0.25*SD + 0.25*SA + 0.20*EQ + 0.10*R + 0.20*A)
+  sample_targets:
+    M2: 500
+    M5: 20
+    M6: 100
+    M8: 30
+    M10: {qualified_leads: 30, qualified_opportunities: 10}
+
+gates:
+  gate_1:
+    name: Broad Screen
+    methods: [M1, M2, M4, M5, M6, M7, M9]
+    minimum_score: "6.0"
+    rules: [M9 uses the light profile, no confirmed critical veto]
+  gate_2:
+    name: Deep Research
+    methods: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    minimum_score: "7.0"
+    minimum_confidence: "50"
+    rules: [all completeness checks pass, no confirmed critical veto]
+  gate_3:
+    name: Live Validation
+    methods: [M1, M2, M3, M4, M5, M6, M7, M8, M9, M10]
+    minimum_score: "7.5"
+    rules: [M10 is valid, no confirmed critical veto]
+  gate_4:
+    name: Final Selection
+    methods: [M1, M2, M3, M4, M5, M6, M7, M8, M9, M10]
+    preferred_score: "8.0"
+    minimum_confidence: "75"
+    rules: [paid evidence exists, founder decision is required below the preference]
+
+vetoes:
+  no_reachable_economic_buyer:
+    name: No reachable economic buyer
+    trigger: M7 buyer_identification < 2 with HIGH confidence
+  no_meaningful_budget:
+    name: No meaningful budget
+    trigger: M4 < 2 with HIGH confidence
+  major_access_or_regulatory_barrier:
+    name: Major access or regulatory barrier
+    trigger: required solution data or integration is verified prohibited or unavailable
+  highly_bespoke_delivery:
+    name: Highly bespoke delivery
+    trigger: M9 standardization < 3 and delivery_simplicity < 3 with MEDIUM or HIGH confidence
+  dominant_platform_solves_problem:
+    name: Dominant platform solves problem
+    trigger: M5 unresolved_gap < 2 with HIGH-confidence dominant-solution evidence
+  no_qualified_buying_intent:
+    name: No qualified buying intent
+    trigger: M10 paid_conversion = 0 after at least 30 qualified opportunities, or M8 action_intent < 2 with HIGH confidence

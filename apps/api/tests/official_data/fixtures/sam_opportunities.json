@@ -1,0 +1,17 @@
+{
+  "totalRecords": 2,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "noticeId": "notice-1",
+      "title": "HVAC preventive maintenance services",
+      "solicitationNumber": "SOL-001",
+      "postedDate": "09/01/2026",
+      "responseDeadLine": "10/01/2026",
+      "naicsCode": "238220",
+      "type": "Solicitation"
+    },
+    {"title": "Missing notice identity"}
+  ]
+}

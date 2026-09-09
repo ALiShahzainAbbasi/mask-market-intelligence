@@ -211,6 +211,13 @@ class LocalAuthenticationService:
         if not revoked:
             raise AuthenticationRequired("Authentication required")
 
+    def validate_csrf(self, session_token: SecretStr, csrf_token: SecretStr) -> None:
+        stored = self._live_session(session_token, _safe_now(self.clock))
+        if len(csrf_token.get_secret_value()) > 4096 or not self.tokens.matches(
+            csrf_token, stored.csrf_hash
+        ):
+            raise InvalidCsrfToken("CSRF validation failed")
+
     def rotate(
         self,
         session_token: SecretStr,

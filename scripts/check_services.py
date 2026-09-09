@@ -9,31 +9,39 @@ import httpx
 from mask_api.config import Settings, get_settings
 from mask_api.health import check_readiness
 from mask_api.job_queue.wiring import get_job_queue
-from sqlalchemy import make_url
-
-LOCAL_HOSTS = {"localhost", "127.0.0.1"}
+from mask_api.persistence.targets import database_endpoint, is_local_endpoint
 
 
-def require_local_test_config(settings: Settings, api_url: str) -> None:
-    """Integration can mutate synthetic state; never target an arbitrary remote."""
+def require_database_integration_config(settings: Settings) -> None:
+    """Permit only an explicit local target or opted-in Supabase development project."""
     migration = settings.migration_database_url
+    if settings.environment != "development" or migration is None:
+        raise ValueError("Integration requires explicit development configuration")
+    application_endpoint = database_endpoint(settings.database_url)
+    migration_endpoint = database_endpoint(migration)
+    if settings.database_target == "local":
+        if not is_local_endpoint(application_endpoint) or not is_local_endpoint(migration_endpoint):
+            raise ValueError("Local integration requires loopback database URLs")
+    elif not settings.hosted_integration_enabled:
+        raise ValueError("Hosted integration requires an explicit opt-in")
+
+
+def require_integration_test_config(settings: Settings, api_url: str) -> None:
+    """Integration can mutate synthetic state; never target an arbitrary remote."""
+    require_database_integration_config(settings)
     api = urlsplit(api_url)
     if (
-        settings.environment != "development"
-        or not settings.enable_dev_routes
+        not settings.enable_dev_routes
         or settings.dev_token is None
-        or migration is None
-        or make_url(settings.database_url.get_secret_value()).host not in LOCAL_HOSTS
-        or make_url(migration.get_secret_value()).host not in LOCAL_HOSTS
         or api.scheme not in {"http", "https"}
-        or api.hostname not in LOCAL_HOSTS
+        or api.hostname not in {"localhost", "127.0.0.1"}
         or api.username is not None
         or api.password is not None
         or api.path not in {"", "/"}
         or api.query
         or api.fragment
     ):
-        raise ValueError("Integration requires explicit local development configuration")
+        raise ValueError("Integration requires an explicit loopback API configuration")
 
 
 def api_ready(base_url: str) -> bool:
@@ -58,10 +66,11 @@ def main() -> int:
     try:
         settings = get_settings()
         api_url = os.environ.get("MASK_TEST_API_URL", "http://127.0.0.1:8000")
-        require_local_test_config(settings, api_url)
+        require_integration_test_config(settings, api_url)
     except Exception:
         print(
-            "Service preflight BLOCKED: configure local development URLs, migration identity, "
+            "Service preflight BLOCKED: configure an approved development database, "
+            "migration identity, "
             "and the protected smoke harness. See docs/DEVELOPMENT.md. No tests were run."
         )
         return 1

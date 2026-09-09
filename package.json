@@ -13,6 +13,7 @@
     "dev:api": "uv run uvicorn mask_api.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log",
     "dev:worker": "uv run python -m workers",
     "bootstrap:owner": "uv run python -m scripts.bootstrap_owner",
+    "db:provision-supabase-role": "uv run python -m scripts.provision_supabase_role",
     "build": "pnpm --filter @mask/web build",
     "test:unit": "uv run pytest -m \"not integration\" && pnpm --filter @mask/web test",
     "test:unit:ci": "uv run pytest -m \"not integration\" --junitxml=reports/python-unit.xml && pnpm --filter @mask/web test:ci",
@@ -28,6 +29,8 @@
     "schemas:export": "uv run python scripts/export-openapi.py",
     "schemas:generate": "pnpm run schemas:export && pnpm --filter @mask/schemas generate",
     "schemas:check": "uv run python scripts/export-openapi.py --check && pnpm --filter @mask/schemas check",
+    "research:schemas:export": "uv run python scripts/export-research-schemas.py",
+    "research:schemas:check": "uv run python scripts/export-research-schemas.py --check",
     "check:secrets": "uv run python scripts/check-secrets.py",
     "check:source-secrets": "pwsh -NoProfile -File scripts/scan-secrets.ps1"
   }

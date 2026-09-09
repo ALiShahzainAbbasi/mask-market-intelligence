@@ -8,8 +8,6 @@ from pathlib import Path
 
 from mask_api.persistence import registry
 from mask_api.persistence.base import Base
-from sqlalchemy import create_mock_engine
-from sqlalchemy.schema import ExecutableDDLElement
 
 ROOT = Path(__file__).resolve().parents[2]
 AUTH_TABLES = {"user_credentials", "server_sessions", "identity_security_events"}
@@ -37,7 +35,7 @@ def test_auth_models_are_registered_with_hash_and_tenant_constraints() -> None:
     }
 
 
-def test_frozen_auth_migration_matches_current_metadata() -> None:
+def test_frozen_auth_migration_remains_the_pre_role_audit_baseline() -> None:
     source = (ROOT / "apps/api/migrations/versions/0004_local_authentication.py").read_text()
     assignment = next(
         node
@@ -48,16 +46,12 @@ def test_frozen_auth_migration_matches_current_metadata() -> None:
         )
     )
     frozen = ast.literal_eval(assignment.value)
-    generated: list[str] = []
-
-    def capture(statement: ExecutableDDLElement, *args: object, **kwargs: object) -> None:
-        generated.append(str(statement.compile(dialect=engine.dialect)))
-
-    engine = create_mock_engine("postgresql+psycopg://", capture)
-    Base.metadata.create_all(
-        engine, tables=[Base.metadata.tables[name] for name in sorted(AUTH_TABLES)]
-    )
-    assert {_normalize(value) for value in generated} == {_normalize(value) for value in frozen}
+    normalized = " ".join(_normalize(value) for value in frozen)
+    for name in AUTH_TABLES:
+        assert f"CREATE TABLE {name}" in normalized
+    assert "roles_changed" not in normalized
+    assert "subject_user_id" not in normalized
+    assert "details_json" not in normalized
     assert "mask_api" not in source
 
 

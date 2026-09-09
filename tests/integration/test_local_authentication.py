@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from mask_api.config import Settings
+from mask_api.database import create_db_engine
 from mask_api.modules.identity.auth_contracts import LoginRequest
 from mask_api.modules.identity.auth_models import (
     IdentitySecurityEvent,
@@ -25,8 +26,10 @@ from mask_api.modules.identity.security import Argon2idPasswordManager, Sha256To
 from mask_api.modules.identity.session_adapter import HashedSessionReader
 from mask_api.persistence.schema import EXPECTED_SCHEMA_REVISION
 from pydantic import SecretStr
-from sqlalchemy import Connection, create_engine, func, insert, make_url, select, text
+from sqlalchemy import Connection, func, insert, select, text
 from sqlalchemy.orm import sessionmaker
+
+from scripts.check_services import require_database_integration_config
 
 pytestmark = pytest.mark.integration
 
@@ -39,9 +42,8 @@ def authentication_database() -> Iterator[
     tuple[Connection, dict[str, UUID], SQLAlchemyAuthenticationStore]
 ]:
     settings = Settings()
-    assert settings.environment == "development"
-    assert make_url(settings.database_url.get_secret_value()).host in {"localhost", "127.0.0.1"}
-    engine = create_engine(settings.database_url.get_secret_value())
+    require_database_integration_config(settings)
+    engine = create_db_engine(settings)
     ids = {name: uuid4() for name in ("organization", "user")}
     hasher = Argon2idPasswordManager()
     try:

@@ -1,0 +1,28 @@
+{
+  "BEAAPI": {
+    "Results": {
+      "Data": [
+        {
+          "TableName": "CAEMP25N",
+          "LineCode": "70",
+          "GeoFIPS": "00000",
+          "GeoName": "United States",
+          "TimePeriod": "2024",
+          "DataValue": "1,234.5",
+          "Unit": "Thousands of persons",
+          "IndustryClassification": "238220",
+          "LineDescription": "Plumbing, heating, and air-conditioning contractors"
+        },
+        {
+          "TableName": "CAEMP25N",
+          "LineCode": "70",
+          "GeoFIPS": "01000",
+          "GeoName": "Alabama",
+          "TimePeriod": "2024",
+          "DataValue": "(NA)",
+          "Unit": "Thousands of persons"
+        }
+      ]
+    }
+  }
+}

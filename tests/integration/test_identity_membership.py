@@ -5,12 +5,15 @@ from uuid import UUID, uuid4
 
 import pytest
 from mask_api.config import Settings
+from mask_api.database import create_db_engine
 from mask_api.modules.identity.domain import OrganizationStatus, Role, UserStatus
 from mask_api.modules.identity.models import Organization, User, UserRole
 from mask_api.modules.identity.repository import SQLAlchemyMembershipReader
 from mask_api.persistence.schema import EXPECTED_SCHEMA_REVISION
-from sqlalchemy import Connection, create_engine, insert, make_url, text, update
+from sqlalchemy import Connection, insert, text, update
 from sqlalchemy.orm import sessionmaker
+
+from scripts.check_services import require_database_integration_config
 
 pytestmark = pytest.mark.integration
 
@@ -20,9 +23,8 @@ def membership_database() -> Iterator[
     tuple[Connection, dict[str, UUID], SQLAlchemyMembershipReader]
 ]:
     settings = Settings()
-    assert settings.environment == "development"
-    assert make_url(settings.database_url.get_secret_value()).host in {"localhost", "127.0.0.1"}
-    engine = create_engine(settings.database_url.get_secret_value())
+    require_database_integration_config(settings)
+    engine = create_db_engine(settings)
     ids = {name: uuid4() for name in ("org_a", "org_b", "user_a", "user_b")}
     try:
         with engine.connect() as connection:

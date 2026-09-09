@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "MethodId": {
+      "enum": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "title": "MethodId",
+      "type": "string"
+    },
+    "SignalRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "failure_rule": {
+          "title": "Failure Rule",
+          "type": "string"
+        },
+        "fallback": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fallback",
+          "type": "array"
+        },
+        "primary": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Primary",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary",
+        "fallback",
+        "failure_rule"
+      ],
+      "title": "SignalRoute",
+      "type": "object"
+    },
+    "SourceAccess": {
+      "enum": [
+        "official_api",
+        "commercial_api",
+        "approved_api",
+        "permitted_collector",
+        "official_account_api"
+      ],
+      "title": "SourceAccess",
+      "type": "string"
+    },
+    "SourceConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "access": {
+          "$ref": "#/$defs/SourceAccess"
+        },
+        "cost_class": {
+          "enum": [
+            "free",
+            "paid",
+            "mixed"
+          ],
+          "title": "Cost Class",
+          "type": "string"
+        },
+        "credential_required": {
+          "title": "Credential Required",
+          "type": "boolean"
+        },
+        "default_enabled": {
+          "default": false,
+          "title": "Default Enabled",
+          "type": "boolean"
+        },
+        "evidence_use": {
+          "title": "Evidence Use",
+          "type": "string"
+        },
+        "methods": {
+          "items": {
+            "$ref": "#/$defs/MethodId"
+          },
+          "title": "Methods",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "operational_status": {
+          "default": "available",
+          "enum": [
+            "available",
+            "credential_pending",
+            "approval_pending",
+            "paid_hold"
+          ],
+          "title": "Operational Status",
+          "type": "string"
+        },
+        "policy_status": {
+          "enum": [
+            "allowed",
+            "conditional"
+          ],
+          "title": "Policy Status",
+          "type": "string"
+        },
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        },
+        "source_family": {
+          "title": "Source Family",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_family",
+        "name",
+        "methods",
+        "access",
+        "evidence_use",
+        "reference",
+        "policy_status",
+        "credential_required",
+        "cost_class"
+      ],
+      "title": "SourceConfiguration",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "profile_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "profile_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Profile Version",
+      "type": "string"
+    },
+    "signal_routes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SignalRoute"
+      },
+      "title": "Signal Routes",
+      "type": "object"
+    },
+    "sources": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SourceConfiguration"
+      },
+      "title": "Sources",
+      "type": "object"
+    }
+  },
+  "required": [
+    "profile_version",
+    "profile_id",
+    "sources",
+    "signal_routes"
+  ],
+  "title": "SourceProfile",
+  "type": "object"
+}

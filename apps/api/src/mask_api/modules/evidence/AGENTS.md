@@ -16,8 +16,9 @@ before changing this module.
   access-control bypass behavior.
 - The application service owns the ordered
   `discover -> fetch -> parse -> normalize -> persist` use case. Concrete source
-  policy and evidence persistence must arrive through typed ports; do not add an
-  in-memory or filesystem fallback to production wiring.
+  policy and evidence persistence must arrive through typed ports. An explicit
+  CLI `LocalArtifactStore` may implement those ports, but must never silently
+  replace PostgreSQL in API/worker production wiring.
 - Preserve fetched raw bytes separately from parsed/normalized text. Exact
   duplicates keep every occurrence and point to one canonical occurrence; they
   must not inflate analysis counts.
@@ -29,4 +30,3 @@ before changing this module.
 - Do not register collection HTTP routes or worker handlers until the PostgreSQL
   policy/persistence adapters, tenant authorization, migrations, and live
   acceptance required by Phase 3 exist.
-

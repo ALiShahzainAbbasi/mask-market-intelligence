@@ -329,6 +329,17 @@ def test_logout_requires_live_session_and_matching_csrf() -> None:
     assert store.revocations == [(current.record.session_id, "logout")]
 
 
+def test_session_mutation_guard_checks_persisted_csrf_hash() -> None:
+    tokens = Sha256TokenManager()
+    raw_session = SecretStr("session-token")
+    store = FakeAuthenticationStore(credential())
+    store.resolved[tokens.digest(raw_session)] = stored_session()
+    authentication = service(store)
+    authentication.validate_csrf(raw_session, SecretStr("csrf-token"))
+    with pytest.raises(InvalidCsrfToken):
+        authentication.validate_csrf(raw_session, SecretStr("wrong-csrf"))
+
+
 @pytest.mark.parametrize(
     "current",
     [stored_session(expires_at=NOW), stored_session(revoked_at=NOW - timedelta(seconds=1))],

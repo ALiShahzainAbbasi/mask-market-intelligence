@@ -230,6 +230,7 @@ class CollectionService:
                 documents_parsed=len(documents),
                 unique_documents=len(canonical),
                 duplicate_occurrences=len(duplicates),
+                distinct_source_families=len({document.source_family for document in canonical}),
             ),
         )
         idempotency_key = batch_idempotency_key(request.run_id, policy.id)

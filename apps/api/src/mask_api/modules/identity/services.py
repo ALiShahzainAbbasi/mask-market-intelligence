@@ -76,9 +76,29 @@ class IdentityService:
         acting_role: Role,
     ) -> AccessGrant:
         actor = self.authenticate(token)
-        if actor.organization_id != organization_id or not role_permits(
-            actor.roles, permission, acting_role
-        ):
+        if actor.organization_id != organization_id:
+            raise AccessDenied("Access denied")
+        return self._authorize_actor(actor, permission=permission, acting_role=acting_role)
+
+    def authorize_current_tenant(
+        self,
+        token: SecretStr | None,
+        *,
+        permission: Permission,
+        acting_role: Role,
+    ) -> AccessGrant:
+        """Authorize against the trusted session tenant, never a submitted tenant ID."""
+        actor = self.authenticate(token)
+        return self._authorize_actor(actor, permission=permission, acting_role=acting_role)
+
+    def _authorize_actor(
+        self,
+        actor: AuthenticatedActor,
+        *,
+        permission: Permission,
+        acting_role: Role,
+    ) -> AccessGrant:
+        if not role_permits(actor.roles, permission, acting_role):
             raise AccessDenied("Access denied")
         if permission in RECENT_AUTH_PERMISSIONS:
             age = self._now() - actor.authenticated_at

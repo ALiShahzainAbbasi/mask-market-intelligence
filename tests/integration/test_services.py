@@ -11,30 +11,30 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from mask_api.config import Settings, get_settings
-from mask_api.database import get_engine
+from mask_api.database import create_db_engine, get_engine, postgres_connection_uses_tls
 from mask_api.main import create_app
 from mask_api.persistence.schema import EXPECTED_SCHEMA_REVISION
 from psycopg import connect, sql
 from sqlalchemy import create_engine, make_url, text
 from starlette.testclient import TestClient
 
-from scripts.check_services import require_local_test_config
+from scripts.check_services import require_integration_test_config
 
 pytestmark = pytest.mark.integration
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def local_settings() -> Settings:
+def integration_settings() -> Settings:
     settings = Settings()
-    require_local_test_config(
+    require_integration_test_config(
         settings, os.environ.get("MASK_TEST_API_URL", "http://127.0.0.1:8000")
     )
     return settings
 
 
 def test_database_extension_revision_and_role() -> None:
-    settings = local_settings()
-    engine = create_engine(settings.database_url.get_secret_value())
+    settings = integration_settings()
+    engine = create_db_engine(settings)
     with engine.connect() as connection:
         assert (
             connection.scalar(text("SELECT version_num FROM alembic_version"))
@@ -45,11 +45,30 @@ def test_database_extension_revision_and_role() -> None:
             connection.scalar(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user"))
             is False
         )
+        assert connection.scalar(text("SELECT current_schema()")) == "mask"
+        if settings.database_target == "supabase":
+            assert postgres_connection_uses_tls(connection)
     engine.dispose()
 
 
+def test_supabase_private_schema_is_not_granted_to_data_api_roles() -> None:
+    settings = integration_settings()
+    if settings.database_target != "supabase":
+        pytest.skip("Supabase-specific Data API isolation check")
+    engine = create_db_engine(settings)
+    try:
+        with engine.connect() as connection:
+            for role in ("anon", "authenticated", "service_role"):
+                assert not connection.scalar(
+                    text("SELECT has_schema_privilege(:role, 'mask', 'USAGE')"),
+                    {"role": role},
+                )
+    finally:
+        engine.dispose()
+
+
 def test_api_worker_round_trip_and_idempotency() -> None:
-    settings = local_settings()
+    settings = integration_settings()
     assert settings.dev_token is not None
     base = os.environ.get("MASK_TEST_API_URL", "http://127.0.0.1:8000")
     assert httpx.URL(base).host in {"127.0.0.1", "localhost"}
@@ -83,7 +102,9 @@ def test_api_worker_round_trip_and_idempotency() -> None:
 
 
 def test_migrations_in_disposable_database(monkeypatch: pytest.MonkeyPatch) -> None:
-    settings = local_settings()
+    settings = integration_settings()
+    if settings.database_target == "supabase":
+        pytest.skip("Disposable database create/drop is forbidden for hosted Supabase targets")
     assert settings.migration_database_url is not None
     admin_url = make_url(settings.migration_database_url.get_secret_value())
     assert admin_url.host in {"127.0.0.1", "localhost"}
@@ -121,7 +142,7 @@ def test_dependency_connection_failure_is_safe_and_recovers(
     This verifies application reconnect behavior, not OS-service restart or
     worker graceful shutdown. Those remain explicit operator acceptance items.
     """
-    settings = local_settings()
+    settings = integration_settings()
     variable = "MASK_DATABASE_URL"
     value = settings.database_url
 

@@ -7,11 +7,14 @@ import pytest
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from mask_api.config import Settings
+from mask_api.database import create_db_engine
 from mask_api.persistence import registry as tables
 from mask_api.persistence.base import Base
 from mask_api.persistence.schema import EXPECTED_SCHEMA_REVISION
-from sqlalchemy import Connection, create_engine, insert, make_url, select, text, update
+from sqlalchemy import Connection, insert, inspect, select, text, update
 from sqlalchemy.exc import IntegrityError, ProgrammingError
+
+from scripts.check_services import require_database_integration_config
 
 pytestmark = pytest.mark.integration
 
@@ -19,9 +22,8 @@ pytestmark = pytest.mark.integration
 @pytest.fixture
 def database() -> Iterator[tuple[Connection, dict[str, UUID]]]:
     settings = Settings()
-    assert settings.environment == "development"
-    assert make_url(settings.database_url.get_secret_value()).host in {"localhost", "127.0.0.1"}
-    engine = create_engine(settings.database_url.get_secret_value())
+    require_database_integration_config(settings)
+    engine = create_db_engine(settings)
     ids = {
         name: uuid4()
         for name in ("org_a", "org_b", "user_a", "user_b", "m1", "m2", "m3", "d1", "d2", "d3")
@@ -90,7 +92,36 @@ def database() -> Iterator[tuple[Connection, dict[str, UUID]]]:
 
 def test_postgres_metadata_matches_models(database: tuple[Connection, dict[str, UUID]]) -> None:
     connection, _ = database
-    assert compare_metadata(MigrationContext.configure(connection), Base.metadata) == []
+    enum_checks = {
+        constraint.name
+        for table in Base.metadata.tables.values()
+        for constraint in table.constraints
+        if getattr(constraint, "_type_bound", False) and constraint.name is not None
+    }
+    reflected_checks = {
+        constraint["name"]
+        for table in Base.metadata.tables.values()
+        for constraint in inspect(connection).get_check_constraints(table.name, schema="mask")
+    }
+    assert enum_checks <= reflected_checks
+
+    def include_non_enum_constraint(
+        _object: object,
+        name: str | None,
+        object_type: str,
+        _reflected: bool,
+        _compare_to: object,
+    ) -> bool:
+        # Alembic does not match SQLAlchemy's type-bound Enum CHECK objects to
+        # PostgreSQL's normalized ARRAY/ANY reflection. Presence is checked
+        # explicitly above; all other schema objects still use full comparison.
+        return not (object_type == "check_constraint" and name in enum_checks)
+
+    context = MigrationContext.configure(
+        connection,
+        opts={"include_object": include_non_enum_constraint},
+    )
+    assert compare_metadata(context, Base.metadata) == []
 
 
 def test_cross_tenant_role_rejected(database: tuple[Connection, dict[str, UUID]]) -> None:

@@ -1,0 +1,5 @@
+[
+  ["NAME", "NAICS2017", "NAICS2017_LABEL", "EMPSZES", "ESTAB", "EMP", "PAYANN", "us"],
+  ["United States", "238220", "Plumbing, Heating, and Air-Conditioning Contractors", "242", "1200", "18000", "950000", "1"],
+  ["United States", "238220", "Plumbing, Heating, and Air-Conditioning Contractors", "243", "600", "N", "410000", "1"]
+]

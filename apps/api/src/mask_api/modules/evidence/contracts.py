@@ -15,6 +15,7 @@ from mask_api.modules.evidence.domain import (
     CollectionRunStatus,
     CollectorKind,
     EvidenceAccessClass,
+    EvidencePersona,
     SourcePolicyStatus,
 )
 
@@ -29,6 +30,7 @@ class SourcePolicy(EvidenceValue):
     organization_id: UUID | None = None
     version: str = Field(min_length=1, max_length=64)
     source_name: str = Field(min_length=1, max_length=200)
+    source_family: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
     base_url: str = Field(min_length=8, max_length=2048)
     status: SourcePolicyStatus
     collection_method: CollectionMethod
@@ -142,12 +144,14 @@ class NormalizedDocument(EvidenceValue):
     market_id: UUID
     market_definition_version_id: UUID
     source_id: UUID
+    source_family: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
     source_policy_version_id: UUID
     source_policy_version: str
     source_url: str
     external_id: str | None = None
     title: str | None = None
     author_persona_hint: str | None = None
+    author_persona: EvidencePersona = EvidencePersona.UNKNOWN
     published_at: AwareDatetime | None = None
     collected_at: AwareDatetime
     raw_content: bytes = Field(repr=False)
@@ -163,12 +167,14 @@ class NormalizedDocument(EvidenceValue):
     collector_version: str
     parser_version: str
     normalizer_version: str
+    persona_normalizer_version: str
 
 
 class DuplicateLink(EvidenceValue):
     duplicate_occurrence_key: str
     canonical_occurrence_key: str
     content_hash: str
+    duplicate_source_family: str
 
 
 class CollectionIssue(EvidenceValue):
@@ -185,6 +191,7 @@ class CollectionMetrics(EvidenceValue):
     documents_parsed: int = Field(ge=0)
     unique_documents: int = Field(ge=0)
     duplicate_occurrences: int = Field(ge=0)
+    distinct_source_families: int = Field(ge=0)
 
 
 class CollectionBatch(EvidenceValue):

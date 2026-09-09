@@ -62,6 +62,18 @@ Read `progress.txt` at the start of every project work session, then read `docs/
 - Do not add collection that bypasses authentication, CAPTCHAs, paywalls, robots controls, or other access restrictions.
 - Never commit secrets.
 
+## Autonomous functional track
+
+- The owner-supplied Autonomous Market Intelligence Engine Build Specification
+  v1 and `docs/AUTONOMOUS_RESEARCH_MODE.md` govern checkpoints A01-A20.
+- Keep market, formula, and source-policy inputs versioned, strictly validated,
+  and canonically hashed. Formula changes create a new version.
+- The CLI runner is a thin application adapter. Collection, extraction,
+  deterministic scoring, persistence, and reporting remain independently testable
+  modules behind typed boundaries.
+- A `LocalArtifactStore` is an explicit CLI adapter only, never a silent fallback
+  for failed PostgreSQL/API/worker wiring.
+
 ## Quality bar
 
 - Keep tasks small and scoped.
