@@ -1,0 +1,629 @@
+{
+  "$defs": {
+    "ClusterMembership": {
+      "additionalProperties": false,
+      "properties": {
+        "is_outlier": {
+          "title": "Is Outlier",
+          "type": "boolean"
+        },
+        "membership_score": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Membership Score"
+        },
+        "mention_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Mention Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mention_id",
+        "membership_score",
+        "is_outlier"
+      ],
+      "title": "ClusterMembership",
+      "type": "object"
+    },
+    "DuplicateKind": {
+      "enum": [
+        "exact",
+        "near"
+      ],
+      "title": "DuplicateKind",
+      "type": "string"
+    },
+    "EvidencePersona": {
+      "enum": [
+        "owner",
+        "executive",
+        "manager",
+        "employee",
+        "customer",
+        "vendor",
+        "unknown"
+      ],
+      "title": "EvidencePersona",
+      "type": "string"
+    },
+    "M2ComponentScores": {
+      "additionalProperties": false,
+      "properties": {
+        "dissatisfaction": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dissatisfaction"
+        },
+        "economic_impact": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Economic Impact"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Frequency"
+        },
+        "purchase_intent": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Purchase Intent"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Severity"
+        }
+      },
+      "required": [
+        "frequency"
+      ],
+      "title": "M2ComponentScores",
+      "type": "object"
+    },
+    "M2ComponentValues": {
+      "additionalProperties": false,
+      "properties": {
+        "dissatisfaction": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dissatisfaction"
+        },
+        "economic_impact": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Economic Impact"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Frequency"
+        },
+        "purchase_intent": {
+          "anyOf": [
+            {
+              "maximum": 4.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Purchase Intent"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Severity"
+        }
+      },
+      "required": [
+        "frequency"
+      ],
+      "title": "M2ComponentValues",
+      "type": "object"
+    },
+    "M2Status": {
+      "enum": [
+        "unknown",
+        "provisional",
+        "complete"
+      ],
+      "title": "M2Status",
+      "type": "string"
+    },
+    "PainCluster": {
+      "additionalProperties": false,
+      "properties": {
+        "cluster_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Cluster Id",
+          "type": "string"
+        },
+        "display_label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Display Label",
+          "type": "string"
+        },
+        "is_outlier": {
+          "title": "Is Outlier",
+          "type": "boolean"
+        },
+        "memberships": {
+          "items": {
+            "$ref": "#/$defs/ClusterMembership"
+          },
+          "minItems": 1,
+          "title": "Memberships",
+          "type": "array"
+        },
+        "persona": {
+          "$ref": "#/$defs/EvidencePersona"
+        }
+      },
+      "required": [
+        "cluster_id",
+        "persona",
+        "display_label",
+        "memberships",
+        "is_outlier"
+      ],
+      "title": "PainCluster",
+      "type": "object"
+    },
+    "PainClusterMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "cluster_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Cluster Id",
+          "type": "string"
+        },
+        "component_sample_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Component Sample Counts",
+          "type": "object"
+        },
+        "component_scores": {
+          "$ref": "#/$defs/M2ComponentScores"
+        },
+        "component_values": {
+          "$ref": "#/$defs/M2ComponentValues"
+        },
+        "contradiction_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contradiction Ids",
+          "type": "array"
+        },
+        "mention_count": {
+          "minimum": 1,
+          "title": "Mention Count",
+          "type": "integer"
+        },
+        "missing_components": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Components",
+          "type": "array"
+        },
+        "opportunity_score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Opportunity Score"
+        },
+        "representative_mention_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "title": "Representative Mention Ids",
+          "type": "array"
+        },
+        "source_family_count": {
+          "minimum": 1,
+          "title": "Source Family Count",
+          "type": "integer"
+        },
+        "unique_document_count": {
+          "minimum": 1,
+          "title": "Unique Document Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cluster_id",
+        "unique_document_count",
+        "source_family_count",
+        "mention_count",
+        "component_values",
+        "component_scores",
+        "component_sample_counts",
+        "missing_components",
+        "representative_mention_ids",
+        "contradiction_ids"
+      ],
+      "title": "PainClusterMetrics",
+      "type": "object"
+    },
+    "PainDuplicateLink": {
+      "additionalProperties": false,
+      "properties": {
+        "duplicate_kind": {
+          "$ref": "#/$defs/DuplicateKind"
+        },
+        "duplicate_mention_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Duplicate Mention Id",
+          "type": "string"
+        },
+        "retained_mention_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Retained Mention Id",
+          "type": "string"
+        },
+        "similarity": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Similarity"
+        }
+      },
+      "required": [
+        "duplicate_kind",
+        "retained_mention_id",
+        "duplicate_mention_id",
+        "similarity"
+      ],
+      "title": "PainDuplicateLink",
+      "type": "object"
+    },
+    "PainReportSection": {
+      "additionalProperties": false,
+      "properties": {
+        "clusters": {
+          "items": {
+            "$ref": "#/$defs/PainClusterMetrics"
+          },
+          "title": "Clusters",
+          "type": "array"
+        },
+        "contradiction_count": {
+          "minimum": 0,
+          "title": "Contradiction Count",
+          "type": "integer"
+        },
+        "earliest_source_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Earliest Source Date"
+        },
+        "exact_duplicates": {
+          "minimum": 0,
+          "title": "Exact Duplicates",
+          "type": "integer"
+        },
+        "latest_source_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Latest Source Date"
+        },
+        "market_id": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "near_duplicates": {
+          "minimum": 0,
+          "title": "Near Duplicates",
+          "type": "integer"
+        },
+        "outlier_mentions": {
+          "minimum": 0,
+          "title": "Outlier Mentions",
+          "type": "integer"
+        },
+        "persona_distribution": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/EvidencePersona"
+          },
+          "title": "Persona Distribution",
+          "type": "object"
+        },
+        "source_family_distribution": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Source Family Distribution",
+          "type": "object"
+        },
+        "total_input_mentions": {
+          "minimum": 0,
+          "title": "Total Input Mentions",
+          "type": "integer"
+        },
+        "unique_mentions": {
+          "minimum": 0,
+          "title": "Unique Mentions",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "market_id",
+        "total_input_mentions",
+        "unique_mentions",
+        "exact_duplicates",
+        "near_duplicates",
+        "outlier_mentions",
+        "source_family_distribution",
+        "persona_distribution",
+        "earliest_source_date",
+        "latest_source_date",
+        "contradiction_count",
+        "clusters"
+      ],
+      "title": "PainReportSection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "clustering_input_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Clustering Input Sha256",
+      "type": "string"
+    },
+    "clusters": {
+      "items": {
+        "$ref": "#/$defs/PainCluster"
+      },
+      "title": "Clusters",
+      "type": "array"
+    },
+    "duplicate_links": {
+      "items": {
+        "$ref": "#/$defs/PainDuplicateLink"
+      },
+      "title": "Duplicate Links",
+      "type": "array"
+    },
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "provisional_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Provisional Reasons",
+      "type": "array"
+    },
+    "report": {
+      "$ref": "#/$defs/PainReportSection"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "status": {
+      "$ref": "#/$defs/M2Status"
+    },
+    "top_cluster_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "title": "Top Cluster Ids",
+      "type": "array"
+    },
+    "unknown_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unknown Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "market_id",
+    "formula_version",
+    "clustering_input_sha256",
+    "status",
+    "top_cluster_ids",
+    "unknown_reasons",
+    "provisional_reasons",
+    "duplicate_links",
+    "clusters",
+    "report"
+  ],
+  "title": "M2Result",
+  "type": "object"
+}

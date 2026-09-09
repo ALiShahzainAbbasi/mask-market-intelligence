@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 02:14 PKT (UTC+05:00)
+Last updated: 2026-09-10 02:51 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -12,27 +12,26 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 ------------------------------------------------------------------------
 Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05 are complete, A06 enforces source holds plus source-family/persona
-normalization for free collectors, and A07's offline deterministic foundation is
-implemented. Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded
-live smoke; approved feeds/pages and later analyst inputs complete the lean set.
-Current task: A11 offline M2 pain pipeline: grounded-record ingestion, exact and
-near dedupe, embeddings port/cache, deterministic clustering, persona separation,
-and cluster metrics/report contracts. A07 and A09 remain partial only because
-their live provider access is held; all unavailable/paid APIs remain skipped.
+A01-A05 and A10-A11 are complete, A06 enforces source holds plus source-family/
+persona normalization for free collectors, and A07/A09 have offline foundations.
+Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
+approved feeds/pages and later analyst inputs complete the lean set. Current task:
+A12 next—exact M1/M4/M5/M6/M7 source-to-metric transforms and deterministic v1
+calculators. A07 and A09 remain partial only because their live provider access is
+held; all unavailable/paid APIs remain skipped.
 Paid collection/model use remains disabled.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 24/171
-Remaining checkpoints: 147/171
-Checkpoint-count progress: 14.0%
+Completed checkpoints: 25/171
+Remaining checkpoints: 146/171
+Checkpoint-count progress: 14.6%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 6/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 7/20 (A01-A20).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -42,9 +41,9 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: begin A11 with grounded commercial-pain record contracts,
-deterministic dedupe/persona-separated aggregation, and provider-neutral embedding
-boundaries. Paid/model network use stays disabled; A09 remains held at its edge.
+Next checkpoint: start A12 with typed source-to-metric inputs and formula-driven
+M1/M4/M5/M6/M7 calculators, golden boundaries, UNKNOWN behavior, and provenance.
+Paid/model network use stays disabled; A07/A09 remain held at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
 this is a sequencing change, not acceptance of missing live-service/CI or security checks.
@@ -80,10 +79,10 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-430 Python + 11 web tests PASS. Ruff/format over 229 files, strict mypy over 123 source files,
+440 Python + 11 web tests PASS. Ruff/format over 244 files, strict mypy over 133 source files,
 architecture/import-cycle, OpenAPI/TypeScript and research-configuration schema
-drift, and the local secret guard PASS. The Windows Gitleaks run executed but reported three redacted findings;
-their exact files/types still require triage, so P01-08 remains open. Auth and
+drift, local secret guard, and current Gitleaks source scan PASS. P01-08 remains
+open for its broader historical/CI acceptance rather than a current finding. Auth and
 collection routes remain disabled. A05's 5 bounded official-source live tests
 PASS. No web/API/worker runtime, broad collection, or paid research ran.
 
@@ -179,7 +178,7 @@ P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
 Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    |  6/20 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    |  7/20 | CLI-first Autonomous Research Build
 
 A01-A20 are counted in the overall checkpoint total but are not an additional
 original guide phase. This denominator change adds 20 source-defined functional
@@ -218,7 +217,7 @@ adapter; keep model choices and all business scoring outside the adapter.
 [x] A10 Add exact-span and numeric-grounding validation, high-impact second-pass
 verification, contradiction preservation, and prompt-injection controls.
 
-[~] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
+[x] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
 cluster calculation, persona separation, and report section.
 
 [ ] A12 Build exact M1/M4/M5/M6/M7 source-to-metric transformations and v1
@@ -2405,6 +2404,47 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 02:51 PKT (UTC+05:00) | AUTONOMOUS-020 | A11 | DONE
+Work:
+  Built the modular offline M2 pain-intelligence vertical slice. Added an A10-only
+  ingestion boundary with document/source/persona/analysis lineage; normalized
+  pain mentions and financial values; exact document+mention dedupe; cached,
+  versioned embedding ports; a zero-network local signed word/bigram hashing
+  adapter; high-threshold near dedupe; optimized deterministic complete-linkage
+  cosine clustering; stable cluster/membership/input hashes; strict persona
+  separation; outlier handling; representative mentions; source/date/persona/
+  component sample distributions; linked contradiction reporting; and the exact
+  formula-v1 M2 cluster/top-five calculation. Missing components or fewer than
+  100 relevant unique documents remain UNKNOWN; below 500 documents or three
+  retained source families remains provisional. Exported the M2 report schema.
+Files:
+  apps/api/src/mask_api/modules/pain_intelligence/{AGENTS.md,__init__.py,
+  clustering.py,contracts.py,deduplication.py,embedding_cache.py,embeddings.py,
+  ingestion.py,metrics.py,ports.py,service.py}; apps/api/tests/pain_intelligence/;
+  configs/schemas/pain/m2-result-v1.schema.json;
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md,PAIN_INTELLIGENCE.md};
+  scripts/export-research-schemas.py; README.md; progress.txt.
+Verification:
+  A11 focused suite PASS: 10 tests, including 100-record golden calculation,
+  cache reuse, exact/near dedupe, deterministic clustering, persona isolation,
+  outliers, contradiction reporting, UNKNOWN handling, and service composition.
+  Full offline Python suite PASS: 440 passed, 30 integration tests deselected;
+  web suite PASS: 11. Ruff lint/format PASS over 244 files; strict mypy PASS over
+  133 source files; web ESLint/Prettier/type generation/TypeScript,
+  architecture/import-cycle, OpenAPI/TypeScript drift, research-schema drift,
+  git diff whitespace, local secret guard, and Gitleaks source scan PASS.
+Limitations/blockers:
+  The local lexical hashing adapter is intentionally cheap and reproducible but
+  is not a claim of production semantic-embedding quality. A later semantic model
+  needs an explicit provider/configuration, bounded budget, labelled clustering
+  evaluation, and human cluster review. Persistence/UI and the 100-200-record AI
+  release dataset remain Phase 4 work. Fixtures are not market evidence. No live
+  model, paid API, collection, outreach, or campaign ran.
+Next:
+  Implement A12 typed metric/provenance inputs and exact formula-driven
+  M1/M4/M5/M6/M7 calculators with golden boundary, missing-value, and UNKNOWN
+  tests; wire source adapters only after transforms cannot invent values.
+
 2026-09-10 02:14 PKT (UTC+05:00) | AUTONOMOUS-019 | A11 | IN_PROGRESS
 Work:
   Started the offline M2 pain-intelligence checkpoint after A10 passed. Reviewed

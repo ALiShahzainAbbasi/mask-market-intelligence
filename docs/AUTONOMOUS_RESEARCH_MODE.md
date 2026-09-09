@@ -107,6 +107,13 @@ exact spans, numeric support, contradiction preservation, prompt-injection revie
 and independent verification of high-impact claims. Only an accepted grounding
 report exposes future scoring input; model use remains held and disabled.
 
+A11 consumes that accepted boundary through a separate M2 pain module. It applies
+duplicate-safe persona-separated processing, a cached zero-cost local lexical
+embedding adapter, deterministic clustering/outliers, the exact formula-v1 M2
+cluster and top-five aggregation, UNKNOWN/provisional sample rules, contradiction
+lineage, and a generated report schema. A later semantic provider remains an
+injected option and is not enabled by default.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See
