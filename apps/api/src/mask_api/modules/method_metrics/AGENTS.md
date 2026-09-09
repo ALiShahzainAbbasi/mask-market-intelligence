@@ -6,17 +6,18 @@ Read the root `AGENTS.md`, `progress.txt`, `docs/RESEARCH_METHODOLOGY.md`,
 before changing this module.
 
 - This module turns already-normalized, explicitly available source values into
-  the exact v1 M1/M4/M5/M6/M7 scores. It does not fetch, parse, or discover
-  evidence; `official_data`, `search_intent`, and analyst/manual capture remain
-  the source adapters. Keep that boundary: no network, database, or provider
+  the exact v1 M1/M4/M5/M6/M7/M9 scores. It does not fetch, parse, or discover
+  evidence; `official_data`, `search_intent`, a MASK AI capability registry,
+  integration discovery, and analyst/manual/leadership capture remain the
+  source adapters. Keep that boundary: no network, database, or provider
   imports here.
 - Every raw input is a `SourcedMetric` with explicit provenance (source,
   observation state, geography, population, period, currency, unit, evidence
   reference). A missing metric stays `None`; never invent, default to zero, or
   silently substitute a different population/geography/period/currency.
-- One calculator file per method (`m1.py`, `m4.py`, `m5.py`, `m6.py`, `m7.py`).
-  Each validates that the loaded `MethodFormula` still has the exact v1
-  component set and `weighted_sum` aggregation before using it, so a future
+- One calculator file per method (`m1.py`, `m4.py`, `m5.py`, `m6.py`, `m7.py`,
+  `m9.py`). Each validates that the loaded `MethodFormula` still has the exact
+  v1 component set and `weighted_sum` aggregation before using it, so a future
   formula-version drift fails loudly instead of silently miscalculating.
 - Component transforms live only in `transforms.py` and call
   `mask_api.modules.scoring.math`; do not reimplement `linear`/`log_scale`/etc.,
@@ -27,12 +28,22 @@ before changing this module.
   the only approved exception, and even then only present components are
   weighted at their configured (not redistributed) weight.
 - `M1`/`M5`/`M6` use `sample`/partial-completeness thresholds and can be
-  `provisional`; `M4`/`M7` have no such rule in v1 and are strictly
+  `provisional`; `M4`/`M7`/`M9` have no such rule in v1 and are strictly
   `unknown`/`complete`. Do not invent a provisional state a method's formula
   configuration does not define.
 - Duplicate competitor-gap findings (same `competitor_id`) are rejected before
   they can inflate M5's `unresolved_gap`; do not weaken that check to "allow
-  and dedupe" without an explicit methodology decision.
-- Tests use fixture `SourcedMetric`/`M5CompetitorGap` values loaded against the
-  real `configs/formulas/v1.yaml`, never live official-data or search-intent
-  calls.
+  and dedupe" without an explicit methodology decision. The same applies to
+  M9's `capability_id`/`platform_id` uniqueness and its integration-prevalence
+  sum, which cannot exceed the total target market (100%).
+- M9's `technical_fit` requires every declared `CapabilityRequirement` to have
+  a matching `CapabilityCoverage` record; a capability with no coverage
+  assessment keeps the whole method `unknown` (per v1's "any required
+  capability ... lacks source-grounded registry evidence" rule) rather than
+  being silently dropped from the weighted-coverage sum. Capability coverage
+  and integration support are leadership/technical-reviewer judgments per
+  `RESEARCH_METHODOLOGY.md` ("AI may organize evidence only"); this module
+  never infers `covered`/`supported` itself.
+- Tests use fixture `SourcedMetric`/`M5CompetitorGap`/`CapabilityRequirement`/
+  `CapabilityCoverage`/`IntegrationRecord` values loaded against the real
+  `configs/formulas/v1.yaml`, never live official-data or search-intent calls.

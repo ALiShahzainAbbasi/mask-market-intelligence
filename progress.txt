@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 04:35 PKT (UTC+05:00)
+Last updated: 2026-09-10 04:50 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -12,26 +12,27 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 ------------------------------------------------------------------------
 Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05, A10-A13 are complete, A06 enforces source holds plus source-family/
+A01-A05, A10-A14 are complete, A06 enforces source holds plus source-family/
 persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 approved feeds/pages and later analyst inputs complete the lean set. Current task:
-A14 next—capability-registry ingestion, integration discovery, complexity, and
-the exact deterministic M9 fit formula. A07 and A09 remain partial only because
-their live provider access is held; all unavailable/paid APIs remain skipped.
+A15 next—confidence/completeness, minimum samples, method statuses, UNKNOWN
+rules, contradiction effects, and automatic veto detection. A07 and A09 remain
+partial only because their live provider access is held; all unavailable/paid
+APIs remain skipped.
 Paid collection/model use remains disabled.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 27/171
-Remaining checkpoints: 144/171
-Checkpoint-count progress: 15.8%
+Completed checkpoints: 28/171
+Remaining checkpoints: 143/171
+Checkpoint-count progress: 16.4%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 9/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 10/20 (A01-A20).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -41,8 +42,9 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A14 with capability-registry ingestion, integration
-discovery, complexity, and the exact deterministic M9 fit formula.
+Next checkpoint: start A15 with confidence/completeness, minimum samples,
+method statuses, UNKNOWN rules, contradiction effects, and automatic veto
+detection.
 Paid/model network use stays disabled; A07/A09 remain held at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
@@ -79,14 +81,16 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-495 Python tests PASS (was 482; +13 A13 focused tests: 12 workflow_intelligence
-plus 1 new parametrized analysis-schema case for workflow-step-v1). Ruff/format
-over 269 files, strict mypy over 147 source files, architecture/import-cycle,
-and research-configuration/OpenAPI schema drift PASS; local secret guard and
-current Gitleaks source scan PASS. Node.js/pnpm (installed via winget during
-A12; run through `npx pnpm@11.19.0` since corepack's global shim install needs
-elevation) confirm the full web suite (11 tests), web lint, web format:check,
-web typecheck, `pnpm schemas:check`, and `pnpm check:progress` all PASS.
+508 Python tests PASS (was 495; +13 A14 focused tests: 10 M9 calculation cases
+plus 3 new weighted_coverage transform cases). Ruff/format over 272 files,
+strict mypy over 148 source files, architecture/import-cycle, and
+research-configuration/OpenAPI schema drift PASS (method-metric-result-v1's
+schema regenerated only for its class-docstring description text, now
+"M1/M4/M5/M6/M7/M9"); local secret guard and current Gitleaks source scan
+PASS. Node.js/pnpm (installed via winget during A12; run through
+`npx pnpm@11.19.0` since corepack's global shim install needs elevation)
+confirm the full web suite (11 tests), web lint, web format:check, web
+typecheck, `pnpm schemas:check`, and `pnpm check:progress` all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -184,7 +188,7 @@ P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
 Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    |  9/20 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    | 10/20 | CLI-first Autonomous Research Build
 
 A01-A20 are counted in the overall checkpoint total but are not an additional
 original guide phase. This denominator change adds 20 source-defined functional
@@ -232,7 +236,7 @@ formula calculators with golden/UNKNOWN tests.
 [x] A13 Build evidence-grounded workflow reconstruction, bottleneck metrics,
 and the exact M3 formula.
 
-[ ] A14 Build capability-registry ingestion, integration discovery, complexity,
+[x] A14 Build capability-registry ingestion, integration discovery, complexity,
 and the exact deterministic M9 fit formula.
 
 [ ] A15 Build confidence/completeness, minimum samples, method statuses, UNKNOWN
@@ -2410,6 +2414,69 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 04:50 PKT (UTC+05:00) | AUTONOMOUS-023 | A14 | DONE
+Work:
+  Implemented A14 by extending `mask_api.modules.method_metrics` (M9 uses the
+  same v1 `weighted_sum` aggregation as M1/M4/M6/M7, not M2/M3's clustering
+  pattern, so it belongs in the existing weighted-sum calculator module
+  rather than a new one). Added `M9Inputs` plus three new composite input
+  contracts: `CapabilityRequirement` (a capability the target market needs,
+  with an importance weight, from the registry) and `CapabilityCoverage` (a
+  technical/business reviewer's covered/not-covered judgment) together drive
+  `technical_fit` via a new `weighted_coverage_score` transform helper
+  (10 * weighted mean of covered flags by required_weight); `IntegrationRecord`
+  (a target-market platform's discovered prevalence and whether MASK AI
+  supports it) drives `integration_fit` as a summed supported-platform-
+  prevalence ratio through the existing MULTIPLY transform. The other five
+  components (`standardization`, `recurring_revenue_potential`,
+  `proof_potential`, `delivery_simplicity`, `expansion_potential`) reuse the
+  existing `SourcedMetric`/`simple_component_breakdown` pattern unchanged.
+  Every declared `CapabilityRequirement` must have a matching
+  `CapabilityCoverage` record or `technical_fit`--and therefore the whole
+  method, since it is a required component--stays UNKNOWN, matching v1's
+  "any required capability ... lacks source-grounded registry evidence"
+  rule exactly; coverage is never inferred by this module, consistent with
+  RESEARCH_METHODOLOGY.md's "AI may organize evidence only" for M9.
+  Capability/platform ids must be unique and integration prevalence cannot
+  exceed the total target market (100%). M9 has no v1 sample/partial-
+  completeness rule, so a known result is always `complete`.
+Files:
+  apps/api/src/mask_api/modules/method_metrics/{__init__.py,AGENTS.md,
+  contracts.py,transforms.py,m9.py};
+  apps/api/tests/method_metrics/{test_m9_calculation.py,test_transforms.py};
+  configs/schemas/method_metrics/method-metric-result-v1.schema.json
+  (regenerated: only its class-docstring description text changed, now
+  "M1/M4/M5/M6/M7/M9");
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md}; README.md; progress.txt.
+Verification:
+  A14 focused suite PASS: 13 tests (10 M9 calculation: golden weighted-sum,
+  partial-capability-coverage UNKNOWN, uncovered-capability lowering
+  technical_fit without dropping it, no-requirements/no-integrations
+  UNKNOWN, log_scale zero floor, duplicate capability/platform id rejection,
+  integration-prevalence-over-100%-rejection, and reproducibility; plus 3
+  weighted_coverage_score transform cases). Full offline Python suite PASS:
+  508 passed (was 495), 30 integration tests deselected. Ruff lint/format
+  PASS over 272 files; strict mypy PASS over 148 source files; architecture/
+  import-cycle check PASS; `research:schemas:check` and `export-openapi.py
+  --check` PASS with no unexpected drift in any existing schema; local
+  secret guard and pinned Gitleaks source scan PASS. Node.js/pnpm (installed
+  during A12) confirm the full web suite (11 tests), web lint,
+  web format:check, web typecheck, `pnpm schemas:check`, and
+  `pnpm check:progress` (28/171 completed, 143 remaining, matching this
+  entry's hand-recalculated totals) all PASS.
+Limitations/blockers:
+  M9's calculator is not yet wired into the CLI's MethodExecutor protocol,
+  matching A11/A12/A13's precedent; a capability registry, integration
+  discovery adapter, and leadership/technical-reviewer capture UI remain
+  later work (P12), not an A14 blocker. No live model call, provider, or
+  fixture is claimed as market evidence or an approved productization
+  assessment.
+Next:
+  Implement A15: confidence/completeness, minimum samples, method statuses,
+  UNKNOWN rules, contradiction effects, and automatic veto detection, per
+  `docs/SCORING.md` sections 6-9 and the versioned `confidence`/`gates`/
+  `vetoes` blocks already validated in `configs/formulas/v1.yaml`.
+
 2026-09-10 04:35 PKT (UTC+05:00) | AUTONOMOUS-022 | A13 | DONE
 Work:
   Implemented the modular offline A13 vertical slice: a ninth versioned

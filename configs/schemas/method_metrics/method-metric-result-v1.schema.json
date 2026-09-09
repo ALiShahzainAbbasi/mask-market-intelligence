@@ -142,7 +142,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "The exact, reproducible v1 result of one M1/M4/M5/M6/M7 calculation.",
+  "description": "The exact, reproducible v1 result of one M1/M4/M5/M6/M7/M9 calculation.",
   "properties": {
     "breakdown": {
       "items": {

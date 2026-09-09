@@ -139,6 +139,22 @@ is the same max-plus-sqrt(evidence-count)-weighted-top-five aggregation A11
 uses for M2. `WorkflowIntelligenceService` is not yet wired into the CLI's
 `MethodExecutor` protocol, matching A11/A12's precedent.
 
+A14 extends `mask_api.modules.method_metrics` with `m9.py`, the exact v1 M9
+MASK AI/productization-fit calculator, since M9 uses the same `weighted_sum`
+aggregation as M1/M4/M6/M7 rather than M2/M3's clustering-style pattern.
+Two components have their own typed composite inputs rather than a single
+`SourcedMetric`: `technical_fit` needs a capability registry
+(`CapabilityRequirement`, weighted by importance) crossed against a
+technical/business reviewer's coverage assessment (`CapabilityCoverage`) via
+the new `weighted_coverage` transform, and `integration_fit` needs integration
+discovery (`IntegrationRecord`: a target-market platform's prevalence and
+whether MASK AI supports it) summed to a supported-platform-prevalence ratio.
+Per `RESEARCH_METHODOLOGY.md`, M9 assessment is leadership/technical-reviewer
+owned and AI may only organize evidence; this module accepts already-decided
+`covered`/`supported` judgments and never infers them. A capability with no
+matching coverage record keeps the whole M9 result UNKNOWN rather than being
+dropped from the weighted-coverage sum.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

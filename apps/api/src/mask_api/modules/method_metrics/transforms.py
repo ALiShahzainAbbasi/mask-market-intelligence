@@ -86,6 +86,18 @@ def weighted_mean_sqrt_score(
     return clamp10(mean)
 
 
+def weighted_coverage_score(coverage: tuple[tuple[Decimal, Decimal], ...]) -> Decimal | None:
+    """10 * weighted mean of covered flags (0/1) by required_weight, per the v1 audit expression."""
+    if not coverage:
+        return None
+    covered_values = tuple(covered for covered, _ in coverage)
+    weights = tuple(weight for _, weight in coverage)
+    mean = weighted_mean(covered_values, weights)
+    if mean is None:
+        raise TransformError("weighted_coverage unexpectedly had no values")
+    return clamp10(mean * Decimal(10))
+
+
 def composite_weighted_linear(
     parts: tuple[tuple[Decimal, Decimal, Decimal, Decimal], ...],
 ) -> Decimal:

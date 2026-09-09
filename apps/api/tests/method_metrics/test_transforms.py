@@ -7,6 +7,7 @@ from mask_api.modules.method_metrics.transforms import (
     TransformError,
     apply_transform,
     composite_weighted_linear,
+    weighted_coverage_score,
     weighted_mean_sqrt_score,
 )
 from mask_api.research_runner.contracts import TransformConfiguration, TransformKind
@@ -117,3 +118,24 @@ def test_composite_weighted_linear_matches_m7_meta_fit_expression() -> None:
 def test_composite_weighted_linear_rejects_weights_not_totalling_one() -> None:
     with pytest.raises(TransformError):
         composite_weighted_linear(((Decimal("1"), Decimal("0.40"), Decimal("0"), Decimal("1")),))
+
+
+def test_weighted_coverage_score_matches_the_m9_audit_expression() -> None:
+    # 10*(1*1 + 1*1 + 2*0)/4, matching a partially-covered three-capability registry.
+    score = weighted_coverage_score(
+        (
+            (Decimal(1), Decimal("1")),
+            (Decimal(1), Decimal("1")),
+            (Decimal(0), Decimal("2")),
+        )
+    )
+    assert score == Decimal("5")
+
+
+def test_weighted_coverage_score_full_coverage_is_ten() -> None:
+    score = weighted_coverage_score(((Decimal(1), Decimal("1")), (Decimal(1), Decimal("2"))))
+    assert score == Decimal("10")
+
+
+def test_weighted_coverage_score_is_none_for_no_requirements() -> None:
+    assert weighted_coverage_score(()) is None

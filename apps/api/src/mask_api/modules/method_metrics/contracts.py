@@ -1,4 +1,4 @@
-"""Typed metric inputs, breakdowns, and results for the v1 M1/M4/M5/M6/M7 calculators."""
+"""Typed metric inputs, breakdowns, and results for the v1 M1/M4/M5/M6/M7/M9 calculators."""
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ class ComponentBreakdown(MethodMetricsValue):
 
 
 class MethodMetricResult(MethodMetricsValue):
-    """The exact, reproducible v1 result of one M1/M4/M5/M6/M7 calculation."""
+    """The exact, reproducible v1 result of one M1/M4/M5/M6/M7/M9 calculation."""
 
     method_id: MethodId
     market_id: str = Field(pattern=_MARKET_ID_PATTERN)
@@ -153,3 +153,70 @@ class M7Inputs(MethodMetricsValue):
     procurement_complexity_index_0_10: SourcedMetric | None = None
     active_relevant_advertisers: SourcedMetric | None = None
     account_social_presence_rate: SourcedMetric | None = None
+
+
+class CapabilityRequirement(MethodMetricsValue):
+    """One capability the target market/segment requires, from the registry."""
+
+    capability_id: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+    description: str = Field(min_length=1, max_length=500)
+    required_weight: Decimal = Field(gt=0)
+    evidence_reference: str = Field(min_length=1, max_length=500)
+
+
+class CapabilityCoverage(MethodMetricsValue):
+    """A technical/business reviewer's coverage assessment for one capability."""
+
+    capability_id: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+    covered: bool
+    evidence_reference: str = Field(min_length=1, max_length=500)
+    source_id: str = Field(min_length=1, max_length=100)
+
+
+class IntegrationRecord(MethodMetricsValue):
+    """One target-market platform's integration-discovery and support status."""
+
+    platform_id: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+    platform_name: str = Field(min_length=1, max_length=200)
+    target_market_prevalence_0_1: Decimal = Field(ge=0, le=1)
+    supported: bool
+    evidence_reference: str = Field(min_length=1, max_length=500)
+    source_id: str = Field(min_length=1, max_length=100)
+
+
+class M9Inputs(MethodMetricsValue):
+    """Explicitly available normalized M9 capability-registry/integration source values."""
+
+    market_id: str = Field(pattern=_MARKET_ID_PATTERN)
+    capability_requirements: tuple[CapabilityRequirement, ...] = ()
+    capability_coverage: tuple[CapabilityCoverage, ...] = ()
+    integrations: tuple[IntegrationRecord, ...] = ()
+    workflow_template_similarity_0_1: SourcedMetric | None = None
+    recurring_solution_value_share: SourcedMetric | None = None
+    comparable_internal_project_count: SourcedMetric | None = None
+    delivery_complexity_index_0_10: SourcedMetric | None = None
+    adjacent_high_value_workflow_count: SourcedMetric | None = None
+
+    @model_validator(mode="after")
+    def unique_capability_ids(self) -> M9Inputs:
+        requirement_ids = [item.capability_id for item in self.capability_requirements]
+        if len(requirement_ids) != len(set(requirement_ids)):
+            raise ValueError("capability requirements must have unique capability ids")
+        coverage_ids = [item.capability_id for item in self.capability_coverage]
+        if len(coverage_ids) != len(set(coverage_ids)):
+            raise ValueError("capability coverage records must have unique capability ids")
+        return self
+
+    @model_validator(mode="after")
+    def consistent_integration_prevalence(self) -> M9Inputs:
+        platform_ids = [item.platform_id for item in self.integrations]
+        if len(platform_ids) != len(set(platform_ids)):
+            raise ValueError("integration records must have unique platform ids")
+        total_prevalence = sum(
+            (item.target_market_prevalence_0_1 for item in self.integrations), Decimal("0")
+        )
+        if total_prevalence > Decimal("1"):
+            raise ValueError(
+                "integration platform prevalence cannot exceed the total target market"
+            )
+        return self
