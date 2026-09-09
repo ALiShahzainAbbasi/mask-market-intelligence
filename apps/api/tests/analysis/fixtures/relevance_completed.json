@@ -1,0 +1,22 @@
+{
+  "id": "resp_fixture_001",
+  "model": "fixture-model-2026-09-10",
+  "status": "completed",
+  "output": [
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "{\"label\":\"relevant\",\"reasons\":[\"The source describes dispatch delays.\"],\"evidence_spans\":[\"dispatch delays cost us hours every week\"],\"confidence\":0.91}"
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 120,
+    "output_tokens": 30,
+    "total_tokens": 150
+  }
+}

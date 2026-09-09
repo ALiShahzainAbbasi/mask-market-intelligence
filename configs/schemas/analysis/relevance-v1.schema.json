@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "RelevanceLabel": {
+      "enum": [
+        "relevant",
+        "possibly_relevant",
+        "irrelevant"
+      ],
+      "title": "RelevanceLabel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "evidence_spans": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "title": "Evidence Spans",
+      "type": "array"
+    },
+    "label": {
+      "$ref": "#/$defs/RelevanceLabel"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "label",
+    "reasons",
+    "evidence_spans",
+    "confidence"
+  ],
+  "title": "RelevanceOutput",
+  "type": "object"
+}

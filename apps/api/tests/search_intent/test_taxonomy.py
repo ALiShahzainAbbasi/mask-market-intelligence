@@ -12,9 +12,10 @@ from mask_api.modules.search_intent.taxonomy import (
     ("keyword", "expected"),
     [
         ("What is field service management", KeywordIntent.INFORMATIONAL),
-        ("how to reduce dispatch delays", KeywordIntent.PROBLEM_AWARE),
-        ("field service automation", KeywordIntent.SOLUTION_SEEKING),
-        ("best field service software pricing", KeywordIntent.COMMERCIAL_RESEARCH),
+        ("how to reduce dispatch delays", KeywordIntent.PROBLEM),
+        ("field service automation", KeywordIntent.SOLUTION),
+        ("best field service software pricing", KeywordIntent.COMMERCIAL),
+        ("field service software vs spreadsheets", KeywordIntent.COMPARISON),
         ("request a demo field service software", KeywordIntent.TRANSACTIONAL),
         ("ServiceTitan alternatives to spreadsheets", KeywordIntent.COMPETITOR_SWITCHING),
         ("HVAC dispatch", KeywordIntent.UNKNOWN),
@@ -28,8 +29,8 @@ def test_taxonomy_classifies_only_explicit_lexical_intent(
     assert KEYWORD_INTENT_TAXONOMY_VERSION == "keyword-intent-v1"
 
 
-def test_higher_intent_pattern_has_deterministic_precedence() -> None:
+def test_switching_pattern_has_deterministic_precedence() -> None:
     assert (
-        classify_keyword_intent("best field service software vs spreadsheets")
+        classify_keyword_intent("best replacement for field service software")
         == KeywordIntent.COMPETITOR_SWITCHING
     )

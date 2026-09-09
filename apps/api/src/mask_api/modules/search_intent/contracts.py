@@ -25,9 +25,10 @@ class SearchIntentValue(BaseModel):
 
 class KeywordIntent(StrEnum):
     INFORMATIONAL = "informational"
-    PROBLEM_AWARE = "problem_aware"
-    SOLUTION_SEEKING = "solution_seeking"
-    COMMERCIAL_RESEARCH = "commercial_research"
+    PROBLEM = "problem"
+    SOLUTION = "solution"
+    COMMERCIAL = "commercial"
+    COMPARISON = "comparison"
     TRANSACTIONAL = "transactional"
     COMPETITOR_SWITCHING = "competitor_switching"
     UNKNOWN = "unknown"

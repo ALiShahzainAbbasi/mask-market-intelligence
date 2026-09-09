@@ -1,0 +1,72 @@
+{
+  "$defs": {
+    "KeywordIntent": {
+      "enum": [
+        "informational",
+        "problem",
+        "solution",
+        "commercial",
+        "comparison",
+        "transactional",
+        "competitor_switching",
+        "unknown"
+      ],
+      "title": "KeywordIntent",
+      "type": "string"
+    },
+    "SearchIntentRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KeywordIntent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "intent_type": {
+          "$ref": "#/$defs/KeywordIntent"
+        },
+        "keyword": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Keyword",
+          "type": "string"
+        }
+      },
+      "required": [
+        "keyword",
+        "intent_type",
+        "alternative_intent",
+        "confidence"
+      ],
+      "title": "SearchIntentRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "records": {
+      "items": {
+        "$ref": "#/$defs/SearchIntentRecord"
+      },
+      "maxItems": 200,
+      "title": "Records",
+      "type": "array"
+    }
+  },
+  "required": [
+    "records"
+  ],
+  "title": "SearchIntentOutput",
+  "type": "object"
+}

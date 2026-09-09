@@ -1,0 +1,47 @@
+{
+  "$defs": {
+    "EvidencePersona": {
+      "enum": [
+        "owner",
+        "executive",
+        "manager",
+        "employee",
+        "customer",
+        "vendor",
+        "unknown"
+      ],
+      "title": "EvidencePersona",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "evidence_span": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Evidence Span"
+    },
+    "persona": {
+      "$ref": "#/$defs/EvidencePersona"
+    }
+  },
+  "required": [
+    "persona",
+    "evidence_span",
+    "confidence"
+  ],
+  "title": "PersonaOutput",
+  "type": "object"
+}

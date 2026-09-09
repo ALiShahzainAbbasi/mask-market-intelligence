@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 01:06 PKT (UTC+05:00)
+Last updated: 2026-09-10 02:14 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -16,21 +16,23 @@ A01-A05 are complete, A06 enforces source holds plus source-family/persona
 normalization for free collectors, and A07's offline deterministic foundation is
 implemented. Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded
 live smoke; approved feeds/pages and later analyst inputs complete the lean set.
-Current task: A07 remains partial only because Google Ads live access is held;
-YouTube and every other unavailable/paid account API remain skipped by owner decision.
+Current task: A11 offline M2 pain pipeline: grounded-record ingestion, exact and
+near dedupe, embeddings port/cache, deterministic clustering, persona separation,
+and cluster metrics/report contracts. A07 and A09 remain partial only because
+their live provider access is held; all unavailable/paid APIs remain skipped.
 Paid collection/model use remains disabled.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 23/171
-Remaining checkpoints: 148/171
-Checkpoint-count progress: 13.5%
+Completed checkpoints: 24/171
+Remaining checkpoints: 147/171
+Checkpoint-count progress: 14.0%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 5/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 6/20 (A01-A20).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -40,9 +42,9 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: begin A09's offline provider port and structured extraction
-contracts, then A10 grounding validation, while keeping paid/model/network use
-disabled until separately approved credentials and budgets exist.
+Next checkpoint: begin A11 with grounded commercial-pain record contracts,
+deterministic dedupe/persona-separated aggregation, and provider-neutral embedding
+boundaries. Paid/model network use stays disabled; A09 remains held at its edge.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
 this is a sequencing change, not acceptance of missing live-service/CI or security checks.
@@ -78,7 +80,7 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-402 Python + 11 web tests PASS. Ruff/format, strict mypy over 115 source files,
+430 Python + 11 web tests PASS. Ruff/format over 229 files, strict mypy over 123 source files,
 architecture/import-cycle, OpenAPI/TypeScript and research-configuration schema
 drift, and the local secret guard PASS. The Windows Gitleaks run executed but reported three redacted findings;
 their exact files/types still require triage, so P01-08 remains open. Auth and
@@ -177,7 +179,7 @@ P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
 Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    |  5/20 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    |  6/20 | CLI-first Autonomous Research Build
 
 A01-A20 are counted in the overall checkpoint total but are not an additional
 original guide phase. This denominator change adds 20 source-defined functional
@@ -210,13 +212,13 @@ CPC/competition handling, and the versioned intent taxonomy.
 [ ] A08 Add a licensed firmographic/contact provider port and adapter profile for
 target-account, buyer-identification, and contact-coverage metrics.
 
-[ ] A09 Add an LLM provider port and OpenAI Responses API Structured Outputs
+[~] A09 Add an LLM provider port and OpenAI Responses API Structured Outputs
 adapter; keep model choices and all business scoring outside the adapter.
 
-[ ] A10 Add exact-span and numeric-grounding validation, high-impact second-pass
+[x] A10 Add exact-span and numeric-grounding validation, high-impact second-pass
 verification, contradiction preservation, and prompt-injection controls.
 
-[ ] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
+[~] A11 Build the M2 pain extraction, embeddings, near-dedupe, clustering,
 cluster calculation, persona separation, and report section.
 
 [ ] A12 Build exact M1/M4/M5/M6/M7 source-to-metric transformations and v1
@@ -2403,6 +2405,116 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 02:14 PKT (UTC+05:00) | AUTONOMOUS-019 | A11 | IN_PROGRESS
+Work:
+  Started the offline M2 pain-intelligence checkpoint after A10 passed. Reviewed
+  the canonical M2 evidence fields, exact v1 formula, 100/500 unique-document
+  sample rules, three-source-family provisional rule, persona separation,
+  embedding/clustering lineage, outlier, contradiction, and human-review duties.
+  The implementation will consume only A10-accepted grounded records and keep
+  embeddings behind a versioned injected port/cache so held model access is not
+  silently reintroduced.
+Files:
+  progress.txt.
+Verification:
+  A10/full quality gates PASS before A11 start. A11 code/tests NOT RUN because
+  this entry records the required start checkpoint before implementation.
+Limitations/blockers:
+  Live/model embeddings remain held. A11 must use deterministic fixture vectors
+  for offline acceptance and cannot claim production semantic quality until a
+  provider/configuration and the evaluation policy are explicitly approved.
+Next:
+  Add grounded pain-mention/embedding/cluster contracts, exact and near-duplicate
+  handling, deterministic persona-separated clustering, M2 component/aggregation
+  calculations, lineage-rich report data, and golden/UNKNOWN tests.
+
+2026-09-10 02:12 PKT (UTC+05:00) | AUTONOMOUS-018 | A10 | DONE
+Work:
+  Implemented the mandatory offline grounding boundary after structured analysis.
+  It revalidates request/schema identity, checks exact case-sensitive spans,
+  normalizes and verifies material numeric claims, preserves contradictory records
+  and paths, detects bounded prompt-injection signals, and deterministically
+  identifies high-impact financial/purchase-intent/severe-pain/pricing/workflow/
+  interview claims. Added an injected independent-verifier port and service: a
+  missing/ambiguous verification or injection signal quarantines output,
+  unsupported claims and deterministic failures reject it, and only accepted
+  reports expose a separate scoring_input. No repair, retry, model choice, score,
+  provider call, or credential was added.
+Files:
+  apps/api/src/mask_api/modules/analysis/{__init__.py,AGENTS.md,grounding.py,
+  grounding_contracts.py,ports.py}; apps/api/tests/analysis/{test_grounding.py,
+  test_schemas.py}; docs/{ANALYSIS_PROVIDER.md,AUTONOMOUS_RESEARCH_MODE.md,
+  GROUNDING_VALIDATION.md,MODULARITY.md}; README.md; progress.txt.
+Verification:
+  A10/A09 focused suite PASS: 27 tests. Full offline Python suite PASS: 430
+  passed, 30 integration tests deselected; web suite PASS: 11. Ruff lint/format
+  PASS over 229 files; strict mypy PASS over 123 source files; web ESLint,
+  Prettier, route type generation, and TypeScript PASS; architecture/import-cycle,
+  OpenAPI/TypeScript drift, research-schema drift, git diff whitespace, local
+  Git-aware secret guard, and Gitleaks source scan PASS.
+Limitations/blockers:
+  A10 is an offline safety gate, not production AI approval. A09 live execution,
+  provider/model selection, labelled AI release evaluation, and all paid calls
+  remain held. The severe-pain 8-10 rule is versioned review prioritization only,
+  not methodology scoring. No output from fixtures is market evidence.
+Next:
+  Begin A11 locally with grounded M2 record ingestion, exact/near dedupe,
+  provider-neutral embeddings, deterministic clustering/persona separation, and
+  cluster calculation/report contracts; retain UNKNOWN where inputs are absent.
+
+2026-09-10 01:55 PKT (UTC+05:00) | AUTONOMOUS-017 | A09 / A10 | IN_PROGRESS / IN_PROGRESS
+Work:
+  Completed A09's offline boundary: eight canonical v1 Pydantic/JSON Schemas,
+  provider-neutral request/result/cache ports, immutable local cache, and an
+  OpenAI Responses mapping/parser with explicit model/cost/token limits,
+  untrusted-input separation, no tools, no storage, raw response provenance,
+  and refusal/incomplete handling. Corrected A07's intent values to the canonical
+  taxonomy. Began A10 after the A09 offline suite passed.
+Files:
+  apps/api/src/mask_api/modules/analysis/{AGENTS.md,__init__.py,cache.py,
+  contracts.py,openai_responses.py,ports.py,schemas.py};
+  apps/api/tests/analysis/; configs/schemas/analysis/;
+  apps/api/src/mask_api/modules/search_intent/{contracts.py,taxonomy.py};
+  apps/api/tests/search_intent/{test_google_ads.py,test_taxonomy.py};
+  docs/{ANALYSIS_PROVIDER.md,MODULARITY.md,SEARCH_INTENT.md};
+  scripts/export-research-schemas.py; progress.txt.
+Verification:
+  A09 plus corrected A07 focused suites PASS: 40 tests. Ruff PASS over both
+  modules/tests and schema exporter; strict mypy PASS over the analysis module
+  and exporter; generated research-schema drift check PASS. Current official
+  OpenAI Structured Outputs documentation was checked for the Responses JSON
+  Schema shape, closed/required objects, supported schema subset, and explicit
+  refusal/incomplete edge cases. No live request ran.
+Limitations/blockers:
+  A09 remains IN_PROGRESS because the owner placed live model use on hold: no
+  model/key is configured, no concrete credential-bearing network transport is
+  bundled, and no evaluation release gate has been claimed. Its offline boundary
+  is ready for later opt-in wiring. A10 has just started.
+Next:
+  Implement a pure A10 validation report and independent-verifier port; quarantine
+  invalid spans/numbers, preserve contradictions, and require review for injection
+  signals or unverified high-impact claims before scoring eligibility.
+
+2026-09-10 01:35 PKT (UTC+05:00) | AUTONOMOUS-016 | A09 | IN_PROGRESS
+Work:
+  Owner kept held APIs disabled and directed implementation forward. Started the
+  offline A09 extraction foundation: provider-neutral analysis contracts, strict
+  versioned schemas, deterministic cache/provenance, and a fail-closed OpenAI
+  Responses Structured Outputs boundary. Current official OpenAI documentation
+  was reviewed; no API key, model call, or paid budget was enabled.
+Files:
+  progress.txt.
+Verification:
+  NOT RUN yet; implementation has just started.
+Limitations/blockers:
+  Live OpenAI acceptance remains intentionally held and no model has been selected
+  or authorized. During schema review, the A07 code taxonomy was found to differ
+  from the canonical AI_PIPELINE.md search-intent values; this must be reconciled
+  before sharing one schema version.
+Next:
+  Align the offline intent taxonomy, then implement and fixture-test A09 without
+  adding an SDK, credential, network call, or business scoring logic.
+
 2026-09-10 01:06 PKT (UTC+05:00) | AUTONOMOUS-014 | A05 | DONE
 Work:
   Owner supplied local Census, BEA, and SAM.gov credentials, approved their use,

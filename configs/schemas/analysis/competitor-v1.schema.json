@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "CompetitorPricing": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Currency"
+        },
+        "evidence_span": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Evidence Span"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Period"
+        },
+        "status": {
+          "$ref": "#/$defs/PricingStatus"
+        }
+      },
+      "required": [
+        "status",
+        "amount",
+        "currency",
+        "period",
+        "evidence_span"
+      ],
+      "title": "CompetitorPricing",
+      "type": "object"
+    },
+    "CompetitorRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "competitor_name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Competitor Name",
+          "type": "string"
+        },
+        "competitor_type": {
+          "$ref": "#/$defs/CompetitorType"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_spans": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Evidence Spans",
+          "type": "array"
+        },
+        "features": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Features",
+          "type": "array"
+        },
+        "integrations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Integrations",
+          "type": "array"
+        },
+        "positioning": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Positioning"
+        },
+        "pricing": {
+          "$ref": "#/$defs/CompetitorPricing"
+        },
+        "problem_solved": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Problem Solved",
+          "type": "array"
+        },
+        "strengths": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Strengths",
+          "type": "array"
+        },
+        "target_buyer": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Target Buyer"
+        },
+        "target_market": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Target Market"
+        },
+        "weaknesses": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Weaknesses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "competitor_name",
+        "competitor_type",
+        "target_market",
+        "target_buyer",
+        "problem_solved",
+        "pricing",
+        "features",
+        "integrations",
+        "positioning",
+        "strengths",
+        "weaknesses",
+        "evidence_spans",
+        "confidence"
+      ],
+      "title": "CompetitorRecord",
+      "type": "object"
+    },
+    "CompetitorType": {
+      "enum": [
+        "direct_ai_vendor",
+        "vertical_saas",
+        "agency",
+        "consultancy",
+        "bpo",
+        "internal_diy"
+      ],
+      "title": "CompetitorType",
+      "type": "string"
+    },
+    "PricingStatus": {
+      "enum": [
+        "exact",
+        "starting_at",
+        "estimated",
+        "unknown"
+      ],
+      "title": "PricingStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "records": {
+      "items": {
+        "$ref": "#/$defs/CompetitorRecord"
+      },
+      "maxItems": 50,
+      "title": "Records",
+      "type": "array"
+    }
+  },
+  "required": [
+    "records"
+  ],
+  "title": "CompetitorOutput",
+  "type": "object"
+}

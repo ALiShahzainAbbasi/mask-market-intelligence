@@ -18,10 +18,12 @@ _INTENT_PATTERNS: tuple[tuple[KeywordIntent, tuple[re.Pattern[str], ...]], ...] 
                 r"\breplacements?\s+for\b",
                 r"\bswitch(?:ing)?\s+from\b",
                 r"\bmigrate\s+from\b",
-                r"\bversus\b",
-                r"\bvs\.?\b",
             )
         ),
+    ),
+    (
+        KeywordIntent.COMPARISON,
+        tuple(re.compile(pattern) for pattern in (r"\bversus\b", r"\bvs\.?\b")),
     ),
     (
         KeywordIntent.TRANSACTIONAL,
@@ -38,7 +40,7 @@ _INTENT_PATTERNS: tuple[tuple[KeywordIntent, tuple[re.Pattern[str], ...]], ...] 
         ),
     ),
     (
-        KeywordIntent.COMMERCIAL_RESEARCH,
+        KeywordIntent.COMMERCIAL,
         tuple(
             re.compile(pattern)
             for pattern in (
@@ -53,7 +55,7 @@ _INTENT_PATTERNS: tuple[tuple[KeywordIntent, tuple[re.Pattern[str], ...]], ...] 
         ),
     ),
     (
-        KeywordIntent.SOLUTION_SEEKING,
+        KeywordIntent.SOLUTION,
         tuple(
             re.compile(pattern)
             for pattern in (
@@ -65,7 +67,7 @@ _INTENT_PATTERNS: tuple[tuple[KeywordIntent, tuple[re.Pattern[str], ...]], ...] 
         ),
     ),
     (
-        KeywordIntent.PROBLEM_AWARE,
+        KeywordIntent.PROBLEM,
         tuple(
             re.compile(pattern)
             for pattern in (

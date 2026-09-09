@@ -1,0 +1,39 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "description": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "out_of_scope_signals": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Out Of Scope Signals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "out_of_scope_signals",
+    "confidence"
+  ],
+  "title": "ClusterNamingOutput",
+  "type": "object"
+}

@@ -4,19 +4,27 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Callable
+from functools import partial
 from pathlib import Path
+from typing import Any
 
+from mask_api.modules.analysis.contracts import AnalysisSchemaId
+from mask_api.modules.analysis.schemas import strict_json_schema
 from mask_api.research_runner.contracts import MarketConfiguration, SourceProfile
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = {
-    ROOT / "configs" / "schemas" / "market.schema.json": MarketConfiguration,
-    ROOT / "configs" / "schemas" / "source-profile.schema.json": SourceProfile,
+TARGETS: dict[Path, Callable[[], dict[str, Any]]] = {
+    ROOT / "configs" / "schemas" / "market.schema.json": MarketConfiguration.model_json_schema,
+    ROOT / "configs" / "schemas" / "source-profile.schema.json": SourceProfile.model_json_schema,
 }
+for schema_id in AnalysisSchemaId:
+    target = ROOT / "configs" / "schemas" / "analysis" / f"{schema_id.value}.schema.json"
+    TARGETS[target] = partial(strict_json_schema, schema_id)
 
 
-def rendered_schema(model: type[MarketConfiguration] | type[SourceProfile]) -> str:
-    return json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n"
+def rendered_schema(factory: Callable[[], dict[str, Any]]) -> str:
+    return json.dumps(factory(), indent=2, sort_keys=True) + "\n"
 
 
 def main() -> int:
@@ -24,15 +32,15 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.check:
-        for target, model in TARGETS.items():
-            rendered = rendered_schema(model)
+        for target, factory in TARGETS.items():
+            rendered = rendered_schema(factory)
             if not target.exists() or target.read_text(encoding="utf-8") != rendered:
                 raise SystemExit(f"research configuration schema is out of date: {target.name}")
         print("Research configuration schema is current.")
         return 0
-    for target, model in TARGETS.items():
+    for target, factory in TARGETS.items():
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(rendered_schema(model), encoding="utf-8", newline="\n")
+        target.write_text(rendered_schema(factory), encoding="utf-8", newline="\n")
         print(f"Wrote {target.relative_to(ROOT)}")
     return 0
 

@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "EvidencePolarity": {
+      "enum": [
+        "supporting",
+        "contradictory",
+        "neutral"
+      ],
+      "title": "EvidencePolarity",
+      "type": "string"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "weak",
+        "moderate",
+        "strong"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    },
+    "GeneralEvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_span": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Evidence Span",
+          "type": "string"
+        },
+        "evidence_type": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Evidence Type",
+          "type": "string"
+        },
+        "methodology_id": {
+          "$ref": "#/$defs/MethodId"
+        },
+        "polarity": {
+          "$ref": "#/$defs/EvidencePolarity"
+        },
+        "strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        }
+      },
+      "required": [
+        "methodology_id",
+        "evidence_type",
+        "polarity",
+        "claim",
+        "evidence_span",
+        "strength",
+        "confidence"
+      ],
+      "title": "GeneralEvidenceRecord",
+      "type": "object"
+    },
+    "MethodId": {
+      "enum": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "title": "MethodId",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "records": {
+      "items": {
+        "$ref": "#/$defs/GeneralEvidenceRecord"
+      },
+      "maxItems": 100,
+      "title": "Records",
+      "type": "array"
+    }
+  },
+  "required": [
+    "records"
+  ],
+  "title": "GeneralEvidenceOutput",
+  "type": "object"
+}

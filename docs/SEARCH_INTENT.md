@@ -9,7 +9,7 @@ M6 formula calculation, scoring, persistence composition, credentials, or HTTP
 routes.
 
 The versioned `keyword-intent-v1` taxonomy classifies only explicit lexical
-signals into informational, problem-aware, solution-seeking, commercial-research,
+signals into problem, informational, solution, commercial, comparison,
 transactional, or competitor-switching intent. Unclear phrases remain `UNKNOWN`.
 No intent weight is invented here; A12 will apply only the approved formula
 inputs and must keep missing required values unknown.

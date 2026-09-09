@@ -101,6 +101,12 @@ These edges are source capabilities, not method results. They are intentionally
 not wired into the CLI until the method transformations/executors can turn their
 records into the exact versioned metrics without inventing missing values.
 
+A09 provides eight versioned structured-extraction schemas and a disabled,
+injected OpenAI Responses boundary. A10 adds the mandatory offline grounding gate:
+exact spans, numeric support, contradiction preservation, prompt-injection review,
+and independent verification of high-impact claims. Only an accepted grounding
+report exposes future scoring input; model use remains held and disabled.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

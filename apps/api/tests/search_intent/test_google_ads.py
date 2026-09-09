@@ -125,7 +125,7 @@ def test_fixture_parser_preserves_cpc_bids_competition_and_unknowns() -> None:
 
     assert len(batch.metrics) == 3
     first = batch.metrics[0]
-    assert first.intent == KeywordIntent.COMMERCIAL_RESEARCH
+    assert first.intent == KeywordIntent.COMMERCIAL
     assert first.avg_monthly_searches == 1000
     assert first.competition == KeywordCompetition.HIGH
     assert first.competition_index == 82

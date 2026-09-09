@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "InterviewFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_span": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Evidence Span",
+          "type": "string"
+        },
+        "finding_type": {
+          "$ref": "#/$defs/InterviewFindingType"
+        }
+      },
+      "required": [
+        "finding_type",
+        "claim",
+        "evidence_span",
+        "confidence"
+      ],
+      "title": "InterviewFinding",
+      "type": "object"
+    },
+    "InterviewFindingType": {
+      "enum": [
+        "pain_confirmed",
+        "pain_rejected",
+        "urgency",
+        "existing_spend",
+        "workflow_detail",
+        "buying_authority",
+        "buying_objection",
+        "current_solution",
+        "willingness_to_solve",
+        "contradiction"
+      ],
+      "title": "InterviewFindingType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/InterviewFinding"
+      },
+      "maxItems": 100,
+      "title": "Findings",
+      "type": "array"
+    },
+    "unresolved_questions": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 30,
+      "title": "Unresolved Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "findings",
+    "unresolved_questions"
+  ],
+  "title": "InterviewOutput",
+  "type": "object"
+}
