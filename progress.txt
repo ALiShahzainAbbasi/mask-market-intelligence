@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 04:50 PKT (UTC+05:00)
+Last updated: 2026-09-10 05:15 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -12,27 +12,27 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 ------------------------------------------------------------------------
 Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05, A10-A14 are complete, A06 enforces source holds plus source-family/
+A01-A05, A10-A15 are complete, A06 enforces source holds plus source-family/
 persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 approved feeds/pages and later analyst inputs complete the lean set. Current task:
-A15 next—confidence/completeness, minimum samples, method statuses, UNKNOWN
-rules, contradiction effects, and automatic veto detection. A07 and A09 remain
-partial only because their live provider access is held; all unavailable/paid
-APIs remain skipped.
+A16 next—approved overall weighting, fixed gate profiles, immutable score
+snapshots, deterministic recommendations, and compatibility checks. A07 and A09
+remain partial only because their live provider access is held; all
+unavailable/paid APIs remain skipped.
 Paid collection/model use remains disabled.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 28/171
-Remaining checkpoints: 143/171
-Checkpoint-count progress: 16.4%
+Completed checkpoints: 29/171
+Remaining checkpoints: 142/171
+Checkpoint-count progress: 17.0%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 10/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 11/20 (A01-A20).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -42,9 +42,9 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A15 with confidence/completeness, minimum samples,
-method statuses, UNKNOWN rules, contradiction effects, and automatic veto
-detection.
+Next checkpoint: start A16 with approved overall weighting, fixed gate
+profiles, immutable score snapshots, deterministic recommendations, and
+compatibility checks.
 Paid/model network use stays disabled; A07/A09 remain held at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
@@ -81,16 +81,18 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-508 Python tests PASS (was 495; +13 A14 focused tests: 10 M9 calculation cases
-plus 3 new weighted_coverage transform cases). Ruff/format over 272 files,
-strict mypy over 148 source files, architecture/import-cycle, and
-research-configuration/OpenAPI schema drift PASS (method-metric-result-v1's
-schema regenerated only for its class-docstring description text, now
-"M1/M4/M5/M6/M7/M9"); local secret guard and current Gitleaks source scan
-PASS. Node.js/pnpm (installed via winget during A12; run through
-`npx pnpm@11.19.0` since corepack's global shim install needs elevation)
-confirm the full web suite (11 tests), web lint, web format:check, web
-typecheck, `pnpm schemas:check`, and `pnpm check:progress` all PASS.
+533 Python tests PASS (was 508; +25 A15 focused tests: confidence aggregation/
+sample-adequacy, completeness classification, and automatic-veto detection).
+Ruff/format over 282 files, strict mypy over 153 source files, architecture/
+import-cycle, and research-configuration/OpenAPI schema drift PASS (two new
+confidence result schemas exported, no unexpected drift elsewhere); local
+secret guard and current Gitleaks source scan PASS. Node.js/pnpm (installed
+via winget during A12; run through `npx pnpm@11.19.0` since corepack's
+global shim install needs elevation) confirm the full web suite (11 tests),
+web lint, web format:check, web typecheck, `pnpm schemas:check`, and
+`pnpm check:progress` (29/171 completed, 142 remaining) all PASS. Also
+re-verified this session: all 5 credentialed official-data live smokes
+(Census CBP, BLS, BEA Regional, SEC EDGAR, SAM.gov) still PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -188,7 +190,7 @@ P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
 Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    | 10/20 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    | 11/20 | CLI-first Autonomous Research Build
 
 A01-A20 are counted in the overall checkpoint total but are not an additional
 original guide phase. This denominator change adds 20 source-defined functional
@@ -239,7 +241,7 @@ and the exact M3 formula.
 [x] A14 Build capability-registry ingestion, integration discovery, complexity,
 and the exact deterministic M9 fit formula.
 
-[ ] A15 Build confidence/completeness, minimum samples, method statuses, UNKNOWN
+[x] A15 Build confidence/completeness, minimum samples, method statuses, UNKNOWN
 rules, contradiction effects, and automatic veto detection.
 
 [ ] A16 Build approved overall weighting, fixed gate profiles, immutable score
@@ -2414,6 +2416,81 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 05:15 PKT (UTC+05:00) | AUTONOMOUS-024 | A15 | DONE
+Work:
+  Before starting A15, re-ran and confirmed the owner-supplied official-data
+  credentials still work: all 5 live smokes (Census CBP, BLS, BEA Regional,
+  SEC EDGAR, SAM.gov) PASS. Implemented A15 as a new `mask_api.modules.
+  confidence` module sitting above the method calculators, consuming their
+  public result contracts (`method_metrics.MethodMetricResult`) and never
+  computing a method score itself. `calculate_confidence` implements the
+  exact v1 weighted-aggregation expression (10*(0.25*SD+0.25*SA+0.20*EQ+
+  0.10*R+0.20*A)) and Low/Medium/High labeling from five already-normalized
+  0-10 dimension inputs; any missing dimension keeps the result UNKNOWN,
+  never a partial/renormalized weighting. Deliberately does NOT derive
+  source_diversity/evidence_quality/recency/cross_source_agreement from raw
+  evidence: SCORING.md section 6 says those normalizers are versioned
+  alongside each method rubric, and none exist in v1.yaml yet (open decision
+  D04, still pending an owner/reviewer) -- inventing one would itself be an
+  unapproved methodology change. `sample_adequacy_score` is the one
+  dimension with an approved generic derivation (v1.yaml's
+  `confidence.sample_targets` gives an exact target per method, matching
+  that method's own `sample.full_target`), including the M10 multi-metric
+  "any of" target via a best-of-ratios rule. `classify_completeness` maps a
+  method's own status to Proven/Weak/Missing/Not-applicable. `evaluate_
+  automatic_vetoes` implements the three v1 vetoes with a purely numeric
+  trigger (no_meaningful_budget, no_reachable_economic_buyer,
+  highly_bespoke_delivery): the numeric condition alone marks a finding
+  suspected, and the exact confidence label the trigger names (HIGH, or
+  MEDIUM-or-HIGH for highly_bespoke_delivery) is required for confirmed. The
+  other three v1 vetoes are always reported in `not_evaluated` rather than
+  guessed: two need an explicit human-verified evidence contract that does
+  not exist yet, and one needs M8/M10 data (A18/A19). Every v1 veto is
+  treated as critical severity; resolved/accepted_exception remain P18 human
+  review-workflow states this module never assigns. Exported JSON Schemas
+  for `MarketMethodSummary` and `VetoAssessmentResult`.
+Files:
+  apps/api/src/mask_api/modules/confidence/{AGENTS.md,__init__.py,
+  contracts.py,confidence.py,completeness.py,vetoes.py};
+  apps/api/tests/confidence/{test_confidence.py,test_completeness.py,
+  test_vetoes.py};
+  configs/schemas/confidence/{market-method-summary-v1.schema.json,
+  veto-assessment-result-v1.schema.json};
+  scripts/export-research-schemas.py;
+  docs/{CONFIDENCE_AND_VETOES.md,AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md};
+  README.md; progress.txt.
+Verification:
+  A15 focused suite PASS: 25 tests (confidence golden aggregation and Low/
+  Medium/High boundary cases including the exact 50 and 75 thresholds,
+  any-missing-dimension UNKNOWN, single- and multi-metric sample adequacy,
+  no-approved-target/unknown-actual UNKNOWN cases, completeness mapping and
+  not_applicable override, and per-veto confirmed/suspected/no-finding
+  cases plus trigger-text-drift and incomplete-taxonomy guards). Full
+  offline Python suite PASS: 533 passed (was 508), 30 integration tests
+  deselected. Ruff lint/format PASS over 282 files; strict mypy PASS over
+  153 source files; architecture/import-cycle check PASS;
+  `research:schemas:check` and `export-openapi.py --check` PASS with no
+  unexpected drift; local secret guard and pinned Gitleaks source scan
+  PASS. Node.js/pnpm confirm the full web suite (11 tests), web lint,
+  web format:check, web typecheck, `pnpm schemas:check`, and
+  `pnpm check:progress` (29/171 completed, 142 remaining, matching this
+  entry's hand-recalculated totals) all PASS. All 5 credentialed
+  official-data live smokes re-confirmed PASS at session start.
+Limitations/blockers:
+  Confidence cannot become numerically known for any method until an owner/
+  reviewer approves the source_diversity/evidence_quality/recency/
+  cross_source_agreement normalizers (D04); this module is the aggregation
+  engine those normalizers will plug into, not a substitute for approving
+  them. Three of six vetoes stay permanently not_evaluated until their
+  evidence contracts or M8/M10 exist. Gate-score calculation, the Gate 1-4
+  readiness engine, and the human veto-investigation/resolution workflow
+  are A16 and P18 respectively, not A15 blockers.
+Next:
+  Implement A16: approved overall weighting, fixed gate profiles, immutable
+  score snapshots, deterministic recommendations, and compatibility checks,
+  per docs/SCORING.md section 8 and the `gates` block already validated in
+  configs/formulas/v1.yaml.
+
 2026-09-10 04:50 PKT (UTC+05:00) | AUTONOMOUS-023 | A14 | DONE
 Work:
   Implemented A14 by extending `mask_api.modules.method_metrics` (M9 uses the

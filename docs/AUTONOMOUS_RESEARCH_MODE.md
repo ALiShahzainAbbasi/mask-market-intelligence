@@ -155,6 +155,20 @@ owned and AI may only organize evidence; this module accepts already-decided
 matching coverage record keeps the whole M9 result UNKNOWN rather than being
 dropped from the weighted-coverage sum.
 
+A15 adds `mask_api.modules.confidence`, sitting above the method calculators
+and consuming their public result contracts. It implements the exact v1
+confidence-aggregation formula (given the five dimensions as already-
+normalized 0-10 inputs), `sample_adequacy` scoring against v1's approved
+per-method targets, Proven/Weak/Missing/Not-applicable completeness
+classification, and automatic detection of the three v1 vetoes with a purely
+numeric trigger (`no_meaningful_budget`, `no_reachable_economic_buyer`,
+`highly_bespoke_delivery`). It deliberately does not derive
+`source_diversity`/`evidence_quality`/`recency`/`cross_source_agreement`
+from raw evidence (per-method normalizers for those remain open decision D04)
+and honestly reports the other three vetoes as not-evaluated rather than
+inventing the evidence contracts or M8/M10 data they need. See
+`docs/CONFIDENCE_AND_VETOES.md`.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

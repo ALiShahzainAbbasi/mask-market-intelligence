@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "ConfidenceLabel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLabel",
+      "type": "string"
+    },
+    "ConfidenceResult": {
+      "additionalProperties": false,
+      "description": "The exact, reproducible v1 confidence result for one method or gate.",
+      "properties": {
+        "label": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceLabel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "numeric_confidence": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numeric Confidence"
+        },
+        "unknown_reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknown Reasons",
+          "type": "array"
+        }
+      },
+      "title": "ConfidenceResult",
+      "type": "object"
+    },
+    "MethodCompletenessState": {
+      "enum": [
+        "proven",
+        "weak",
+        "missing",
+        "not_applicable"
+      ],
+      "title": "MethodCompletenessState",
+      "type": "string"
+    },
+    "MethodId": {
+      "enum": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "title": "MethodId",
+      "type": "string"
+    },
+    "MethodStatusSnapshot": {
+      "additionalProperties": false,
+      "description": "One method's computed score, completeness, and confidence for a market.",
+      "properties": {
+        "completeness": {
+          "$ref": "#/$defs/MethodCompletenessState"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "method_id": {
+          "$ref": "#/$defs/MethodId"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "status": {
+          "maxLength": 20,
+          "minLength": 1,
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method_id",
+        "status",
+        "completeness"
+      ],
+      "title": "MethodStatusSnapshot",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A market's method-by-method status snapshot, in fixed M1-M10 order.",
+  "properties": {
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "methods": {
+      "items": {
+        "$ref": "#/$defs/MethodStatusSnapshot"
+      },
+      "minItems": 1,
+      "title": "Methods",
+      "type": "array"
+    }
+  },
+  "required": [
+    "market_id",
+    "formula_version",
+    "methods"
+  ],
+  "title": "MarketMethodSummary",
+  "type": "object"
+}

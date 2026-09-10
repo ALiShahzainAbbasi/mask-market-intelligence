@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "VetoFinding": {
+      "additionalProperties": false,
+      "description": "One automatically detected veto signal; never resolved/excepted here.\n\n`resolved` and `accepted_exception` are human review-workflow states\n(P18) outside this module's automatic-detection scope.",
+      "properties": {
+        "evidence_references": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "severity": {
+          "pattern": "^(warning|critical)$",
+          "title": "Severity",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/VetoStatus"
+        },
+        "trigger_detail": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Trigger Detail",
+          "type": "string"
+        },
+        "veto_id": {
+          "$ref": "#/$defs/VetoId"
+        }
+      },
+      "required": [
+        "veto_id",
+        "severity",
+        "status",
+        "trigger_detail",
+        "evidence_references"
+      ],
+      "title": "VetoFinding",
+      "type": "object"
+    },
+    "VetoId": {
+      "enum": [
+        "no_reachable_economic_buyer",
+        "no_meaningful_budget",
+        "major_access_or_regulatory_barrier",
+        "highly_bespoke_delivery",
+        "dominant_platform_solves_problem",
+        "no_qualified_buying_intent"
+      ],
+      "title": "VetoId",
+      "type": "string"
+    },
+    "VetoStatus": {
+      "enum": [
+        "suspected",
+        "confirmed"
+      ],
+      "title": "VetoStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The deterministic, reproducible set of automatically detected vetoes.",
+  "properties": {
+    "findings": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/VetoFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "formula_version": {
+      "pattern": "^v[1-9][0-9]*$",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "not_evaluated": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Not Evaluated",
+      "type": "array"
+    }
+  },
+  "required": [
+    "market_id",
+    "formula_version"
+  ],
+  "title": "VetoAssessmentResult",
+  "type": "object"
+}
