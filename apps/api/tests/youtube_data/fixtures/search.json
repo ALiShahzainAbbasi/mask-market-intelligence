@@ -1,0 +1,25 @@
+{
+  "nextPageToken": "CAUQAA",
+  "items": [
+    {
+      "id": { "kind": "youtube#video", "videoId": "dQw4w9WgXcQ" },
+      "snippet": {
+        "publishedAt": "2026-01-15T10:00:00Z",
+        "channelId": "UC_fixture_channel_1",
+        "title": "Why HVAC dispatch software wastes hours every week",
+        "description": "A contractor walks through the daily dispatch grind and the manual rescheduling pain.",
+        "channelTitle": "Fixture Trade Channel"
+      }
+    },
+    {
+      "id": { "kind": "youtube#video", "videoId": "abc123def45" },
+      "snippet": {
+        "publishedAt": "2026-02-01T08:30:00Z",
+        "channelId": "UC_fixture_channel_2",
+        "title": "",
+        "description": "Missing title should be dropped as an issue.",
+        "channelTitle": "Fixture Trade Channel"
+      }
+    }
+  ]
+}

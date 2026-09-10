@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 21:15 PKT (UTC+05:00)
+Last updated: 2026-09-10 21:35 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -17,16 +17,22 @@ persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 Gemini and YouTube Data API credentials are now locally configured (owner-
 supplied 2026-09-10) and live wiring for both is in progress under A17.5.
-Current task: A17.5 in progress. The live Gemini analysis provider
-(mirroring openai_responses.py's exact shape; extraction/classification
-only, never scores/confidence/gates/vetoes) is implemented and tested with
-a fake transport; no live network call has been made yet since
-MASK_gemini_API_KEY is not yet passed policy-approval wiring at the
-composition root. Next: YouTube collector, USAspending, O*NET importer,
-Common Crawl retriever, fallback registry, and the first real
-MethodExecutor wiring. A07 and A09 remain partial only because their live
-provider access is held/being wired; Google Ads, Reddit, Google Places,
-Meta, Brave, and firmographic providers remain skipped/optional.
+Current task: A17.5 in progress. Two live-capable providers now exist,
+both offline-tested against fake transports only (no live call made for
+either yet, both disabled until explicit policy approval at a composition
+root): a Gemini analysis provider (mirroring openai_responses.py's exact
+shape; extraction/classification only, never scores/confidence/gates/
+vetoes) and a YouTube Data API adapter (mask_api.modules.youtube_data;
+search.list/commentThreads.list for M2/M3/M5, with its own per-endpoint
+quota-unit ledger separate from the shared BudgetLedger and a distinct
+quota-exceeded error path for SOURCE_UNAVAILABLE_QUOTA handling). The
+youtube source profile entry is now operational_status: available
+(local MASK_youtube_API_KEY configured), matching how census_cbp/sam_gov
+are available despite also requiring a credential. Next: USAspending,
+O*NET importer, Common Crawl retriever, fallback registry, and the first
+real MethodExecutor wiring. A07 and A09 remain partial only because their
+live provider access is held/being wired; Google Ads, Reddit, Google
+Places, Meta, Brave, and firmographic providers remain skipped/optional.
 Paid collection/model use remains disabled; Gemini/YouTube use their free
 tiers/quotas only, targeting $0 external paid-data cost.
 Local authentication remains application-owned and disabled at the HTTP boundary;
@@ -50,12 +56,13 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: continue A17.5 (YouTube collector, USAspending, O*NET
-importer, Common Crawl retriever, fallback registry, and the first real
-MethodExecutor wiring), per the owner's explicit 2026-09-10 free-first
-research directive. The live Gemini analysis provider is now implemented
-and offline-tested; wiring it through a real transport and the composition
-root (with policy approval) is still pending.
+Next checkpoint: continue A17.5 (USAspending, O*NET importer, Common Crawl
+retriever, fallback registry, and the first real MethodExecutor wiring),
+per the owner's explicit 2026-09-10 free-first research directive. The
+live Gemini analysis provider and the YouTube Data API adapter are now
+both implemented and offline-tested; wiring either through a real
+transport and a composition root (with explicit policy approval) is still
+pending, and no live network call has been made for either.
 Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
 and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
@@ -93,22 +100,28 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-580 Python tests PASS (was 568; +12 A17.5 Gemini-provider focused tests:
-schema-dialect $ref inlining, stateless/tool-free payload shape, prompt-
-injection-in-source-text stays inert in the system instruction, parser
-usage/cost/schema validation, null-optional-field preservation, disabled-
-adapter short-circuit, cache reuse while disabled, safety-block/non-STOP-
-finish-reason handling, and malformed/missing-candidate envelope rejection).
-Ruff/format over 305 files, strict mypy over 165 source files (apps/api/src
-plus workers), architecture/import-cycle, and research-configuration/OpenAPI
-schema drift PASS (no new schema needed -- the Gemini provider reuses the
-existing analysis contracts/JSON schemas); local secret guard and current
-Gitleaks source scan PASS (confirmed the Gemini/YouTube local credential
-names remain unleaked, and no fixture API key pattern was flagged). Node.js/
-pnpm confirm the full web suite (11 tests), web lint, web format:check, web
-typecheck, `pnpm schemas:check`, and `pnpm check:progress` (31/172
-completed, 141 remaining, matching this entry's hand-recalculated totals)
-all PASS.
+619 Python tests PASS (was 580; +39 A17.5 YouTube-adapter focused tests:
+request-builder validation limits for both endpoints, search/commentThreads
+parser extraction plus missing-title/empty-text issue recording and
+duplicate-comment dedupe, quota-ledger exact-cost charging/rejection-without-
+partial-charge/cheaper-endpoint-still-fits-after-exhaustion, and transport/
+adapter provenance-and-quota-cost preservation, disabled/unapproved/
+credential-missing/operational-hold short-circuits, budget-limit and quota-
+limit preflight rejection, the distinct provider quotaExceeded error path
+versus a generic 403, generic HTTP-failure retry metadata, content-type
+rejection, and endpoint-origin enforcement; one pre-existing source-profile
+assertion in test_configuration.py was updated from credential_pending to
+available to match the youtube source entry's new operational status now
+that its adapter exists and a local key is configured). Ruff/format over
+318 files, strict mypy over 172 source files (apps/api/src plus workers),
+architecture/import-cycle, and research-configuration/OpenAPI schema drift
+PASS (no new schema needed -- neither provider changes a persisted
+contract shape); local secret guard and current Gitleaks source scan PASS
+(confirmed the Gemini/YouTube local credential names remain unleaked, and
+no fixture API key pattern was flagged). Node.js/pnpm confirm the full web
+suite (11 tests), web lint, web format:check, web typecheck, `pnpm
+schemas:check`, and `pnpm check:progress` (31/172 completed, 141
+remaining, matching this entry's hand-recalculated totals) all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -2461,6 +2474,97 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 21:35 PKT (UTC+05:00) | AUTONOMOUS-028 | A17.5 | IN_PROGRESS
+Work:
+  Added the second A17.5 live-capable source: `mask_api.modules.
+  youtube_data`, a fixed-scope adapter for two YouTube Data API v3
+  endpoints (`search.list` for M2/M3/M5 video discovery,
+  `commentThreads.list` for public audience pain/workaround discussion on
+  a named video). Deliberately built as its own module rather than an
+  extension of `official_data`, since `official_data` is explicitly scoped
+  to US government statutory sources (see its own docs) and YouTube has a
+  different auth shape (query-param API key against a commercial platform)
+  and, more importantly, a different cost model: YouTube meters requests
+  in quota units per endpoint (search=100, commentThreads=1, against a
+  10,000-unit default daily free tier), which the shared `BudgetLedger`
+  (requests/documents/bytes/currency) cannot express. Added a small,
+  separate `YouTubeQuotaLedger` that reserves the exact per-endpoint unit
+  cost before every call, alongside (not instead of) the existing shared
+  budget preflight. A provider-reported `quotaExceeded` response (HTTP 403
+  with that specific error reason, detected from the parsed error body)
+  raises the distinct `YouTubeQuotaExceededTransportError` rather than a
+  generic HTTP failure, so a future caller can record
+  `SOURCE_UNAVAILABLE_QUOTA` and continue the run with other providers
+  instead of failing it -- directly implementing the owner's "never fail
+  the whole run on quota exhaustion" instruction. Contracts, quota
+  accounting, request builders, parsers, and network transport are in
+  separate files, matching `official_data`'s split; parsers open no
+  sockets, read no credentials, and write no storage. Search/comment
+  results are raw evidence only -- this module performs no relevance
+  classification, persona assignment, or scoring; that stays the
+  grounding pipeline's job. Flipped the `youtube` entry in
+  `configs/sources/default_us_public.yaml` from `operational_status:
+  credential_pending` to `available`, matching how `census_cbp`/`sam_gov`
+  are `available` despite also requiring a credential (the field records
+  whether the adapter/pipeline can accept a credential through normal
+  configuration, not whether a specific local `.env` currently has one
+  set) -- now that both the owner-supplied `MASK_youtube_API_KEY` and the
+  adapter itself exist. Added `docs/YOUTUBE_DATA.md`.
+Files:
+  apps/api/src/mask_api/modules/youtube_data/{AGENTS.md,__init__.py,
+  contracts.py,quota.py,requests.py,parsers.py,transport.py,errors.py};
+  apps/api/tests/youtube_data/{test_requests.py,test_parsers.py,
+  test_quota.py,test_transport.py,fixtures/{search.json,
+  comment_threads.json,quota_exceeded.json}};
+  apps/api/tests/research_runner/test_configuration.py (updated the
+  youtube operational_status assertion to match the config change above);
+  configs/sources/default_us_public.yaml;
+  docs/{YOUTUBE_DATA.md,AUTONOMOUS_RESEARCH_MODE.md,SOURCE_AVAILABILITY.md};
+  README.md; progress.txt.
+Verification:
+  New focused suite PASS: 39 tests (search/commentThreads request-builder
+  validation limits, both parsers' extraction plus missing-title/empty-
+  text issue recording and duplicate-comment dedupe, quota-ledger exact-
+  cost charging/rejection-without-partial-charge/a cheaper endpoint still
+  fitting after a more expensive one is exhausted, and the transport/
+  adapter's provenance-and-quota-cost preservation, disabled/unapproved/
+  credential-missing/operational-hold short-circuits before any network
+  call, shared-budget and quota-ledger preflight rejection, the distinct
+  provider quotaExceeded error path versus a generic 403 with no quota
+  reason, generic HTTP-failure retry metadata, content-type rejection,
+  and endpoint-origin enforcement). Full offline suite PASS: 619 (was
+  580), 30 integration tests deselected -- confirmed via the project's
+  actual root-scoped `pnpm run test:unit`. Ruff check/format PASS over
+  318 files; strict mypy PASS over 172 source files (`apps/api/src` and
+  `workers`). Architecture/import-cycle check PASS.
+  `research:schemas:check` PASS with no drift (neither provider changes a
+  persisted contract shape). Local secret guard (`check:secrets`) and
+  pinned Gitleaks source scan (`scan-secrets.ps1`, "no leaks found") both
+  PASS. Node.js/pnpm confirm the full web suite (11 tests), web lint, and
+  web typecheck all PASS unaffected. `pnpm check:progress` PASS at
+  31/172 (unchanged -- A17.5 remains one in-progress checkpoint).
+Limitations/blockers:
+  No live YouTube network call has been made; only a fake transport was
+  exercised, matching the Gemini provider's current state. The adapter is
+  not yet wired into any composition root or `MethodExecutor`, and no
+  concrete `search.list` query-planning logic exists yet for how a market
+  definition becomes an actual search query -- that belongs to the later
+  fallback-registry/MethodExecutor wiring, not this adapter. `videos.list`
+  (view/like/comment counts for a discovered video) was intentionally not
+  built in this pass to keep scope to the two endpoints the owner's
+  evidence list named (pain/complaints, workflow evidence, competitor
+  discussion); it can be added later at 1 quota unit per call if a metric
+  needs it.
+Next:
+  Build the concrete stdlib `urllib` transports and wire both `GeminiAdapter`
+  and `YouTubeApiAdapter` through a composition root under explicit policy
+  approval; then continue A17.5 with the keyless USAspending adapter
+  (M4/M5), the O*NET dataset bootstrap/importer (M3), the targeted Common
+  Crawl retriever, the provider-independent source/evidence fallback
+  registry with Tier A-E quality classes, and the first real
+  `MethodExecutor` implementations -- toward one real, source-backed
+  calibration market report at $0 paid-data cost.
+
 2026-09-10 21:15 PKT (UTC+05:00) | AUTONOMOUS-027 | A17.5 | IN_PROGRESS
 Work:
   Started A17.5 with its first live-capable sub-piece: a Gemini structured-

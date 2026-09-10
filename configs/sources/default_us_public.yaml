@@ -87,7 +87,7 @@ sources:
     default_enabled: false
     credential_required: true
     cost_class: mixed
-    operational_status: credential_pending
+    operational_status: available
   google_places:
     source_family: local_business_reviews
     name: Google Places API

@@ -215,6 +215,22 @@ Like OpenAI's adapter, it may only extract, classify, and summarize; it
 never calculates a score, confidence index, gate, veto, or ranking. See
 `docs/ANALYSIS_PROVIDER.md`.
 
+A17.5 also adds `mask_api.modules.youtube_data`, a fixed-scope adapter for
+two YouTube Data API v3 endpoints (`search.list`, `commentThreads.list`) for
+M2/M3/M5 public pain, workflow, and competitor-discussion evidence. It is
+deliberately a separate module from `official_data` (scoped to US government
+sources) rather than an extension of it, since YouTube is a commercial
+platform with a different auth shape and a distinct per-endpoint quota-unit
+cost model that the shared `BudgetLedger` cannot express -- a new
+`YouTubeQuotaLedger` reserves those units alongside the shared budget, and a
+provider-reported `quotaExceeded` response raises a distinct error type so a
+caller can record `SOURCE_UNAVAILABLE_QUOTA` instead of failing the run. The
+`youtube` source profile entry is now `operational_status: available` (the
+owner-supplied `MASK_youtube_API_KEY` is configured locally), matching how
+`census_cbp`/`sam_gov` are `available` despite also requiring a credential.
+No live call has been made; the adapter is exercised only against a fake
+transport and fixtures so far. See `docs/YOUTUBE_DATA.md`.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

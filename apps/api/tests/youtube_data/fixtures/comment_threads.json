@@ -1,0 +1,37 @@
+{
+  "nextPageToken": null,
+  "items": [
+    {
+      "id": "UgxFixtureThread1",
+      "videoId": "dQw4w9WgXcQ",
+      "snippet": {
+        "videoId": "dQw4w9WgXcQ",
+        "totalReplyCount": 3,
+        "topLevelComment": {
+          "snippet": {
+            "textDisplay": "We lose two hours a day rescheduling missed appointments manually.",
+            "authorDisplayName": "FixtureViewer1",
+            "publishedAt": "2026-01-16T09:00:00Z",
+            "likeCount": 12
+          }
+        }
+      }
+    },
+    {
+      "id": "UgxFixtureThread2",
+      "videoId": "dQw4w9WgXcQ",
+      "snippet": {
+        "videoId": "dQw4w9WgXcQ",
+        "totalReplyCount": 0,
+        "topLevelComment": {
+          "snippet": {
+            "textDisplay": "",
+            "authorDisplayName": "FixtureViewer2",
+            "publishedAt": "2026-01-16T09:05:00Z",
+            "likeCount": 0
+          }
+        }
+      }
+    }
+  ]
+}

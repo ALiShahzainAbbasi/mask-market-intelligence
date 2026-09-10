@@ -49,7 +49,7 @@ def test_network_sources_are_opt_in_and_routes_are_resolved() -> None:
     assert profile.sources["rss_atom"].operational_status == "available"
     assert profile.sources["static_html"].operational_status == "available"
     assert profile.sources["google_places"].operational_status == "paid_hold"
-    assert profile.sources["youtube"].operational_status == "credential_pending"
+    assert profile.sources["youtube"].operational_status == "available"
     assert profile.sources["reddit"].operational_status == "approval_pending"
     known = set(profile.sources)
     for route in profile.signal_routes.values():
