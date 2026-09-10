@@ -1,6 +1,7 @@
 # Official US Data Adapters
 
-Status: A05 complete; all five deliberately small live smoke checks passed on 2026-09-10.
+Status: A05's five sources are complete with passed live smoke checks; A17.5
+adds a sixth, keyless source (USAspending), offline-tested only so far.
 
 ## Purpose and boundary
 
@@ -20,15 +21,21 @@ The current adapters cover:
 | BEA Regional | `apps.bea.gov/api/data/` | Regional income, employment, and GDP observations | BEA API key required |
 | SEC EDGAR submissions | `data.sec.gov/submissions/CIK##########.json` | Filing metadata for named companies | No key; contact email required in User-Agent |
 | SAM.gov opportunities | `api.sam.gov/opportunities/v2/search` | Bounded procurement-demand records | SAM public API key required |
+| USAspending award search | `api.usaspending.gov/api/v2/search/spending_by_award/` | Awarded federal contract spend, incumbents, and economic-demand evidence (M4/M5) | None -- keyless, public data |
 
 Endpoint and parameter choices follow the official
 [Census CBP API](https://www.census.gov/data/developers/data-sets/cbp-zbp/cbp-api.2021.html),
 [BLS API](https://www.bls.gov/developers/api_signature_v2.htm),
 [BEA API guide](https://apps.bea.gov/api/_pdf/bea_web_service_api_user_guide.pdf),
 [SEC EDGAR API](https://www.sec.gov/search-filings/edgar-application-programming-interfaces),
-and [SAM.gov opportunities API](https://open.gsa.gov/api/get-opportunities-public-api/).
+[SAM.gov opportunities API](https://open.gsa.gov/api/get-opportunities-public-api/),
+and the [USAspending API contract for `spending_by_award`](https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md).
 The Census NAICS field is an explicit request input and defaults to
-`NAICS2017`; it is never guessed from the data year.
+`NAICS2017`; it is never guessed from the data year. USAspending requests are
+fixed to procurement contract award types (`A`/`B`/`C`/`D`) and a bounded
+NAICS/date-range filter; a zero-result response is a normal empty batch, not
+an error -- whether that means `NOT_RELEVANT` for a given market is a
+method-input decision made later, not something this adapter infers.
 
 ## Safety and cost controls
 
@@ -69,6 +76,11 @@ models, or scoring code.
   than one year, one NAICS code, a page size of 1-1000, and a nonnegative page
   index. Parsers retain procurement/award fields needed for market analysis but
   intentionally exclude point-of-contact details and echoed response links.
+- USAspending requests require 1-10 two-to-six-digit NAICS codes, ordered
+  `YYYY-MM-DD` dates no more than five years apart, and a page size of 1-100.
+  Parsers record recipient name, award amount, dates, description, NAICS, and
+  awarding agency; a result missing its award ID or recipient name is dropped
+  as a parse issue rather than kept with an invented identity.
 
 ## Test and live-smoke contract
 
@@ -89,6 +101,9 @@ uv run pytest apps/api/tests/official_data/test_live_official_smoke.py -q
 
 The authorized harness passed Census CBP, keyless BLS, BEA Regional, SEC EDGAR,
 and SAM.gov against their current endpoints on 2026-09-10. No credential value,
-response body, or credential-bearing URL was logged or committed. The adapters
-are not yet registered with the API or worker; persistence and durable job
-wiring remain Phase 3 work.
+response body, or credential-bearing URL was logged or committed. USAspending
+was added under A17.5 with the same offline fixture/limit/gate test coverage
+and a live smoke test (`test_live_usaspending_single_page_query`) that follows
+the identical opt-in gate; it has not yet been run live. The adapters are not
+yet registered with the API or worker; persistence and durable job wiring
+remain Phase 3 work.

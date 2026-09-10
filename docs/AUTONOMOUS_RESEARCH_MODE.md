@@ -231,6 +231,18 @@ owner-supplied `MASK_youtube_API_KEY` is configured locally), matching how
 No live call has been made; the adapter is exercised only against a fake
 transport and fixtures so far. See `docs/YOUTUBE_DATA.md`.
 
+A17.5 also extends `mask_api.modules.official_data` with a sixth source,
+USAspending award search (`OfficialSourceId.USASPENDING`), for M4/M5 awarded
+federal contract spend and incumbent evidence. Unlike YouTube, USAspending is
+a genuine US government source that fits `official_data`'s existing
+five-source dispatch pattern directly rather than needing a separate module,
+and it needs no credential at all. A zero-result response is a normal empty
+batch; deciding that a market has `NOT_RELEVANT` USAspending evidence (as
+opposed to a real gap) is a later method-input concern, not something this
+adapter infers. Its live smoke test exists and follows the same explicit
+opt-in gate as the other five official_data sources, but has not been run.
+See `docs/OFFICIAL_DATA.md`.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

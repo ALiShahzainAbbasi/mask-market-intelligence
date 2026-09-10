@@ -13,6 +13,7 @@ from mask_api.modules.official_data.parsers import (
     parse_census_cbp,
     parse_sam_opportunities,
     parse_sec_submissions,
+    parse_usaspending,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -79,6 +80,19 @@ def test_sam_keeps_valid_public_opportunity_and_flags_missing_identity() -> None
     assert batch.issues[0].code == "sam.identity_missing"
 
 
+def test_usaspending_keeps_valid_award_and_flags_missing_identity() -> None:
+    batch = parse_usaspending(fixture("usaspending.json"))
+
+    assert len(batch.records) == 1
+    record = batch.records[0]
+    assert record.source_record_id == "CONT_AWD_FIXTURE_0001"
+    assert record.attributes["award_amount"] == 482500.0
+    assert record.attributes["naics_code"] == "238220"
+    assert record.attributes["recipient_name"] == "Fixture Field Services LLC"
+    assert record.published_date == "2025-01-01"
+    assert batch.issues[0].code == "usaspending.identity_missing"
+
+
 def test_exact_duplicates_do_not_inflate_official_records() -> None:
     census = json.loads(fixture("census_cbp.json"))
     census.append(census[1])
@@ -105,12 +119,14 @@ def test_empty_valid_responses_remain_empty_instead_of_inventing_data() -> None:
         b'"reportDate":[],"form":[],"primaryDocument":[]}}}'
     )
     sam = parse_sam_opportunities(b'{"opportunitiesData":[]}')
+    usaspending = parse_usaspending(b'{"results":[]}')
 
     assert not census.observations
     assert not bls.observations
     assert not bea.observations
     assert not sec.records
     assert not sam.records
+    assert not usaspending.records
 
 
 @pytest.mark.parametrize(

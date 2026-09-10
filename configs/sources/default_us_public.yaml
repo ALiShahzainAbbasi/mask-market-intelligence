@@ -64,6 +64,18 @@ sources:
     credential_required: true
     cost_class: free
     operational_status: available
+  usaspending:
+    source_family: government_procurement
+    name: USAspending.gov award search
+    methods: [M4, M5]
+    access: official_api
+    evidence_use: Awarded federal contract spend, incumbents, and economic-demand evidence
+    reference: https://api.usaspending.gov/docs/endpoints
+    policy_status: allowed
+    default_enabled: false
+    credential_required: false
+    cost_class: free
+    operational_status: available
   google_ads_keyword_planner:
     source_family: search_advertising
     name: Google Ads Keyword Planner
@@ -188,7 +200,7 @@ sources:
 signal_routes:
   firm_counts_and_economics:
     primary: [census_cbp, bls, bea]
-    fallback: [firmographics, sec_edgar]
+    fallback: [firmographics, sec_edgar, usaspending]
     failure_rule: Keep unavailable values UNKNOWN and record attempted sources.
   pain_and_workflows:
     primary: [reddit, youtube, google_places, rss_atom, static_html]
@@ -196,7 +208,7 @@ signal_routes:
     failure_rule: Keep the method incomplete when sample, diversity, or provenance rules fail.
   competitors_and_pricing:
     primary: [sec_edgar, static_html, rss_atom]
-    fallback: [brave_search, sam_gov, meta_ad_library]
+    fallback: [brave_search, sam_gov, usaspending, meta_ad_library]
     failure_rule: Never infer missing prices or traction.
   search_demand:
     primary: [google_ads_keyword_planner]

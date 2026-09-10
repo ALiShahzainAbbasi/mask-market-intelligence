@@ -14,6 +14,7 @@ class OfficialSourceId(StrEnum):
     BEA = "bea"
     SEC_EDGAR = "sec_edgar"
     SAM_GOV = "sam_gov"
+    USASPENDING = "usaspending"
 
 
 class OfficialValue(BaseModel):

@@ -7,7 +7,11 @@ from pathlib import Path
 
 import pytest
 from mask_api.modules.official_data.contracts import OfficialSourceId
-from mask_api.modules.official_data.requests import OfficialRequest, census_cbp_request
+from mask_api.modules.official_data.requests import (
+    OfficialRequest,
+    census_cbp_request,
+    usaspending_award_search_request,
+)
 from mask_api.modules.official_data.transport import (
     OfficialApiAdapter,
     OfficialApiSettings,
@@ -136,6 +140,32 @@ def test_fetch_preserves_request_and_raw_response_provenance() -> None:
     assert result.batch.observations[0].metric == "establishment_count"
     assert ledger.usage.requests == 1
     assert ledger.usage.total_bytes == len(result.batch.raw_response)
+
+
+def test_usaspending_requires_no_credential_and_dispatches_its_own_parser() -> None:
+    usaspending_response = OfficialTransportResponse(
+        status_code=200,
+        content_type="application/json",
+        body=(FIXTURES / "usaspending.json").read_bytes(),
+    )
+    transport = FakeTransport([usaspending_response])
+    usaspending_adapter = OfficialApiAdapter(
+        "usaspending",
+        source("usaspending"),
+        settings(),
+        transport,
+        user_agent="MASK-AI-Market-Research/0.1",
+        now=lambda: NOW,
+    )
+    usaspending_request = usaspending_award_search_request(
+        naics_codes=("238220",), start_date="2024-01-01", end_date="2024-12-31"
+    )
+
+    result = usaspending_adapter.fetch(usaspending_request, budget())
+
+    assert result.request.credential_fields == ()
+    assert result.batch.source_id == OfficialSourceId.USASPENDING
+    assert result.batch.records[0].source_record_id == "CONT_AWD_FIXTURE_0001"
 
 
 def test_standard_transport_validates_endpoint_and_applies_bounded_request() -> None:

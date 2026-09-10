@@ -10,6 +10,7 @@ from mask_api.modules.official_data.requests import (
     census_cbp_request,
     sam_opportunities_request,
     sec_submissions_request,
+    usaspending_award_search_request,
 )
 from pydantic import SecretStr
 
@@ -79,9 +80,48 @@ def test_other_builders_use_only_documented_fixed_endpoints() -> None:
     assert sam.query["limit"] == "10"
 
 
+def test_usaspending_request_requires_no_key_and_pins_award_type_codes() -> None:
+    request = usaspending_award_search_request(
+        naics_codes=("238220",),
+        start_date="2024-01-01",
+        end_date="2024-12-31",
+    )
+
+    assert request.method == "POST"
+    assert request.endpoint == "https://api.usaspending.gov/api/v2/search/spending_by_award/"
+    assert request.secret_query == {}
+    assert request.secret_body == {}
+    assert request.json_body is not None
+    filters = request.json_body["filters"]
+    assert isinstance(filters, dict)
+    assert filters["award_type_codes"] == ["A", "B", "C", "D"]
+    assert filters["naics_codes"] == {"require": ["238220"]}
+    provenance = request.provenance()
+    assert provenance.source_id == OfficialSourceId.USASPENDING
+    assert provenance.credential_fields == ()
+
+
 @pytest.mark.parametrize(
     "call",
     [
+        lambda: usaspending_award_search_request(
+            naics_codes=(), start_date="2024-01-01", end_date="2024-12-31"
+        ),
+        lambda: usaspending_award_search_request(
+            naics_codes=("bad-code",), start_date="2024-01-01", end_date="2024-12-31"
+        ),
+        lambda: usaspending_award_search_request(
+            naics_codes=("238220",), start_date="2024-13-01", end_date="2024-12-31"
+        ),
+        lambda: usaspending_award_search_request(
+            naics_codes=("238220",), start_date="2024-12-31", end_date="2024-01-01"
+        ),
+        lambda: usaspending_award_search_request(
+            naics_codes=("238220",), start_date="2018-01-01", end_date="2024-12-31"
+        ),
+        lambda: usaspending_award_search_request(
+            naics_codes=("238220",), start_date="2024-01-01", end_date="2024-12-31", limit=0
+        ),
         lambda: census_cbp_request(
             year=2022,
             naics=238220,

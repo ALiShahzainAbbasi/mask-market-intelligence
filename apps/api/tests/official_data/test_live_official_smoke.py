@@ -13,6 +13,7 @@ from mask_api.modules.official_data.requests import (
     census_cbp_request,
     sam_opportunities_request,
     sec_submissions_request,
+    usaspending_award_search_request,
 )
 from mask_api.modules.official_data.transport import (
     OfficialApiAdapter,
@@ -136,5 +137,17 @@ def test_live_sam_single_page_query() -> None:
             limit=1,
             offset=0,
             api_key=_secret("MASK_SAM_API_KEY"),
+        ),
+    )
+
+
+def test_live_usaspending_single_page_query() -> None:
+    _fetch(
+        "usaspending",
+        usaspending_award_search_request(
+            naics_codes=("238220",),
+            start_date="2024-01-01",
+            end_date="2024-12-31",
+            limit=1,
         ),
     )

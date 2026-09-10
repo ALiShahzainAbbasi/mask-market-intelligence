@@ -248,6 +248,46 @@ def parse_sam_opportunities(body: bytes) -> OfficialBatch:
     return _batch(OfficialSourceId.SAM_GOV, "sam-opportunities-v2-v1", body, (), records, issues)
 
 
+def parse_usaspending(body: bytes) -> OfficialBatch:
+    raw = _object(_json(body, "usaspending.response_invalid"), "usaspending.response_shape_invalid")
+    values = raw.get("results")
+    if not isinstance(values, list):
+        raise OfficialDataError("usaspending.results_invalid")
+    records: list[OfficialRecord] = []
+    issues: list[OfficialParseIssue] = []
+    for row in values:
+        if not isinstance(row, dict):
+            issues.append(OfficialParseIssue(code="usaspending.row_invalid"))
+            continue
+        award_id = str(row.get("generated_internal_id", "") or row.get("Award ID", "")).strip()
+        recipient = str(row.get("Recipient Name", "")).strip()
+        if not award_id or not recipient:
+            issues.append(OfficialParseIssue(code="usaspending.identity_missing"))
+            continue
+        records.append(
+            OfficialRecord(
+                source_id=OfficialSourceId.USASPENDING,
+                source_record_id=award_id,
+                title=f"{recipient} award {row.get('Award ID', award_id)}",
+                published_date=_string_or_none(row.get("Start Date")),
+                attributes={
+                    "recipient_name": recipient,
+                    "award_amount": _json_value(row.get("Award Amount")),
+                    "start_date": _json_value(row.get("Start Date")),
+                    "end_date": _json_value(row.get("End Date")),
+                    "description": _json_value(row.get("Description")),
+                    "naics_code": _json_value(row.get("NAICS")),
+                    "awarding_agency": _json_value(row.get("Awarding Agency")),
+                },
+            )
+        )
+    return _batch(OfficialSourceId.USASPENDING, "usaspending-award-v1", body, (), records, issues)
+
+
+def _string_or_none(value: object) -> str | None:
+    return value if isinstance(value, str) and value.strip() else None
+
+
 def _batch(
     source: OfficialSourceId,
     version: str,

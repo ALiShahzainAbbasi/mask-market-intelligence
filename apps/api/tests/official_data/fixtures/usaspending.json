@@ -1,0 +1,32 @@
+{
+  "spending_level": "awards",
+  "limit": 10,
+  "results": [
+    {
+      "internal_id": 1001,
+      "generated_internal_id": "CONT_AWD_FIXTURE_0001",
+      "Award ID": "GS-00F-000AA",
+      "Recipient Name": "Fixture Field Services LLC",
+      "Award Amount": 482500.0,
+      "Start Date": "2025-01-01",
+      "End Date": "2025-12-31",
+      "Description": "HVAC preventive maintenance and dispatch support services",
+      "NAICS": "238220",
+      "Awarding Agency": "General Services Administration"
+    },
+    {
+      "internal_id": 1002,
+      "generated_internal_id": "",
+      "Award ID": "",
+      "Recipient Name": "",
+      "Award Amount": 10000.0,
+      "Start Date": "2025-02-01",
+      "End Date": "2025-06-30",
+      "Description": "Missing identity should be dropped as an issue.",
+      "NAICS": "238220",
+      "Awarding Agency": "Fixture Agency"
+    }
+  ],
+  "page_metadata": { "page": 1, "hasNext": false },
+  "messages": []
+}

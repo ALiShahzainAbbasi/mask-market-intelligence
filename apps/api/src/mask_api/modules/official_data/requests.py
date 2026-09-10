@@ -179,6 +179,58 @@ def sam_opportunities_request(
     )
 
 
+def usaspending_award_search_request(
+    *,
+    naics_codes: tuple[str, ...],
+    start_date: str,
+    end_date: str,
+    limit: int = 10,
+    page: int = 1,
+) -> OfficialRequest:
+    if not naics_codes or len(naics_codes) > 10:
+        raise ValueError("USAspending requires between 1 and 10 NAICS codes")
+    if any(not re.fullmatch(r"[0-9]{2,6}", code) for code in naics_codes):
+        raise ValueError("USAspending NAICS codes must contain two to six digits")
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d")
+        end = datetime.strptime(end_date, "%Y-%m-%d")
+    except ValueError as error:
+        raise ValueError("USAspending dates must use YYYY-MM-DD") from error
+    if start > end or (end - start).days > 366 * 5:
+        raise ValueError("USAspending date range must be ordered and no longer than five years")
+    if limit < 1 or limit > 100 or page < 1:
+        raise ValueError("USAspending limit or page is invalid")
+    return OfficialRequest(
+        source_id=OfficialSourceId.USASPENDING,
+        method="POST",
+        endpoint="https://api.usaspending.gov/api/v2/search/spending_by_award/",
+        json_body={
+            "filters": {
+                "award_type_codes": ["A", "B", "C", "D"],
+                "time_period": [{"start_date": start_date, "end_date": end_date}],
+                "naics_codes": {"require": list(naics_codes)},
+            },
+            "fields": [
+                "Award ID",
+                "Recipient Name",
+                "Award Amount",
+                "Start Date",
+                "End Date",
+                "Description",
+                "NAICS",
+                "Awarding Agency",
+                "generated_internal_id",
+            ],
+            "limit": limit,
+            "page": page,
+            "sort": "Award Amount",
+            "order": "desc",
+            "subawards": False,
+            "spending_level": "awards",
+        },
+    )
+
+
 def _require_secret(value: SecretStr, name: str) -> None:
     if not value.get_secret_value().strip():
         raise ValueError(f"{name} cannot be empty")

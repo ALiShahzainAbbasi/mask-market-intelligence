@@ -28,6 +28,7 @@ recorded. Credential values live only in ignored local environment files.
 | SAM.gov opportunities | Official API | M3/M4/M5/M6 procurement demand, requirements, incumbents, and pricing clues | Available; local key configured; one-query live smoke passed |
 | SEC EDGAR | Official keyless API | M1/M4/M5 named-company filings, competition, spend, risks, and pricing evidence | Available; contact user-agent required; one-query live smoke passed |
 | BLS Public Data API | Official keyless API | M1/M4 employment, wage, industry-growth, and labor-cost series | Available with limited unregistered quotas; one-series live smoke passed |
+| USAspending award search | Official keyless API | M4/M5 awarded federal contract spend, incumbents, and economic-demand evidence | Available; keyless; added under A17.5; offline-tested only, live smoke not yet run |
 | YouTube Data API v3 | Official keyed API | M2/M3/M5 public pain, workflow, and competitor-discussion evidence from video search and comment threads | Available; local key configured under A17.5; adapter offline-tested against a fake transport only, no live smoke run yet |
 | Registered RSS/Atom feeds | Permitted feed retrieval, not an account API | M2-M7/M9 approved public article and discussion evidence | Available only for explicitly registered feeds and current source policy |
 | Registered static webpages | Permitted page retrieval, not an account API | M2-M7/M9 approved public source evidence | Available only for exact registered pages; never broadened into crawling |

@@ -21,6 +21,7 @@ from mask_api.modules.official_data.parsers import (
     parse_census_cbp,
     parse_sam_opportunities,
     parse_sec_submissions,
+    parse_usaspending,
 )
 from mask_api.modules.official_data.requests import OfficialRequest
 from mask_api.research_runner.budgets import BudgetCharge, BudgetLedger
@@ -192,6 +193,7 @@ class OfficialApiAdapter:
             OfficialSourceId.BEA: parse_bea,
             OfficialSourceId.SEC_EDGAR: parse_sec_submissions,
             OfficialSourceId.SAM_GOV: parse_sam_opportunities,
+            OfficialSourceId.USASPENDING: parse_usaspending,
         }[request.source_id]
         return OfficialFetchResult(
             retrieved_at=self._timestamp(),
@@ -232,6 +234,8 @@ def _validate_endpoint(request: OfficialRequest) -> None:
         OfficialSourceId.SEC_EDGAR: parts.hostname == "data.sec.gov"
         and bool(re.fullmatch(r"/submissions/CIK[0-9]{10}\.json", parts.path)),
         OfficialSourceId.SAM_GOV: request.endpoint == "https://api.sam.gov/opportunities/v2/search",
+        OfficialSourceId.USASPENDING: request.endpoint
+        == "https://api.usaspending.gov/api/v2/search/spending_by_award/",
     }
     if parts.scheme != "https" or not valid[request.source_id]:
         raise OfficialTransportError("official.endpoint_invalid")
