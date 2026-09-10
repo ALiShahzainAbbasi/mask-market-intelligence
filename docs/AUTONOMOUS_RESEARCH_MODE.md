@@ -202,6 +202,19 @@ rendering is intentionally deferred: it would need a new rendering
 dependency this project has not evaluated; HTML output is print-to-PDF
 ready in any browser today.
 
+A17.5 (Free-Source Real Market Integration, in progress) adds
+`mask_api.modules.analysis.gemini`, a second `AnalysisProvider`
+implementation alongside A09's OpenAI adapter, mirroring its exact
+architecture against Gemini's `generateContent` REST endpoint (no SDK
+dependency). It reads `MASK_gemini_API_KEY` (the owner-supplied name,
+reused as-is), stays disabled until explicit `policy_approved` enablement,
+inlines Pydantic's `$ref`/`$defs` into the restricted schema dialect
+Gemini's `responseSchema` accepts, and is exercised so far only against a
+fake transport and fixture response bodies -- no live call has been made.
+Like OpenAI's adapter, it may only extract, classify, and summarize; it
+never calculates a score, confidence index, gate, veto, or ranking. See
+`docs/ANALYSIS_PROVIDER.md`.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

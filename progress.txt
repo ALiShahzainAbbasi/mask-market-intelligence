@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 06:35 PKT (UTC+05:00)
+Last updated: 2026-09-10 21:15 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -17,12 +17,16 @@ persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 Gemini and YouTube Data API credentials are now locally configured (owner-
 supplied 2026-09-10) and live wiring for both is in progress under A17.5.
-Current task: A17.5 next—free-source real-data wiring (Gemini provider,
-YouTube collector, USAspending, O*NET importer, Common Crawl retriever,
-fallback registry, and the first real MethodExecutor wiring). A07 and A09
-remain partial only because their live provider access is held/being wired;
-Google Ads, Reddit, Google Places, Meta, Brave, and firmographic providers
-remain skipped/optional.
+Current task: A17.5 in progress. The live Gemini analysis provider
+(mirroring openai_responses.py's exact shape; extraction/classification
+only, never scores/confidence/gates/vetoes) is implemented and tested with
+a fake transport; no live network call has been made yet since
+MASK_gemini_API_KEY is not yet passed policy-approval wiring at the
+composition root. Next: YouTube collector, USAspending, O*NET importer,
+Common Crawl retriever, fallback registry, and the first real
+MethodExecutor wiring. A07 and A09 remain partial only because their live
+provider access is held/being wired; Google Ads, Reddit, Google Places,
+Meta, Brave, and firmographic providers remain skipped/optional.
 Paid collection/model use remains disabled; Gemini/YouTube use their free
 tiers/quotas only, targeting $0 external paid-data cost.
 Local authentication remains application-owned and disabled at the HTTP boundary;
@@ -46,10 +50,12 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A17.5 (free-source real-data wiring: Gemini
-provider, YouTube collector, USAspending, O*NET importer, Common Crawl
-retriever, fallback registry, and the first real MethodExecutor wiring),
-per the owner's explicit 2026-09-10 free-first research directive.
+Next checkpoint: continue A17.5 (YouTube collector, USAspending, O*NET
+importer, Common Crawl retriever, fallback registry, and the first real
+MethodExecutor wiring), per the owner's explicit 2026-09-10 free-first
+research directive. The live Gemini analysis provider is now implemented
+and offline-tested; wiring it through a real transport and the composition
+root (with policy approval) is still pending.
 Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
 and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
@@ -87,17 +93,22 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-568 Python tests PASS (was 555; +13 A17 focused tests: report-package
-composition, JSON round-trip/determinism, HTML section/escaping, and CSV
-manifest join/absence-stays-blank cases). Ruff/format over 303 files, strict
-mypy over 164 source files, architecture/import-cycle, and
-research-configuration/OpenAPI schema drift PASS (one new report-v1 schema
-exported, no unexpected drift elsewhere); local secret guard and current
+580 Python tests PASS (was 568; +12 A17.5 Gemini-provider focused tests:
+schema-dialect $ref inlining, stateless/tool-free payload shape, prompt-
+injection-in-source-text stays inert in the system instruction, parser
+usage/cost/schema validation, null-optional-field preservation, disabled-
+adapter short-circuit, cache reuse while disabled, safety-block/non-STOP-
+finish-reason handling, and malformed/missing-candidate envelope rejection).
+Ruff/format over 305 files, strict mypy over 165 source files (apps/api/src
+plus workers), architecture/import-cycle, and research-configuration/OpenAPI
+schema drift PASS (no new schema needed -- the Gemini provider reuses the
+existing analysis contracts/JSON schemas); local secret guard and current
 Gitleaks source scan PASS (confirmed the Gemini/YouTube local credential
-names remain unleaked). Node.js/pnpm confirm the full web suite (11 tests),
-web lint, web format:check, web typecheck, `pnpm schemas:check`, and
-`pnpm check:progress` (31/172 completed, 141 remaining, matching this
-entry's hand-recalculated totals) all PASS.
+names remain unleaked, and no fixture API key pattern was flagged). Node.js/
+pnpm confirm the full web suite (11 tests), web lint, web format:check, web
+typecheck, `pnpm schemas:check`, and `pnpm check:progress` (31/172
+completed, 141 remaining, matching this entry's hand-recalculated totals)
+all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -259,7 +270,7 @@ breakdowns, unknowns, raw/normalized/evidence/metrics outputs, and formula appen
 PDF explicitly deferred (see 2026-09-10 AUTONOMOUS-026 entry): it needs a new,
 unapproved rendering dependency; HTML is print-to-PDF ready in any browser today.
 
-[ ] A17.5 Free-Source Real Market Integration. Added 2026-09-10 by explicit
+[~] A17.5 Free-Source Real Market Integration. Added 2026-09-10 by explicit
 owner request after Gemini and YouTube Data API credentials were supplied
 locally; denominator change recorded below (171 -> 172 checkpoints; A track
 20 -> 21). Wire real free/zero-cost sources into the existing calculators
@@ -2450,6 +2461,84 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 21:15 PKT (UTC+05:00) | AUTONOMOUS-027 | A17.5 | IN_PROGRESS
+Work:
+  Started A17.5 with its first live-capable sub-piece: a Gemini structured-
+  analysis provider mirroring openai_responses.py's exact architecture
+  (Settings/TransportResponse/Transport Protocol/build-payload/parse-
+  result/Adapter), reusing the existing provider-neutral `AnalysisProvider`
+  port, `AnalysisRequest`/`AnalysisResult` contracts, and
+  `ArtifactAnalysisCache` unchanged. `build_generate_content_payload`
+  builds a stateless, tool-free `generateContent` request: the untrusted
+  source text is embedded only inside a JSON data blob in the user turn,
+  never inside the `systemInstruction`, and the extraction-boundary
+  instructions ("never calculate market scores... gates, or rankings")
+  stay fixed regardless of source content -- verified with an explicit
+  prompt-injection-shaped source-text test. `to_gemini_schema` inlines
+  Pydantic's `$ref`/`$defs` and drops `additionalProperties`/`$defs`/
+  `title`, since Gemini's `responseSchema` dialect is a restricted OpenAPI-
+  3.0-like subset that does not support them; this is a documented,
+  accepted provider difference (Gemini cannot itself reject an unexpected
+  extra property the way OpenAI's strict mode does) -- required field and
+  type/enum validation is unaffected. `parse_generate_content_result`
+  defensively parses the `candidates`/`usageMetadata`/`promptFeedback`
+  envelope, maps `finishReason` to the same COMPLETED/REFUSED/INCOMPLETE
+  states OpenAI's adapter uses, validates structured output against the
+  same versioned schemas, and computes cost via the same per-request
+  pricing fields. `GeminiAdapter` is cache-first, budget-gated through the
+  shared `BudgetLedger`, and requires `enabled` + `policy_approved` +
+  `MASK_gemini_API_KEY` (the exact existing env var name, not renamed)
+  before any transport call -- identical disabled-by-default posture to
+  the OpenAI adapter. Gemini still performs extraction/classification only
+  here; no code path lets it calculate a score, confidence, gate, or veto.
+  No live network call was made; the adapter was exercised only against a
+  fake transport and fixture response bodies.
+Files:
+  apps/api/src/mask_api/modules/analysis/gemini.py;
+  apps/api/tests/analysis/{test_gemini.py,
+  fixtures/gemini_relevance_completed.json}; progress.txt.
+Verification:
+  New focused suite PASS: 12 tests (schema-dialect $ref inlining, payload
+  statelessness/tool-freedom, prompt-injection-in-source-text stays inert
+  in the system instruction, parser usage/cost/schema validation against
+  the fixture, null-optional-field preservation for CommercialPainRecord,
+  disabled-adapter short-circuit before any transport call, cache reuse
+  while disabled, safety-blocked-prompt and non-STOP-finish-reason
+  handling remain explicit and uncached, and four malformed/missing-
+  candidate envelope rejection cases). Full offline suite PASS: 580
+  (was 568), 30 integration tests deselected -- confirmed both from a
+  plain apps/api-scoped run and the project's actual root-scoped
+  `pnpm run test:unit` invocation, which is authoritative. Ruff
+  check/format PASS over 305 files; strict mypy PASS over 165 source
+  files (`apps/api/src` and `workers` -- the project's own `typecheck`
+  scope; mypy is not run over `tests/`, matching the pre-existing
+  `test_openai_responses.py` precedent exactly). Architecture/import-
+  cycle check PASS. `research:schemas:check` PASS with no drift (no new
+  schema needed; the Gemini provider reuses existing analysis contracts).
+  Local secret guard (`check:secrets`) and pinned Gitleaks source scan
+  (`scan-secrets.ps1`, "no leaks found") both PASS. Node.js/pnpm confirm
+  the full web suite (11 tests), web lint, and web typecheck all PASS
+  unaffected. `pnpm check:progress` PASS at 31/172 (unchanged -- A17.5
+  remains one in-progress checkpoint, not yet DONE).
+Limitations/blockers:
+  No live Gemini network call has been made; only a fake transport was
+  exercised. The adapter is not yet wired into any composition root or
+  `MethodExecutor`, and no real `GeminiTransport` implementation (the
+  actual `urllib`-based HTTPS edge) exists yet -- that live transport,
+  plus explicit `policy_approved=True` enablement, is required before any
+  real request can be sent. Gemini Search-grounded discovery (a separate
+  concern from this structured-extraction adapter) is not yet built.
+Next:
+  Build the concrete stdlib `urllib` `GeminiTransport` implementation and
+  wire `GeminiAdapter` through a composition root under explicit policy
+  approval; then continue A17.5 with Gemini Search-grounded discovery, the
+  live YouTube Data API collector (M2/M3/M5), the keyless USAspending
+  adapter (M4/M5), the O*NET dataset bootstrap/importer (M3), the targeted
+  Common Crawl retriever, the provider-independent source/evidence
+  fallback registry with Tier A-E quality classes, and the first real
+  `MethodExecutor` implementations -- toward one real, source-backed
+  calibration market report at $0 paid-data cost.
+
 2026-09-10 06:35 PKT (UTC+05:00) | AUTONOMOUS-026 | A17 | DONE
 Work:
   Implemented A17 as `mask_api.modules.reporting`, a pure presentation layer

@@ -1,0 +1,21 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [
+          {
+            "text": "{\"label\":\"relevant\",\"reasons\":[\"The source describes dispatch delays.\"],\"evidence_spans\":[\"dispatch delays cost us hours every week\"],\"confidence\":0.91}"
+          }
+        ]
+      },
+      "finishReason": "STOP"
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 120,
+    "candidatesTokenCount": 30,
+    "totalTokenCount": 150
+  },
+  "modelVersion": "fixture-gemini-model-2026-09-10"
+}
