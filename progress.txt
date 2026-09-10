@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 05:15 PKT (UTC+05:00)
+Last updated: 2026-09-10 06:10 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -10,29 +10,32 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 
 1. CURRENT POSITION
 ------------------------------------------------------------------------
-Current phase: Autonomous functional research build A01-A20, with the established P01-P03 infrastructure/evidence foundations preserved.
+Current phase: Autonomous functional research build A01-A20 plus A17.5, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05, A10-A15 are complete, A06 enforces source holds plus source-family/
+A01-A05, A10-A16 are complete, A06 enforces source holds plus source-family/
 persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
-approved feeds/pages and later analyst inputs complete the lean set. Current task:
-A16 next—approved overall weighting, fixed gate profiles, immutable score
-snapshots, deterministic recommendations, and compatibility checks. A07 and A09
-remain partial only because their live provider access is held; all
-unavailable/paid APIs remain skipped.
-Paid collection/model use remains disabled.
+Gemini and YouTube Data API credentials are now locally configured (owner-
+supplied 2026-09-10) and live wiring for both is in progress under A17.5.
+Current task: A17 next—machine-readable and human-readable report generation—
+immediately followed by A17.5's free-source real-data wiring. A07 and A09
+remain partial only because their live provider access is held/being wired;
+Google Ads, Reddit, Google Places, Meta, Brave, and firmographic providers
+remain skipped/optional.
+Paid collection/model use remains disabled; Gemini/YouTube use their free
+tiers/quotas only, targeting $0 external paid-data cost.
 Local authentication remains application-owned and disabled at the HTTP boundary;
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 29/171
-Remaining checkpoints: 142/171
-Checkpoint-count progress: 17.0%
+Completed checkpoints: 30/172
+Remaining checkpoints: 142/172
+Checkpoint-count progress: 17.4%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 11/20 (A01-A20).
+Autonomous functional-build checkpoints complete: 12/21 (A01-A20 plus A17.5).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -42,10 +45,12 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A16 with approved overall weighting, fixed gate
-profiles, immutable score snapshots, deterministic recommendations, and
-compatibility checks.
-Paid/model network use stays disabled; A07/A09 remain held at their live edges.
+Next checkpoint: start A17 (report generation), then A17.5 (free-source real-
+data wiring: Gemini provider, YouTube collector, USAspending, O*NET importer,
+Common Crawl retriever, fallback registry, and the first real MethodExecutor
+wiring), per the owner's explicit 2026-09-10 free-first research directive.
+Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
+and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
 The A01-A20 functional track may proceed with remaining P01/P02 acceptance open;
 this is a sequencing change, not acceptance of missing live-service/CI or security checks.
@@ -81,18 +86,20 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-533 Python tests PASS (was 508; +25 A15 focused tests: confidence aggregation/
-sample-adequacy, completeness classification, and automatic-veto detection).
-Ruff/format over 282 files, strict mypy over 153 source files, architecture/
-import-cycle, and research-configuration/OpenAPI schema drift PASS (two new
-confidence result schemas exported, no unexpected drift elsewhere); local
-secret guard and current Gitleaks source scan PASS. Node.js/pnpm (installed
-via winget during A12; run through `npx pnpm@11.19.0` since corepack's
-global shim install needs elevation) confirm the full web suite (11 tests),
-web lint, web format:check, web typecheck, `pnpm schemas:check`, and
-`pnpm check:progress` (29/171 completed, 142 remaining) all PASS. Also
-re-verified this session: all 5 credentialed official-data live smokes
-(Census CBP, BLS, BEA Regional, SEC EDGAR, SAM.gov) still PASS.
+555 Python tests PASS (was 533; +22 A16 focused tests: automated research
+score, cross-method confidence aggregation, gate readiness, and snapshot
+composition). Ruff/format over 291 files, strict mypy over 158 source files,
+architecture/import-cycle, and research-configuration/OpenAPI schema drift
+PASS (one new market-score-snapshot schema exported, no unexpected drift
+elsewhere); local secret guard and current Gitleaks source scan PASS
+(confirmed the newly-added Gemini/YouTube local credential names are not
+leaked). `scripts/check-progress.mjs` extended to recognize the `A17.5`
+dotted checkpoint-ID format alongside `A\d{2}`. Node.js/pnpm confirm the
+full web suite (11 tests), web lint, web format:check, web typecheck,
+`pnpm schemas:check`, and `pnpm check:progress` (30/172 completed, 142
+remaining, matching this entry's hand-recalculated totals) all PASS.
+Re-verified this session at start: all 5 credentialed official-data live
+smokes (Census CBP, BLS, BEA Regional, SEC EDGAR, SAM.gov) still PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -189,12 +196,14 @@ P22 | NOT_STARTED    |  0/ 5 | First Real System Test: 3-5 Markets
 P23 | NOT_STARTED    |  0/ 5 | Calibration Run: Approximately 10 Markets
 P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selection
 
-Autonomous functional build track (new scope from the 2026-09-09 specification):
-A   | IN_PROGRESS    | 11/20 | CLI-first Autonomous Research Build
+Autonomous functional build track (new scope from the 2026-09-09 specification;
+A17.5 added 2026-09-10 under explicit owner request, see its checkpoint entry):
+A   | IN_PROGRESS    | 12/21 | CLI-first Autonomous Research Build
 
-A01-A20 are counted in the overall checkpoint total but are not an additional
-original guide phase. This denominator change adds 20 source-defined functional
-tasks without deleting, renumbering, or silently accepting any P00-P24 work.
+A01-A20 (plus A17.5) are counted in the overall checkpoint total but are not an
+additional original guide phase. This denominator change adds 20 source-defined
+functional tasks, plus one more (A17.5) added 2026-09-10, without deleting,
+renumbering, or silently accepting any P00-P24 work.
 
 AUTONOMOUS FUNCTIONAL BUILD CHECKPOINTS
 ------------------------------------------------------------------------
@@ -244,11 +253,36 @@ and the exact deterministic M9 fit formula.
 [x] A15 Build confidence/completeness, minimum samples, method statuses, UNKNOWN
 rules, contradiction effects, and automatic veto detection.
 
-[ ] A16 Build approved overall weighting, fixed gate profiles, immutable score
+[x] A16 Build approved overall weighting, fixed gate profiles, immutable score
 snapshots, deterministic recommendations, and compatibility checks.
 
 [ ] A17 Generate report.json, HTML, PDF, CSV source manifest, score/confidence
 breakdowns, unknowns, raw/normalized/evidence/metrics outputs, and formula appendix.
+
+[ ] A17.5 Free-Source Real Market Integration. Added 2026-09-10 by explicit
+owner request after Gemini and YouTube Data API credentials were supplied
+locally; denominator change recorded below (171 -> 172 checkpoints; A track
+20 -> 21). Wire real free/zero-cost sources into the existing calculators
+and produce the first genuine source-backed market report at $0 paid-data
+cost: a live Gemini analysis provider (relevance/persona/pain/workflow/
+competitor/intent/evidence classification and cluster naming only, never
+scores/confidence/ROI/rankings/gates/vetoes), Gemini Search-grounded
+discovery (discovery-only until the original source is fetched/verified --
+Gemini prose is never itself evidence), a live YouTube Data API collector
+for M2/M3/M5, a keyless USAspending adapter for M4/M5 (or NOT_RELEVANT,
+never a penalty), an O*NET downloadable-dataset bootstrap/importer for M3
+occupation/task/workflow mapping, a targeted Common Crawl retriever
+(indexed-record range fetch only, never full WARC/archive downloads) as a
+live-fetch fallback, extending the existing RSS/Atom/static-HTML crawler
+under the same source-policy gate, a provider-independent source/evidence
+fallback registry, Tier A-E deterministic source-quality classes (Tier E
+never directly scores), M6 free-mode search-intent evidence, and the
+RiskAdjustedMethodScore secondary display metric. M8/M10 stay UNOBSERVED
+until real interviews/campaigns exist. First real run targets one
+calibration market, not a 30-market batch. Preserves every OBSERVED/
+DERIVED/ESTIMATED_BY_APPROVED_RULE/UNKNOWN/CONFLICTED/UNOBSERVED/
+NOT_RELEVANT/SOURCE_UNAVAILABLE/SOURCE_UNAVAILABLE_QUOTA distinction; no
+synthetic fixture may enter a real market report.
 
 [ ] A18 Build budget- and compliance-gated automated M8 research invitations,
 interviewer/landing flow, respondent qualification, and exact M8 calculation.
@@ -2416,6 +2450,97 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 06:10 PKT (UTC+05:00) | AUTONOMOUS-025 | A16 | DONE
+Work:
+  Owner supplied local Gemini and YouTube Data API credentials
+  (MASK_gemini_API_KEY, MASK_youtube_API_KEY in .env.official.local; exact
+  existing names reused, not renamed/duplicated) and directed a free-first
+  real-data expansion: complete A16/A17, then wire real free sources into
+  the existing calculators for one real, source-backed market report at $0
+  paid-data cost. Re-confirmed all 5 official-data live smokes still PASS
+  before starting. Added checkpoint A17.5 (Free-Source Real Market
+  Integration) to the roadmap per explicit owner request; extended
+  `scripts/check-progress.mjs` to recognize the `A\d{2}.\d` dotted-ID format
+  so it is tracked by the same tooling as every other checkpoint (171 -> 172
+  total; A track 20 -> 21). Implemented A16 as `mask_api.modules.
+  market_scoring`, the top of the calculation stack, composing `confidence`
+  and the method calculators' public results without recomputing any of
+  them. `AutomatedResearchScore` is the raw (never renormalized) sum of
+  available weighted method contributions -- explicitly not the approved
+  score, matching SCORING.md's "provisional contribution" language exactly.
+  `FinalValidatedScore` stays `not_ready` in every run, honestly, because no
+  reviewed-score human-approval workflow exists yet (P12). `aggregate_
+  confidence` implements the one renormalization SCORING.md approves
+  (weighted mean across a required-method subset, only for confidence,
+  never to conceal a missing score) and now backs both gate confidence and
+  the full ten-method overall confidence. `evaluate_gate` implements the
+  exact five-state result taxonomy (not_ready/blocked/eligible_to_advance/
+  does_not_meet_gate/founder_review_required) with a confirmed critical veto
+  always checked first, computing gate_score before the confidence check so
+  a not_ready-for-confidence result still carries useful numbers.
+  `build_market_score_snapshot` composes everything into one immutable,
+  reproducible `MarketScoreSnapshot` (inputs_sha256 verifies bit-for-bit
+  reproducibility independent of the per-run snapshot_id/generated_at);
+  `snapshots_are_comparable` is the only approved way to decide two
+  snapshots may be ranked together. Snapshots persist through the existing
+  CLI `LocalArtifactStore`, not new production DB tables -- DATA_MODEL.md's
+  `market_score_snapshots` table remains unimplemented (P02/P03/P13 scope)
+  and this checkpoint does not build it ahead of schedule. Also extracted
+  `label_for_confidence`/`clamp_100` out of A15's confidence.py as small
+  shared public functions so this module's cross-method aggregation reuses
+  the exact same Low/Medium/High boundary rule instead of duplicating it.
+Files:
+  apps/api/src/mask_api/modules/confidence/{confidence.py,__init__.py}
+  (label_for_confidence/clamp_100 extracted and exported);
+  apps/api/src/mask_api/modules/market_scoring/{AGENTS.md,__init__.py,
+  contracts.py,scoring.py,gates.py,snapshot.py};
+  apps/api/tests/market_scoring/{test_scoring.py,test_gates.py,
+  test_snapshot.py};
+  configs/schemas/market_scoring/market-score-snapshot-v1.schema.json;
+  scripts/{export-research-schemas.py,check-progress.mjs};
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md}; README.md; progress.txt.
+Verification:
+  A16 focused suite PASS: 22 tests (golden automated-research-score with a
+  constant-score reproducibility trick, no-renormalization proof,
+  confidence-aggregation golden/missing-required-method cases, risk-
+  adjusted-score formula and UNKNOWN propagation, all five gate result
+  states including blocked-overrides-perfect-score and confidence-below-
+  minimum-still-reports-gate-score, and snapshot golden/reproducibility/
+  naive-timestamp-rejection/mismatched-veto-market cases). Confidence
+  regression suite PASS unchanged after the extraction refactor (25 tests).
+  Full offline Python suite PASS: 555 passed (was 533), 30 integration
+  tests deselected. Ruff lint/format PASS over 291 files; strict mypy PASS
+  over 158 source files; architecture/import-cycle check PASS;
+  `research:schemas:check` and `export-openapi.py --check` PASS with no
+  unexpected drift; local secret guard and pinned Gitleaks source scan PASS
+  (confirmed the new local credential variable names are not leaked). Node.js/
+  pnpm confirm the full web suite (11 tests), web lint, web format:check,
+  web typecheck, `pnpm schemas:check`, and `pnpm check:progress` (30/172
+  completed, 142 remaining, matching this entry's hand-recalculated totals)
+  all PASS. All 5 credentialed official-data live smokes re-confirmed PASS
+  at session start.
+Limitations/blockers:
+  `MarketScoreSnapshot` is not yet wired into the CLI (no MethodExecutor
+  implementation exists for any method anywhere in the codebase yet --
+  confirmed by direct inspection of research_runner/{execution,runner,
+  __main__}.py); that wiring is explicit A17.5 scope, not an A16 blocker.
+  Gemini/YouTube/USAspending/O*NET/Common Crawl adapters do not exist yet;
+  credentials are configured but unused until A17.5. No live model, quota,
+  or paid-data cost has been incurred.
+Next:
+  Implement A17 (machine-readable JSON report + human-readable report),
+  then proceed immediately into A17.5: Gemini provider (mirroring
+  openai_responses.py's Settings/Transport/build_payload/parse_result/
+  Adapter shape, no SDK dependency), YouTube Data API collector
+  (official_data-style, matching its already-registered `access:
+  official_api` source entry), a keyless USAspending official_data adapter,
+  an O*NET downloadable-dataset importer, a targeted Common Crawl retriever,
+  a provider-independent source-fallback registry, source-quality tiers,
+  and the first real MethodExecutor implementations wiring official_data/
+  search_intent/the new adapters into method_metrics/pain_intelligence/
+  workflow_intelligence -- toward one real, source-backed calibration
+  market report at $0 paid-data cost.
+
 2026-09-10 05:15 PKT (UTC+05:00) | AUTONOMOUS-024 | A15 | DONE
 Work:
   Before starting A15, re-ran and confirmed the owner-supplied official-data

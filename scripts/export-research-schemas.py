@@ -12,6 +12,7 @@ from typing import Any
 from mask_api.modules.analysis.contracts import AnalysisSchemaId
 from mask_api.modules.analysis.schemas import strict_json_schema
 from mask_api.modules.confidence.contracts import MarketMethodSummary, VetoAssessmentResult
+from mask_api.modules.market_scoring.contracts import MarketScoreSnapshot
 from mask_api.modules.method_metrics.contracts import MethodMetricResult
 from mask_api.modules.pain_intelligence.contracts import M2Result
 from mask_api.modules.workflow_intelligence.contracts import M3Result
@@ -42,6 +43,11 @@ TARGETS: dict[Path, Callable[[], dict[str, Any]]] = {
     / "schemas"
     / "confidence"
     / "veto-assessment-result-v1.schema.json": VetoAssessmentResult.model_json_schema,
+    ROOT
+    / "configs"
+    / "schemas"
+    / "market_scoring"
+    / "market-score-snapshot-v1.schema.json": MarketScoreSnapshot.model_json_schema,
 }
 for schema_id in AnalysisSchemaId:
     target = ROOT / "configs" / "schemas" / "analysis" / f"{schema_id.value}.schema.json"

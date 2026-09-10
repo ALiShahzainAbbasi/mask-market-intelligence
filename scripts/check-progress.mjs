@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 const content = await readFile(new URL("../progress.txt", import.meta.url), "utf8");
-const items = [...content.matchAll(/^\[([x ~?!])\] (P\d{2}-\d{2}|A\d{2}) /gm)];
+const items = [...content.matchAll(/^\[([x ~?!])\] (P\d{2}-\d{2}|A\d{2}(?:\.\d)?) /gm)];
 const done = items.filter(item => item[1] === "x").length;
 const ids = new Set(items.map(item => item[2]));
 if (ids.size !== items.length) throw new Error("Duplicate checkpoint IDs");
@@ -19,7 +19,7 @@ for (const row of rows) {
   }
 }
 const autonomousRow = content.match(/^A\s+\| [A-Z_ ]+ \|\s*(\d+)\/\s*(\d+) \|/m);
-const autonomous = items.filter(item => /^A\d{2}$/.test(item[2]));
+const autonomous = items.filter(item => /^A\d{2}(?:\.\d)?$/.test(item[2]));
 if (!autonomousRow || autonomous.length !== +autonomousRow[2] ||
     autonomous.filter(item => item[1] === "x").length !== +autonomousRow[1]) {
   throw new Error("Autonomous build rollup mismatch");

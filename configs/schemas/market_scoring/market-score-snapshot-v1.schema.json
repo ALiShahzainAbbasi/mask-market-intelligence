@@ -1,0 +1,519 @@
+{
+  "$defs": {
+    "AutomatedResearchScore": {
+      "additionalProperties": false,
+      "description": "The provisional, fully-automatic weighted sum of available method scores.\n\nNever the market's final/approved score. SCORING.md: \"The UI may show a\nprovisional contribution (sum of available weighted contributions) but\nmust not label it the final score or rank it as though complete.\" The\nsum is over each contributing method's *configured* overall weight, not\nrenormalized across only the available methods, so it is naturally lower\nwhen methods are missing rather than inflated to look complete.",
+      "properties": {
+        "contributing_methods": {
+          "items": {
+            "$ref": "#/$defs/MethodId"
+          },
+          "title": "Contributing Methods",
+          "type": "array"
+        },
+        "missing_methods": {
+          "items": {
+            "$ref": "#/$defs/MethodId"
+          },
+          "title": "Missing Methods",
+          "type": "array"
+        },
+        "observed_weight": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Observed Weight"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        }
+      },
+      "required": [
+        "observed_weight",
+        "contributing_methods",
+        "missing_methods"
+      ],
+      "title": "AutomatedResearchScore",
+      "type": "object"
+    },
+    "ConfidenceLabel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLabel",
+      "type": "string"
+    },
+    "ConfidenceResult": {
+      "additionalProperties": false,
+      "description": "The exact, reproducible v1 confidence result for one method or gate.",
+      "properties": {
+        "label": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceLabel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "numeric_confidence": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numeric Confidence"
+        },
+        "unknown_reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknown Reasons",
+          "type": "array"
+        }
+      },
+      "title": "ConfidenceResult",
+      "type": "object"
+    },
+    "FinalValidatedScore": {
+      "additionalProperties": false,
+      "description": "SCORING.md's strict overall score: null until all ten REVIEWED scores are approved.\n\nNo human-review workflow exists yet (P12's reviewed-score approval UI),\nso this is always `not_ready` in the current offline pipeline. The\ncontract exists so downstream reporting has a stable shape once a\nreviewed-score workflow is built, instead of guessing at one later.",
+      "properties": {
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "status": {
+          "$ref": "#/$defs/FinalValidatedScoreStatus"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "FinalValidatedScore",
+      "type": "object"
+    },
+    "FinalValidatedScoreStatus": {
+      "enum": [
+        "not_ready",
+        "ready"
+      ],
+      "title": "FinalValidatedScoreStatus",
+      "type": "string"
+    },
+    "GateEvaluation": {
+      "additionalProperties": false,
+      "description": "One gate's deterministic readiness result; never a stage transition.\n\nSCORING.md: \"Humans record the actual decision: advance, hold, reject,\nor, at Gate 4, select. Eligibility never changes a market stage\nautomatically.\" This contract stops at eligibility.",
+      "properties": {
+        "gate_confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "gate_id": {
+          "$ref": "#/$defs/GateId"
+        },
+        "gate_score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gate Score"
+        },
+        "missing_methods": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MethodId"
+          },
+          "title": "Missing Methods",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/GateResultStatus"
+        },
+        "unresolved_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gate_id",
+        "status",
+        "unresolved_reasons"
+      ],
+      "title": "GateEvaluation",
+      "type": "object"
+    },
+    "GateId": {
+      "enum": [
+        "gate_1",
+        "gate_2",
+        "gate_3",
+        "gate_4"
+      ],
+      "title": "GateId",
+      "type": "string"
+    },
+    "GateResultStatus": {
+      "enum": [
+        "not_ready",
+        "blocked",
+        "eligible_to_advance",
+        "does_not_meet_gate",
+        "founder_review_required"
+      ],
+      "title": "GateResultStatus",
+      "type": "string"
+    },
+    "MethodCompletenessState": {
+      "enum": [
+        "proven",
+        "weak",
+        "missing",
+        "not_applicable"
+      ],
+      "title": "MethodCompletenessState",
+      "type": "string"
+    },
+    "MethodId": {
+      "enum": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7",
+        "M8",
+        "M9",
+        "M10"
+      ],
+      "title": "MethodId",
+      "type": "string"
+    },
+    "MethodStatusSnapshot": {
+      "additionalProperties": false,
+      "description": "One method's computed score, completeness, and confidence for a market.",
+      "properties": {
+        "completeness": {
+          "$ref": "#/$defs/MethodCompletenessState"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "method_id": {
+          "$ref": "#/$defs/MethodId"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "status": {
+          "maxLength": 20,
+          "minLength": 1,
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method_id",
+        "status",
+        "completeness"
+      ],
+      "title": "MethodStatusSnapshot",
+      "type": "object"
+    },
+    "SnapshotCompatibilityKey": {
+      "additionalProperties": false,
+      "description": "The exact fields two snapshots must share to be ranked together.\n\nSCORING.md section 10: \"Markets may be ranked together only when\nsnapshots use the same market-definition rules, research profile,\nscoring configuration, and comparable evidence cutoff policy.\"",
+      "properties": {
+        "formula_version": {
+          "pattern": "^v[1-9][0-9]*$",
+          "title": "Formula Version",
+          "type": "string"
+        },
+        "market_definition_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Market Definition Version",
+          "type": "string"
+        },
+        "research_profile": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Research Profile",
+          "type": "string"
+        }
+      },
+      "required": [
+        "formula_version",
+        "market_definition_version",
+        "research_profile"
+      ],
+      "title": "SnapshotCompatibilityKey",
+      "type": "object"
+    },
+    "VetoAssessmentResult": {
+      "additionalProperties": false,
+      "description": "The deterministic, reproducible set of automatically detected vetoes.",
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VetoFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "formula_version": {
+          "pattern": "^v[1-9][0-9]*$",
+          "title": "Formula Version",
+          "type": "string"
+        },
+        "market_id": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Market Id",
+          "type": "string"
+        },
+        "not_evaluated": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Not Evaluated",
+          "type": "array"
+        }
+      },
+      "required": [
+        "market_id",
+        "formula_version"
+      ],
+      "title": "VetoAssessmentResult",
+      "type": "object"
+    },
+    "VetoFinding": {
+      "additionalProperties": false,
+      "description": "One automatically detected veto signal; never resolved/excepted here.\n\n`resolved` and `accepted_exception` are human review-workflow states\n(P18) outside this module's automatic-detection scope.",
+      "properties": {
+        "evidence_references": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "severity": {
+          "pattern": "^(warning|critical)$",
+          "title": "Severity",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/VetoStatus"
+        },
+        "trigger_detail": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Trigger Detail",
+          "type": "string"
+        },
+        "veto_id": {
+          "$ref": "#/$defs/VetoId"
+        }
+      },
+      "required": [
+        "veto_id",
+        "severity",
+        "status",
+        "trigger_detail",
+        "evidence_references"
+      ],
+      "title": "VetoFinding",
+      "type": "object"
+    },
+    "VetoId": {
+      "enum": [
+        "no_reachable_economic_buyer",
+        "no_meaningful_budget",
+        "major_access_or_regulatory_barrier",
+        "highly_bespoke_delivery",
+        "dominant_platform_solves_problem",
+        "no_qualified_buying_intent"
+      ],
+      "title": "VetoId",
+      "type": "string"
+    },
+    "VetoStatus": {
+      "enum": [
+        "suspected",
+        "confirmed"
+      ],
+      "title": "VetoStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The immutable, reproducible v1 snapshot of one market scoring run.\n\nA new recalculation always produces a new snapshot; nothing here is\nmutated in place. `inputs_sha256` lets a caller verify that identical\neligible inputs and configuration reproduce bit-for-bit identical\ncomputed values (score/gate/veto fields), independent of `snapshot_id`\nand `generated_at`, which are unique per run by design.",
+  "properties": {
+    "automated_research_score": {
+      "$ref": "#/$defs/AutomatedResearchScore"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/SnapshotCompatibilityKey"
+    },
+    "final_validated_score": {
+      "$ref": "#/$defs/FinalValidatedScore"
+    },
+    "gates": {
+      "items": {
+        "$ref": "#/$defs/GateEvaluation"
+      },
+      "minItems": 1,
+      "title": "Gates",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "inputs_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Inputs Sha256",
+      "type": "string"
+    },
+    "market_id": {
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "title": "Market Id",
+      "type": "string"
+    },
+    "methods": {
+      "items": {
+        "$ref": "#/$defs/MethodStatusSnapshot"
+      },
+      "minItems": 1,
+      "title": "Methods",
+      "type": "array"
+    },
+    "overall_confidence": {
+      "$ref": "#/$defs/ConfidenceResult"
+    },
+    "snapshot_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "vetoes": {
+      "$ref": "#/$defs/VetoAssessmentResult"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "market_id",
+    "compatibility",
+    "generated_at",
+    "methods",
+    "automated_research_score",
+    "final_validated_score",
+    "overall_confidence",
+    "gates",
+    "vetoes",
+    "inputs_sha256"
+  ],
+  "title": "MarketScoreSnapshot",
+  "type": "object"
+}

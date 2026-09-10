@@ -52,14 +52,28 @@ def calculate_confidence(
         (values[name] * formula.weights[name] for name in _DIMENSION_WEIGHT_KEYS),  # type: ignore[operator]
         ZERO,
     )
-    numeric_confidence = _clamp_100(weighted_sum * TEN)
+    numeric_confidence = clamp_100(weighted_sum * TEN)
+    return ConfidenceResult(
+        numeric_confidence=numeric_confidence,
+        label=label_for_confidence(numeric_confidence, formula),
+    )
+
+
+def label_for_confidence(
+    numeric_confidence: Decimal,
+    formula: ConfidenceConfiguration,
+) -> ConfidenceLabel:
+    """Map a 0-100 confidence value to its v1 Low/Medium/High label.
+
+    Shared by `calculate_confidence` (per-method, five dimensions) and
+    `market_scoring`'s gate/overall confidence aggregation (across methods),
+    so the same boundary rule is never duplicated.
+    """
     if numeric_confidence < formula.low_below:
-        label = ConfidenceLabel.LOW
-    elif numeric_confidence >= formula.high_at_least:
-        label = ConfidenceLabel.HIGH
-    else:
-        label = ConfidenceLabel.MEDIUM
-    return ConfidenceResult(numeric_confidence=numeric_confidence, label=label)
+        return ConfidenceLabel.LOW
+    if numeric_confidence >= formula.high_at_least:
+        return ConfidenceLabel.HIGH
+    return ConfidenceLabel.MEDIUM
 
 
 def sample_adequacy_score(
@@ -94,7 +108,7 @@ def sample_adequacy_score(
     return ratio_score(actual, target)
 
 
-def _clamp_100(value: Decimal) -> Decimal:
+def clamp_100(value: Decimal) -> Decimal:
     return max(ZERO, min(Decimal(100), value))
 
 

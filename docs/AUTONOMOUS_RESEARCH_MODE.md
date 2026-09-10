@@ -169,6 +169,25 @@ and honestly reports the other three vetoes as not-evaluated rather than
 inventing the evidence contracts or M8/M10 data they need. See
 `docs/CONFIDENCE_AND_VETOES.md`.
 
+A16 adds `mask_api.modules.market_scoring`, the top of the calculation
+stack. `AutomatedResearchScore` is the raw (never renormalized) sum of
+available weighted method contributions -- explicitly not the market's
+approved score, matching SCORING.md's "provisional contribution" language.
+`FinalValidatedScore` stays `not_ready` in every run today, honestly,
+because no reviewed-score human-approval workflow exists yet (P12).
+`aggregate_confidence` computes gate and overall confidence via the one
+renormalization SCORING.md approves (across a required-method subset, never
+to conceal a missing score). `evaluate_gate` implements the exact five-state
+gate result taxonomy (`not_ready`/`blocked`/`eligible_to_advance`/
+`does_not_meet_gate`/`founder_review_required`) with a confirmed critical
+veto always taking priority. `build_market_score_snapshot` composes all of
+this into one immutable, reproducible snapshot; `snapshots_are_comparable`
+is the only approved way to decide two snapshots may be ranked together.
+Snapshots are persisted through the CLI's `LocalArtifactStore`, the same
+file-based pattern every research run already uses -- the DATA_MODEL.md
+`market_score_snapshots` table remains unimplemented (P02/P03/P13 work),
+which this checkpoint does not build ahead of schedule.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See
