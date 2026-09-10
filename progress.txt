@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 06:10 PKT (UTC+05:00)
+Last updated: 2026-09-10 06:35 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -12,13 +12,14 @@ Autonomous Market Intelligence Engine Build Specification v1, and docs/
 ------------------------------------------------------------------------
 Current phase: Autonomous functional research build A01-A20 plus A17.5, with the established P01-P03 infrastructure/evidence foundations preserved.
 Current implementation status: IN_PROGRESS - Supabase PostgreSQL/pgvector is live;
-A01-A05, A10-A16 are complete, A06 enforces source holds plus source-family/
+A01-A05, A10-A17 are complete, A06 enforces source holds plus source-family/
 persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 Gemini and YouTube Data API credentials are now locally configured (owner-
 supplied 2026-09-10) and live wiring for both is in progress under A17.5.
-Current task: A17 next—machine-readable and human-readable report generation—
-immediately followed by A17.5's free-source real-data wiring. A07 and A09
+Current task: A17.5 next—free-source real-data wiring (Gemini provider,
+YouTube collector, USAspending, O*NET importer, Common Crawl retriever,
+fallback registry, and the first real MethodExecutor wiring). A07 and A09
 remain partial only because their live provider access is held/being wired;
 Google Ads, Reddit, Google Places, Meta, Brave, and firmographic providers
 remain skipped/optional.
@@ -28,14 +29,14 @@ Local authentication remains application-owned and disabled at the HTTP boundary
 Supabase Auth is not added. The runtime uses the IPv4 session pooler with TLS and
 the migration role uses the direct TLS endpoint.
 
-Completed checkpoints: 30/172
-Remaining checkpoints: 142/172
-Checkpoint-count progress: 17.4%
+Completed checkpoints: 31/172
+Remaining checkpoints: 141/172
+Checkpoint-count progress: 18.0%
 Completed phases: 1/25 (P00 baseline approved for infrastructure work).
 Phase 0 drafting/initial verification checkpoints complete: 10/10.
 Phase 0 approval checkpoint remaining: 0; numerical rubric approvals deferred.
 Implementation/operational checkpoints complete: 7/140 (Phases 1-24).
-Autonomous functional-build checkpoints complete: 12/21 (A01-A20 plus A17.5).
+Autonomous functional-build checkpoints complete: 13/21 (A01-A20 plus A17.5).
 Phase 1: IN_PROGRESS (6/10 verified). Phase 2: IN_PROGRESS (1/7 verified).
 Phase 3: IN_PROGRESS (0/8 verified). Phases 4-24: NOT_STARTED.
 
@@ -45,10 +46,10 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: start A17 (report generation), then A17.5 (free-source real-
-data wiring: Gemini provider, YouTube collector, USAspending, O*NET importer,
-Common Crawl retriever, fallback registry, and the first real MethodExecutor
-wiring), per the owner's explicit 2026-09-10 free-first research directive.
+Next checkpoint: start A17.5 (free-source real-data wiring: Gemini
+provider, YouTube collector, USAspending, O*NET importer, Common Crawl
+retriever, fallback registry, and the first real MethodExecutor wiring),
+per the owner's explicit 2026-09-10 free-first research directive.
 Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
 and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
@@ -86,20 +87,17 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-555 Python tests PASS (was 533; +22 A16 focused tests: automated research
-score, cross-method confidence aggregation, gate readiness, and snapshot
-composition). Ruff/format over 291 files, strict mypy over 158 source files,
-architecture/import-cycle, and research-configuration/OpenAPI schema drift
-PASS (one new market-score-snapshot schema exported, no unexpected drift
-elsewhere); local secret guard and current Gitleaks source scan PASS
-(confirmed the newly-added Gemini/YouTube local credential names are not
-leaked). `scripts/check-progress.mjs` extended to recognize the `A17.5`
-dotted checkpoint-ID format alongside `A\d{2}`. Node.js/pnpm confirm the
-full web suite (11 tests), web lint, web format:check, web typecheck,
-`pnpm schemas:check`, and `pnpm check:progress` (30/172 completed, 142
-remaining, matching this entry's hand-recalculated totals) all PASS.
-Re-verified this session at start: all 5 credentialed official-data live
-smokes (Census CBP, BLS, BEA Regional, SEC EDGAR, SAM.gov) still PASS.
+568 Python tests PASS (was 555; +13 A17 focused tests: report-package
+composition, JSON round-trip/determinism, HTML section/escaping, and CSV
+manifest join/absence-stays-blank cases). Ruff/format over 303 files, strict
+mypy over 164 source files, architecture/import-cycle, and
+research-configuration/OpenAPI schema drift PASS (one new report-v1 schema
+exported, no unexpected drift elsewhere); local secret guard and current
+Gitleaks source scan PASS (confirmed the Gemini/YouTube local credential
+names remain unleaked). Node.js/pnpm confirm the full web suite (11 tests),
+web lint, web format:check, web typecheck, `pnpm schemas:check`, and
+`pnpm check:progress` (31/172 completed, 141 remaining, matching this
+entry's hand-recalculated totals) all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. A05's 5 bounded official-source live tests PASS. No web/API/worker
@@ -198,7 +196,7 @@ P24 | NOT_STARTED    |  0/ 7 | Full Market Discovery, Validation & Final Selecti
 
 Autonomous functional build track (new scope from the 2026-09-09 specification;
 A17.5 added 2026-09-10 under explicit owner request, see its checkpoint entry):
-A   | IN_PROGRESS    | 12/21 | CLI-first Autonomous Research Build
+A   | IN_PROGRESS    | 13/21 | CLI-first Autonomous Research Build
 
 A01-A20 (plus A17.5) are counted in the overall checkpoint total but are not an
 additional original guide phase. This denominator change adds 20 source-defined
@@ -256,8 +254,10 @@ rules, contradiction effects, and automatic veto detection.
 [x] A16 Build approved overall weighting, fixed gate profiles, immutable score
 snapshots, deterministic recommendations, and compatibility checks.
 
-[ ] A17 Generate report.json, HTML, PDF, CSV source manifest, score/confidence
+[x] A17 Generate report.json, HTML, PDF, CSV source manifest, score/confidence
 breakdowns, unknowns, raw/normalized/evidence/metrics outputs, and formula appendix.
+PDF explicitly deferred (see 2026-09-10 AUTONOMOUS-026 entry): it needs a new,
+unapproved rendering dependency; HTML is print-to-PDF ready in any browser today.
 
 [ ] A17.5 Free-Source Real Market Integration. Added 2026-09-10 by explicit
 owner request after Gemini and YouTube Data API credentials were supplied
@@ -2450,6 +2450,76 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-10 06:35 PKT (UTC+05:00) | AUTONOMOUS-026 | A17 | DONE
+Work:
+  Implemented A17 as `mask_api.modules.reporting`, a pure presentation layer
+  over one `market_scoring.MarketScoreSnapshot` with no calculation of its
+  own. `render_json_report` produces the machine-readable report.json (full
+  `ReportPackage` contract). `render_html_report` produces a self-contained
+  static HTML page (no template engine, no external asset) with every
+  interpolated value passed through `html.escape` without exception, since
+  A17.5 will feed it real web-derived evidence text that must never be
+  trusted as safe markup; verified this explicitly with an XSS-shaped
+  fixture. `render_source_manifest_csv` joins the registered source
+  inventory against what a specific run actually attempted
+  (`SourceAttemptOutcome`); a source never tried stays entirely absent
+  rather than being backfilled with an invented row. `executive_summary`
+  and `next_recommended_action` are template-generated from already-
+  computed fields only, following SCORING.md section 7's exact priority
+  order (confirmed veto, then suspected veto, then the nearest gate-
+  blocking missing method, then remaining completeness) -- no free-form or
+  model-generated prose anywhere in this checkpoint. `MethodReportEntry.
+  detail` carries each method's own already-validated result (dumped to
+  JSON by the caller) without reshaping it. PDF rendering is explicitly
+  deferred and documented as a permitted limitation: it needs a new,
+  unapproved rendering dependency (a weasyprint/reportlab-class library);
+  HTML is print-to-PDF ready in any browser today. Added docs/REPORTING.md.
+Files:
+  apps/api/src/mask_api/modules/reporting/{AGENTS.md,__init__.py,
+  contracts.py,builder.py,json_report.py,html_report.py,csv_manifest.py};
+  apps/api/tests/reporting/{test_builder.py,test_json_report.py,
+  test_html_report.py,test_csv_manifest.py};
+  configs/schemas/reporting/report-v1.schema.json;
+  scripts/export-research-schemas.py;
+  docs/{AUTONOMOUS_RESEARCH_MODE.md,MODULARITY.md,REPORTING.md}; README.md;
+  progress.txt.
+Verification:
+  A17 focused suite PASS: 13 tests (golden report composition with
+  risk-adjusted-score cross-check, mismatched-market-id/naive-timestamp
+  rejection, next-action priority ordering, JSON round-trip through the
+  validated contract and determinism, HTML section presence and explicit
+  script-tag-escaping proof, and CSV manifest join with untried-source-
+  stays-blank). Full offline Python suite PASS: 568 passed (was 555), 30
+  integration tests deselected. Ruff lint/format PASS over 303 files;
+  strict mypy PASS over 164 source files; architecture/import-cycle check
+  PASS; `research:schemas:check` and `export-openapi.py --check` PASS with
+  no unexpected drift; local secret guard and pinned Gitleaks source scan
+  PASS. Node.js/pnpm confirm the full web suite (11 tests), web lint, web
+  format:check, web typecheck, `pnpm schemas:check`, and `pnpm
+  check:progress` (31/172 completed, 141 remaining, matching this entry's
+  hand-recalculated totals) all PASS.
+Limitations/blockers:
+  PDF output is not implemented (documented permitted limitation above).
+  Every report built today is necessarily populated from test/fixture
+  data, since no real MethodExecutor wiring exists yet -- a report is a
+  template proof, not market evidence, until A17.5 lands. `source_attempts`
+  and per-method `detail` are designed to be populated by A17.5's real run
+  telemetry; callers may omit them today and the report renders honestly
+  with what it has.
+Next:
+  Implement A17.5 (Free-Source Real Market Integration): a live Gemini
+  analysis provider (mirroring openai_responses.py's exact shape, no SDK
+  dependency), Gemini Search-grounded discovery (discovery-only until the
+  original source is fetched/verified), a live YouTube Data API collector
+  for M2/M3/M5, a keyless USAspending official_data adapter for M4/M5 (or
+  NOT_RELEVANT), an O*NET downloadable-dataset bootstrap/importer for M3,
+  a targeted Common Crawl retriever (indexed-record range fetch only),
+  extending the existing RSS/Atom/static-HTML crawler under the same
+  source-policy gate, a provider-independent source/evidence fallback
+  registry with Tier A-E source-quality classes, M6 free-mode evidence,
+  and the first real MethodExecutor implementations -- toward one real,
+  source-backed calibration market report at $0 paid-data cost.
+
 2026-09-10 06:10 PKT (UTC+05:00) | AUTONOMOUS-025 | A16 | DONE
 Work:
   Owner supplied local Gemini and YouTube Data API credentials

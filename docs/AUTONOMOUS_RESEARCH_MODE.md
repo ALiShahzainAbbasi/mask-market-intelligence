@@ -188,6 +188,20 @@ file-based pattern every research run already uses -- the DATA_MODEL.md
 `market_score_snapshots` table remains unimplemented (P02/P03/P13 work),
 which this checkpoint does not build ahead of schedule.
 
+A17 adds `mask_api.modules.reporting`, a pure presentation layer over one
+`MarketScoreSnapshot`: `report.json` (machine-readable), a self-contained
+static HTML report (every value `html.escape`d, since A17.5 will feed it
+real web-derived evidence text that must never be trusted as safe markup),
+and a CSV source manifest joining the registered source inventory against
+what a specific run actually attempted. `executive_summary` and
+`next_recommended_action` are template-generated from already-computed
+numbers, following SCORING.md section 7's priority order (confirmed veto,
+then suspected veto, then the nearest gate-blocking missing method, then
+lower-priority completeness) -- no free-form or model-generated prose. PDF
+rendering is intentionally deferred: it would need a new rendering
+dependency this project has not evaluated; HTML output is print-to-PDF
+ready in any browser today.
+
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access
 and do not block later deterministic pipeline work. See

@@ -15,6 +15,7 @@ from mask_api.modules.confidence.contracts import MarketMethodSummary, VetoAsses
 from mask_api.modules.market_scoring.contracts import MarketScoreSnapshot
 from mask_api.modules.method_metrics.contracts import MethodMetricResult
 from mask_api.modules.pain_intelligence.contracts import M2Result
+from mask_api.modules.reporting.contracts import ReportPackage
 from mask_api.modules.workflow_intelligence.contracts import M3Result
 from mask_api.research_runner.contracts import MarketConfiguration, SourceProfile
 
@@ -48,6 +49,11 @@ TARGETS: dict[Path, Callable[[], dict[str, Any]]] = {
     / "schemas"
     / "market_scoring"
     / "market-score-snapshot-v1.schema.json": MarketScoreSnapshot.model_json_schema,
+    ROOT
+    / "configs"
+    / "schemas"
+    / "reporting"
+    / "report-v1.schema.json": ReportPackage.model_json_schema,
 }
 for schema_id in AnalysisSchemaId:
     target = ROOT / "configs" / "schemas" / "analysis" / f"{schema_id.value}.schema.json"
