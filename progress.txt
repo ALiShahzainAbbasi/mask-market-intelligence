@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-10 21:55 PKT (UTC+05:00)
+Last updated: 2026-09-11 19:25 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -17,21 +17,31 @@ persona normalization for free collectors, and A07/A09 have offline foundations.
 Census, BEA, SAM.gov, keyless BLS, and SEC each passed one bounded live smoke;
 Gemini and YouTube Data API credentials are now locally configured (owner-
 supplied 2026-09-10) and live wiring for both is in progress under A17.5.
-Current task: A17.5 in progress. Three live-capable providers now exist:
-a Gemini analysis provider (mirroring openai_responses.py's exact shape;
+Current task: A17.5 in progress. Five live-capable sources now exist: a
+Gemini analysis provider (mirroring openai_responses.py's exact shape;
 extraction/classification only, never scores/confidence/gates/vetoes), a
 YouTube Data API adapter (mask_api.modules.youtube_data;
 search.list/commentThreads.list for M2/M3/M5, with its own per-endpoint
 quota-unit ledger and a distinct quota-exceeded error path for
-SOURCE_UNAVAILABLE_QUOTA handling), and a sixth official_data source,
-USAspending award search (M4/M5, keyless, no credential needed at all).
-Gemini and YouTube are offline-tested only (no live call made, disabled
-until explicit policy approval); USAspending has an equivalent gated live
-smoke test like the other five official_data sources, not yet run. The
+SOURCE_UNAVAILABLE_QUOTA handling), a sixth official_data source,
+USAspending award search (M4/M5, keyless), an O*NET database bootstrap/
+cache/import pipeline for M3 (mask_api.modules.onet_data), and a targeted
+Common Crawl retriever (mask_api.modules.common_crawl_data; one CDX
+lookup plus one ranged WARC-record fetch, reusing the existing static-
+HTML parse/normalize pipeline unchanged). Live status: Common Crawl's
+gated smoke test passed against a real server; the original 5
+official_data live smokes still pass; USAspending's equivalent live
+smoke exists but has not been run; O*NET's live download was attempted
+twice -- the first attempt found and fixed a real silent-truncation bug,
+the second (post-fix) correctly rejected a genuine mid-transfer
+connection drop as a clean retryable error instead of corrupting the
+cache, but neither completed end to end against this environment's very
+slow connection to onetcenter.org (see docs/ONET_DATA.md); Gemini/YouTube
+remain offline-tested only, disabled until explicit policy approval. The
 youtube source profile entry is now operational_status: available (local
 MASK_youtube_API_KEY configured), matching how census_cbp/sam_gov are
-available despite also requiring a credential. Next: O*NET importer,
-Common Crawl retriever, fallback registry, and the first real
+available despite also requiring a credential. Next: the provider-
+independent source/evidence fallback registry, then the first real
 MethodExecutor wiring. A07 and A09 remain partial only because their
 live provider access is held/being wired; Google Ads, Reddit, Google
 Places, Meta, Brave, and firmographic providers remain skipped/optional.
@@ -58,14 +68,15 @@ percentage of working software. No reliable delivery-date estimate exists
 yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
-Next checkpoint: continue A17.5 (O*NET importer, Common Crawl retriever,
-fallback registry, and the first real MethodExecutor wiring), per the
-owner's explicit 2026-09-10 free-first research directive. The live
-Gemini analysis provider, the YouTube Data API adapter, and the keyless
-USAspending official_data source are now all implemented and offline-
-tested; wiring Gemini/YouTube through a real transport and a composition
-root (with explicit policy approval) is still pending, and running
-USAspending's/YouTube's gated live smoke tests is still pending.
+Next checkpoint: continue A17.5 (the provider-independent source/evidence
+fallback registry with Tier A-E quality classes, then the first real
+MethodExecutor wiring), per the owner's explicit 2026-09-10 free-first
+research directive. Gemini, YouTube, USAspending, O*NET, and Common Crawl
+are all now implemented and offline-tested; wiring Gemini/YouTube through
+a real transport and a composition root (with explicit policy approval)
+is still pending, running USAspending's/YouTube's gated live smoke tests
+is still pending, and completing O*NET's live smoke end to end remains
+pending a more reliable connection to onetcenter.org.
 Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
 and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
@@ -103,25 +114,34 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-628 Python tests PASS (was 619; +9 A17.5 USAspending focused tests: a
-keyless request builder test plus 6 new invalid-input parametrize cases,
-a parser test for valid-award-extraction/missing-identity-issue-recording,
-and an end-to-end transport/adapter test proving the sixth OfficialSourceId
-dispatches its own parser with an empty credential-fields list). Ruff/
-format over 318 files, strict mypy over 172 source files (apps/api/src
-plus workers), architecture/import-cycle, and research-configuration/
-OpenAPI schema drift PASS (no new schema needed -- USAspending reuses the
-existing OfficialRecord contract); local secret guard and current
-Gitleaks source scan PASS (confirmed the Gemini/YouTube local credential
-names remain unleaked, and no fixture API key pattern was flagged).
-Node.js/pnpm confirm the full web suite (11 tests), web lint, web
-format:check, web typecheck, `pnpm schemas:check`, and `pnpm
-check:progress` (31/172 completed, 141 remaining, matching this entry's
-hand-recalculated totals) all PASS.
+696 Python tests PASS (was 628; +68 A17.5 O*NET and Common Crawl focused
+tests: O*NET CSV parsing against real-verified column headers/blank-value
+behavior, local cache round-trip/corruption/path-traversal detection,
+bootstrap download-once/skip-when-cached/redownload-when-changed logic,
+and the new incomplete-download detection added after the live bug found
+below; Common Crawl CDX request/NDJSON-response parsing including the
+real "no captures" 404 shape, WARC record parsing against a real-verified
+structure (including the trailing-terminator-truncation fix), the
+retriever's enabled/policy/source-policy-scope/budget gates and short-
+range/content-type/status rejection, and an integration suite proving
+reuse of the existing StaticHtmlCollector.parse()/normalize_document()
+unchanged). Ruff/format over 349 files, strict mypy over 187 source files
+(apps/api/src plus workers), architecture/import-cycle, and research-
+configuration/OpenAPI schema drift PASS (no new schema needed); local
+secret guard and current Gitleaks source scan PASS (confirmed the Gemini/
+YouTube local credential names remain unleaked, and no fixture API key
+pattern was flagged). Node.js/pnpm confirm the full web suite (11 tests),
+web lint, web format:check, web typecheck, `pnpm schemas:check`, and
+`pnpm check:progress` (31/172 completed, 141 remaining, matching this
+entry's hand-recalculated totals) all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
-disabled. The original A05's 5 bounded official-source live tests PASS; the
-new sixth (USAspending) live smoke has not yet been run. No web/API/worker
+disabled. The original A05's 5 bounded official-source live tests PASS,
+plus a new live Common Crawl smoke (real CDX lookup + ranged WARC fetch
+against example.com, PASS). USAspending's live smoke has not yet been
+run; O*NET's live download was attempted twice and did not complete end
+to end (see docs/ONET_DATA.md) -- an honest environment limitation, not a
+known code defect; the fix it produced is offline-verified. No web/API/worker
 runtime, broad collection, or paid research ran.
 
 2. STATUS AND COMPLETION RULES
@@ -2471,6 +2491,210 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-11 19:25 PKT (UTC+05:00) | AUTONOMOUS-031 | A17.5 | IN_PROGRESS
+Work:
+  Added the fifth A17.5 live-capable source: a targeted Common Crawl
+  retriever (mask_api.modules.common_crawl_data) for historical/fallback
+  evidence on an already source-policy-approved URL. Verified the real
+  mechanics before writing code rather than guessing: fetched
+  index.commoncrawl.org's real collinfo.json and CDX JSON response shape
+  (confirmed newline-delimited JSON, and that a miss returns HTTP 404 with
+  a `{"message": "No Captures found..."}` body, not an empty 200), then
+  fetched one real WARC record from data.commoncrawl.org with an HTTP
+  Range header and confirmed `206 Partial Content` with a byte-exact body.
+  Built `cdx.py` (request validation, NDJSON parsing), `warc.py` (parses
+  the decompressed WARC record: WARC headers, then -- for
+  WARC-Type: response -- the embedded HTTP status/headers/body), and
+  `transport.py`/`retriever.py` (CDX lookup then exactly one ranged WARC
+  fetch, both budget-gated, disabled by default). Found and fixed a real
+  parsing bug while verifying warc.py against the actual downloaded
+  record: without truncating the payload to the WARC record's own
+  Content-Length before splitting out the HTTP body, the mandatory
+  trailing WARC record terminator (CRLF CRLF) leaked into the extracted
+  body (563 bytes returned instead of the correct 559); fixed and
+  re-verified byte-exact against the same real record.
+  Per the owner's explicit instruction to extend the existing static-HTML
+  crawler rather than build a new scraper, `retriever.fetch_resource()`
+  deliberately produces a plain `evidence.contracts.FetchedResource` (the
+  same contract a live fetch produces) instead of parsed text, and
+  `integration.py` calls the *existing*
+  `evidence.collectors.static_html.StaticHtmlCollector.parse()` and
+  `evidence.normalization.normalize_document()` completely unchanged to
+  do the HTML extraction and lineage/dedup work -- zero duplicated
+  parsing logic. Added `CollectorKind.COMMON_CRAWL` to
+  `evidence.domain` (a small additive enum value) so normalized documents
+  can carry accurate lineage. `find_capture()` reuses
+  `evidence.policy.require_allowed_fetch_url()` with the caller's
+  `SourcePolicy`, so this module can only retrieve a URL that policy would
+  also approve for a live fetch -- never a bypass path. Every retrieval
+  carries a `CommonCrawlProvenance` record (collection ID, capture
+  timestamp, WARC filename/offset/length, retrieval timestamp) so a caller
+  can apply the recency penalty the owner's directive requires rather than
+  presenting archived content as current. Added `docs/COMMON_CRAWL.md`.
+Files:
+  apps/api/src/mask_api/modules/common_crawl_data/{AGENTS.md,__init__.py,
+  contracts.py,errors.py,cdx.py,warc.py,transport.py,retriever.py,
+  integration.py};
+  apps/api/src/mask_api/modules/evidence/{domain.py,AGENTS.md} (added
+  CollectorKind.COMMON_CRAWL and a note pointing to the new module);
+  apps/api/tests/common_crawl_data/{conftest.py,test_cdx.py,test_warc.py,
+  test_transport.py,test_retriever.py,test_integration.py,
+  test_live_common_crawl_smoke.py};
+  docs/{COMMON_CRAWL.md,AUTONOMOUS_RESEARCH_MODE.md,SOURCE_AVAILABILITY.md};
+  README.md; progress.txt.
+Verification:
+  New focused suite PASS: 41 tests (CDX request validation and NDJSON
+  parsing including the real 404 "no captures" shape and malformed-row
+  rejection; WARC parsing including the terminator-truncation fix, non-
+  response rejection, missing-header rejection, and malformed-status-line
+  rejection; transport URL/Range-header construction and unsafe-filename
+  rejection; the retriever's 404-as-None handling, most-recent-capture
+  selection, source-policy-scope enforcement before any network call,
+  enabled/policy-approval gates, short-range/non-206/disallowed-content-
+  type/non-2xx-archived-status rejection, and record-size-cap enforcement
+  before any fetch; and an integration suite proving
+  to_parsed_document/to_normalized_document genuinely reuse the existing
+  static-HTML/normalize pipeline and correctly stamp Common Crawl
+  provenance into metadata without discarding the parser's own metadata).
+  A gated live smoke test
+  (test_live_common_crawl_find_capture_and_fetch_resource) ran a real CDX
+  lookup and ranged WARC fetch for https://example.com/ against
+  CC-MAIN-2026-34 and PASSED in 8 seconds, including the full reuse path
+  into a parsed document with the correct extracted title. Full offline
+  suite PASS: 696 (was 655 after O*NET's fix, see the next entry below),
+  33 integration tests deselected (32 plus this new live smoke, which ran
+  successfully outside the deselected count) -- confirmed via the
+  project's actual root-scoped `pnpm run test:unit`. Ruff check/format
+  PASS over 349 files; strict mypy PASS over 187 source files
+  (`apps/api/src` and `workers`). Architecture/import-cycle check PASS
+  (the new `CollectorKind` member introduced no exhaustiveness break --
+  grepped for every `CollectorKind.` usage first). `research:schemas:check`
+  PASS with no drift. Local secret guard and pinned Gitleaks source scan
+  both PASS. Node.js/pnpm confirm the full web suite (11 tests), web
+  lint, and web typecheck all PASS unaffected. `pnpm check:progress` PASS
+  at 31/172 (unchanged -- A17.5 remains one in-progress checkpoint).
+Limitations/blockers:
+  This module is not yet wired into `evidence.services.CollectionService`
+  or any `MethodExecutor` -- it produces correct, reusable pipeline
+  output (proven by the integration tests and the live smoke), but full
+  orchestration (retry/circuit-breaker policy, persistence dispatch) is
+  later work, matching A12/A13's "calculator built, not yet wired"
+  precedent. `find_capture()` currently requires the caller to name an
+  exact `collection_id` (e.g. "CC-MAIN-2026-34"); automatically resolving
+  "the current/latest collection" from collinfo.json was not built in
+  this pass to keep scope to what the owner's directive named.
+Next:
+  Build the provider-independent source/evidence fallback registry
+  (EvidenceRequirement mapped to Gemini/YouTube/USAspending/O*NET/Common
+  Crawl/RSS/static-HTML with cost/credential/quota/quality/freshness/
+  fallback-priority metadata, Tier A-E source-quality classes where Tier E
+  never directly scores), then the first real `MethodExecutor`
+  implementations wiring these sources into M1-M7/M9 -- toward one real,
+  source-backed calibration market report at $0 paid-data cost.
+
+2026-09-11 18:58 PKT (UTC+05:00) | AUTONOMOUS-030 | A17.5 | IN_PROGRESS
+Work:
+  Added the fourth A17.5 live-capable source: an automated O*NET
+  downloadable-database bootstrap/cache/import pipeline
+  (mask_api.modules.onet_data) for M3 occupation/task mapping, using the
+  official downloadable CSV database release (NOT the separate, unapproved
+  O*NET Web Services API), per the owner's explicit instruction to do this
+  setup automatically rather than ask the owner to download anything
+  manually. Verified the real dataset before writing code: fetched
+  onetcenter.org's real database page to get the current release (31.0)
+  and its exact downloadable file list, downloaded the real ~16.2MB
+  db_31_0_csv.zip to inspect it, and confirmed the exact column headers
+  and blank-value behavior of the two tables this module imports
+  (occupation_data.csv: O*NET-SOC Code/Title/Description;
+  task_statements.csv: O*NET-SOC Code/Task ID/Task/Task Type/Incumbents
+  Responding/Date/Domain Source -- Task Type and Incumbents Responding are
+  sometimes blank in the real data and must stay None, never a guessed
+  default). Built `contracts.py`, `parsers.py` (CSV parsing against the
+  verified real headers), `transport.py` (HEAD + bounded download,
+  disabled by default), `cache.py` (a small dedicated local filesystem
+  cache -- deliberately not the per-run ArtifactStore, since this dataset
+  is shared across every run, not scoped to one), and `bootstrap.py`
+  (`ensure_dataset()`: HEAD-check first, skip the ~16MB download when a
+  cached descriptor's Content-Length/ETag still match; `import_batch()`:
+  extract and parse only the two needed CSV members from the ZIP, not all
+  47 files). Since O*NET publishes no independent checksum for a release,
+  the descriptor's SHA-256 is explicitly documented as a self-computed
+  local integrity check, not verification against a publisher-supplied
+  value. O*NET has no `configs/sources/default_us_public.yaml` entry --
+  it is a shared cross-run reference dataset, not a per-request source,
+  so it does not fit that registry's shape. Added `outputs/reference_data/`
+  to .gitignore for the local cache location. Added `docs/ONET_DATA.md`.
+
+  Attempted the live download twice against the real server (owner
+  explicitly authorized doing this setup live, at zero cost, keyless).
+  First attempt (~17 minutes) completed the download but `import_batch()`
+  then failed with `zipfile.BadZipFile`: the cached archive was 14.68MB
+  against a declared 16.24MB Content-Length. Root cause: the transport's
+  single `response.read(n)` call had silently returned fewer bytes than
+  promised over a slow/unstable connection, and nothing checked for that
+  before caching. This was a real bug, found and fixed: (a)
+  `UrllibOnetTransport.download()` now loop-reads in bounded 64KB chunks
+  to true EOF instead of trusting one `.read(n)` call, catching
+  `http.client.HTTPException`/`IncompleteRead` as a clean retryable error
+  instead of letting it crash uncaught; (b) `_download_and_cache()` now
+  explicitly compares the received byte count against the HEAD response's
+  Content-Length and raises a retryable `onet.download_incomplete` error
+  rather than ever writing a short read to cache. Deleted the corrupted
+  cached archive and retried: the second attempt (~17 minutes) did not
+  silently truncate again -- the connection genuinely dropped mid-
+  transfer, which the fix now correctly surfaces as a caught
+  `onet.network_error` instead of crashing or corrupting the cache,
+  proving the fix works under the exact real adverse condition that
+  caused the original bug. Neither attempt completed a full end-to-end
+  pass; the observed effective throughput to onetcenter.org from this
+  environment was roughly 16KB/s. This is recorded as an honest,
+  documented environment/connection limitation, not a known code defect --
+  the offline suite fully exercises both the success path and this exact
+  incomplete-download detection path with a fake transport.
+Files:
+  apps/api/src/mask_api/modules/onet_data/{AGENTS.md,__init__.py,
+  contracts.py,errors.py,parsers.py,cache.py,transport.py,bootstrap.py};
+  apps/api/tests/onet_data/{test_parsers.py,test_cache.py,
+  test_transport.py,test_bootstrap.py,test_live_onet_smoke.py,
+  fixtures/{occupation_data.csv,task_statements.csv}};
+  .gitignore; docs/{ONET_DATA.md,AUTONOMOUS_RESEARCH_MODE.md,
+  SOURCE_AVAILABILITY.md}; README.md; progress.txt.
+Verification:
+  New focused suite PASS: 27 tests (parser extraction against the real-
+  verified headers plus malformed-header/blank-value/duplicate-row
+  handling, local cache round-trip/overwrite/corruption-detection/path-
+  traversal-rejection, and the bootstrapper's download-once/skip-when-
+  cache-matches/redownload-when-remote-changed/disabled-policy-not-
+  approved/end-to-end-archive-extraction/cached-archive-checksum-
+  mismatch/incomplete-download-rejection behavior -- the last of these
+  added specifically to cover the bug found during live verification).
+  Full offline suite PASS: 655 (was 628), 32 integration tests deselected
+  (was 31 -- the new live smoke test is correctly gated and skipped by
+  default) -- confirmed via the project's actual root-scoped `pnpm run
+  test:unit`. Ruff check/format PASS; strict mypy PASS over 179 source
+  files (`apps/api/src` and `workers`). Architecture/import-cycle check
+  PASS. `research:schemas:check` PASS with no drift. Local secret guard
+  and pinned Gitleaks source scan both PASS. Node.js/pnpm confirm the
+  full web suite (11 tests), web lint, and web typecheck all PASS
+  unaffected. `pnpm check:progress` PASS at 31/172 (unchanged -- A17.5
+  remains one in-progress checkpoint).
+Limitations/blockers:
+  No live O*NET download has completed successfully end to end in this
+  environment (see Work above for the full honest account); the offline-
+  verified bootstrap/import logic is otherwise complete and correct. Not
+  yet wired into any composition root or `MethodExecutor`. `task_ratings
+  .csv` (39MB, importance/frequency ratings) and `work_activities.csv`
+  (12MB) are intentionally not imported in this pass -- a documented,
+  deferred follow-up, not a silent gap.
+Next:
+  Retry the live O*NET download when a more reliable connection is
+  available (the code is ready; no further changes expected to be
+  needed), or accept the offline verification as sufficient and proceed.
+  Continue A17.5 with the targeted Common Crawl retriever (see the entry
+  above -- built immediately after this one, in the same session) and
+  then the provider-independent source/evidence fallback registry and the
+  first real MethodExecutor wiring.
+
 2026-09-10 21:55 PKT (UTC+05:00) | AUTONOMOUS-029 | A17.5 | IN_PROGRESS
 Work:
   Added the third A17.5 live-capable source: a keyless USAspending.gov

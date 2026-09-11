@@ -9,11 +9,16 @@ before changing this module.
   and concrete network/database adapters.
 - A source-specific collector discovers candidates and parses already-fetched
   bytes. It must not open sockets, write evidence, invoke AI, or calculate scores.
-- `http_fetcher.py` is the only current network adapter. Preserve exact-origin
-  policy checks, public-address resolution, TLS verification, disabled ambient
-  proxies/cookies/redirects, response-size limits, MIME allowlists, bounded
-  timeouts, and safe errors. Never add credential, CAPTCHA, paywall, robots, or
-  access-control bypass behavior.
+- `http_fetcher.py` is the only network adapter *inside this module*.
+  Preserve exact-origin policy checks, public-address resolution, TLS
+  verification, disabled ambient proxies/cookies/redirects, response-size
+  limits, MIME allowlists, bounded timeouts, and safe errors. Never add
+  credential, CAPTCHA, paywall, robots, or access-control bypass behavior.
+  `mask_api.modules.common_crawl_data` (A17.5) is a separate module with its
+  own network transport that produces a `FetchedResource` a different way
+  (a historical archive replay, not a live fetch) and reuses this module's
+  `StaticHtmlCollector.parse()`/`normalize_document()` unchanged -- see its
+  own `AGENTS.md`. Do not add Common-Crawl-specific logic here.
 - The application service owns the ordered
   `discover -> fetch -> parse -> normalize -> persist` use case. Concrete source
   policy and evidence persistence must arrive through typed ports. An explicit

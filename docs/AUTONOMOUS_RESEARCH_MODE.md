@@ -231,6 +231,25 @@ owner-supplied `MASK_youtube_API_KEY` is configured locally), matching how
 No live call has been made; the adapter is exercised only against a fake
 transport and fixtures so far. See `docs/YOUTUBE_DATA.md`.
 
+A17.5 also adds `mask_api.modules.common_crawl_data`, a targeted Common
+Crawl retriever for historical/fallback evidence: one CDX index lookup for
+a specific already-approved URL, then exactly one HTTP `Range`-fetched
+WARC record -- never a full WARC file or crawl segment download, verified
+live (`206 Partial Content`, byte-exact) against `data.commoncrawl.org`.
+Rather than build a second HTML parser, it produces a plain
+`evidence.contracts.FetchedResource` and reuses the *existing*
+`StaticHtmlCollector.parse()` and `evidence.normalization
+.normalize_document()` unchanged (a new `CollectorKind.COMMON_CRAWL` value
+was added to `evidence.domain` for lineage), stamping the result with full
+Common Crawl provenance (collection ID, capture timestamp, WARC filename/
+offset/length) so a caller can apply the recency penalty the owner's
+directive requires rather than presenting archived content as current.
+`find_capture()` reuses `evidence.policy.require_allowed_fetch_url()` with
+the caller's `SourcePolicy`, so Common Crawl can only retrieve a URL that
+policy would also approve for a live fetch -- never a bypass. A gated live
+smoke test passed against `https://example.com/`. See
+`docs/COMMON_CRAWL.md`.
+
 A17.5 also extends `mask_api.modules.official_data` with a sixth source,
 USAspending award search (`OfficialSourceId.USASPENDING`), for M4/M5 awarded
 federal contract spend and incumbent evidence. Unlike YouTube, USAspending is
@@ -242,6 +261,31 @@ opposed to a real gap) is a later method-input concern, not something this
 adapter infers. Its live smoke test exists and follows the same explicit
 opt-in gate as the other five official_data sources, but has not been run.
 See `docs/OFFICIAL_DATA.md`.
+
+A17.5 also adds `mask_api.modules.onet_data`, a bootstrap/cache/import
+pipeline for the official O*NET **downloadable database** release (not
+the separate, unapproved O*NET Web Services API) for M3 occupation/task
+mapping. `OnetBootstrapper.ensure_dataset()` HEAD-checks the remote
+archive before deciding whether a cached copy is still current, so a
+later run does not repeat the ~16MB download unnecessarily; O*NET
+publishes no independent checksum, so its descriptor's SHA-256 is a
+self-computed local integrity check, not verification against a
+publisher-supplied value. `import_batch()` extracts and parses only two
+of the release's 47 CSV tables (`occupation_data.csv`,
+`task_statements.csv`); the much larger ratings/activity tables are a
+documented, deferred follow-up. The local cache is its own small
+filesystem adapter, not the per-run `ArtifactStore`, since the dataset is
+shared across every run rather than scoped to one. A live download was
+attempted twice: the first attempt exposed a real silent-truncation bug
+(the transport's single `.read(n)` call returned fewer bytes than
+promised, uncaught), which was fixed (chunked reads to true EOF, plus an
+explicit received-length-versus-`Content-Length` check before caching);
+the second attempt, after the fix, correctly caught a genuine mid-transfer
+connection drop as a clean retryable error instead of corrupting the
+cache, proving the fix works, but neither attempt completed a full
+end-to-end pass against this environment's apparently very slow route to
+`onetcenter.org` -- an honest, documented limitation, not a known code
+defect. See `docs/ONET_DATA.md`.
 
 The lean default source profile also carries an executable operational status.
 Paid, credential-pending, and approval-pending sources stop before network access

@@ -18,6 +18,7 @@ class CollectionMethod(StrEnum):
 class CollectorKind(StrEnum):
     RSS_ATOM = "rss_atom"
     STATIC_HTML = "static_html"
+    COMMON_CRAWL = "common_crawl"
 
 
 class CollectionRunStatus(StrEnum):
