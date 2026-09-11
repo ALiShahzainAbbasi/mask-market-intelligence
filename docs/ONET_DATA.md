@@ -1,8 +1,7 @@
 # O*NET Database Bootstrap
 
-Status: A17.5 offline implementation complete and passing. Live download
-attempted twice against the real `onetcenter.org` server; see "Live smoke
-status" below for the honest current result.
+Status: A17.5 complete. Offline suite passes; live download succeeded end
+to end on the third attempt (see "Live smoke status" below).
 
 ## Purpose and boundary
 
@@ -87,7 +86,7 @@ repeat on a later run against an unchanged release.
 
 ### Live smoke status
 
-Run twice against the real server, honestly reported:
+Run three times against the real server, honestly reported:
 
 1. **First attempt** (~17 minutes) completed the download, but
    `import_batch()` then failed with `zipfile.BadZipFile`. Inspection
@@ -103,18 +102,25 @@ Run twice against the real server, honestly reported:
    caching a short read. Both are covered by new offline tests.
 2. **Second attempt** (~17 minutes, after the fix) did not silently
    truncate again; instead the connection genuinely dropped mid-transfer,
-   which the loop-read now correctly surfaces as a caught, clean,
+   which the loop-read now correctly surfaced as a caught, clean,
    retryable `onet.network_error` -- proving the fix works under the
    exact real adverse condition that caused the original bug, rather than
    crashing uncaught or corrupting the cache.
+3. **Third attempt** (~10.5 minutes) **passed completely**: downloaded
+   the full 16,237,378-byte archive (byte-identical -- same SHA-256,
+   `55033fc6...` -- to an independently downloaded reference copy used to
+   verify the parser during implementation), imported it, and confirmed
+   1,016 occupations and 18,838 task statements. A follow-up query for
+   O*NET-SOC code `49-9021.00` ("Heating, Air Conditioning, and
+   Refrigeration Mechanics and Installers") returned 30 real Core/
+   Supplemental task statements (e.g. "Discuss heating or cooling system
+   malfunctions with users to isolate problems...", "Test electrical
+   circuits or components for continuity...") -- genuine M3 workflow
+   evidence for the `us_hvac_10_99` sample market.
 
-Net effect: the observed effective throughput to `onetcenter.org` from
-this environment was roughly 16KB/s, and the connection did not survive a
-full ~16MB transfer in either attempt. The offline suite (27 tests)
-fully exercises both the success path and this exact incomplete-download
-detection path with a fake transport, so the bootstrap logic itself is
-verified. A genuinely complete live end-to-end pass (download all the way
-through `import_batch()` succeeding) has not yet been achieved and remains
-pending a more reliable connection to `onetcenter.org`, or patience for a
-longer run, in a future session -- an honest, documented limitation, not a
-known code defect.
+Net effect: the connection to `onetcenter.org` from this environment is
+unreliable (roughly 16KB/s and prone to mid-transfer drops), so a live
+run should be expected to need one or two retries, but the bootstrap
+pipeline itself -- download, integrity verification, caching, and
+import -- is now confirmed correct end to end against the real service,
+not just offline fixtures.

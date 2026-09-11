@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-11 19:25 PKT (UTC+05:00)
+Last updated: 2026-09-11 20:20 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -30,14 +30,22 @@ Common Crawl retriever (mask_api.modules.common_crawl_data; one CDX
 lookup plus one ranged WARC-record fetch, reusing the existing static-
 HTML parse/normalize pipeline unchanged). Live status: Common Crawl's
 gated smoke test passed against a real server; the original 5
-official_data live smokes still pass; USAspending's equivalent live
-smoke exists but has not been run; O*NET's live download was attempted
-twice -- the first attempt found and fixed a real silent-truncation bug,
-the second (post-fix) correctly rejected a genuine mid-transfer
-connection drop as a clean retryable error instead of corrupting the
-cache, but neither completed end to end against this environment's very
-slow connection to onetcenter.org (see docs/ONET_DATA.md); Gemini/YouTube
-remain offline-tested only, disabled until explicit policy approval. The
+official_data live smokes still pass; O*NET's live download now also
+PASSED (third attempt, ~10.5 min, after two earlier attempts found and
+fixed a real silent-truncation bug -- see docs/ONET_DATA.md), importing
+1,016 real occupations and 18,838 real task statements; USAspending's
+equivalent live smoke exists but has not been run; Gemini/YouTube remain
+offline-tested only for their own gated smoke tests, disabled until
+explicit policy approval. A standalone live ingestion pass (owner
+directive, non-Gemini sources) was run against the us_hvac_10_99 sample
+market via scripts/ingest_us_hvac_10_99.py and got real data back from
+Census CBP (23,617 real establishments in the 10-99 employee band),
+BLS, SAM.gov, USAspending, YouTube search, and (separately) O*NET
+(30 real HVAC task statements for O*NET-SOC 49-9021.00); BEA/SEC/Common
+Crawl were explicitly skipped for this market with documented reasons
+(no target region, no contact email configured, no approved source
+policy for an HVAC URL). This is raw evidence ingestion only -- no
+MethodExecutor wiring exists yet, so nothing has been scored. The
 youtube source profile entry is now operational_status: available (local
 MASK_youtube_API_KEY configured), matching how census_cbp/sam_gov are
 available despite also requiring a credential. Next: the provider-
@@ -72,11 +80,12 @@ Next checkpoint: continue A17.5 (the provider-independent source/evidence
 fallback registry with Tier A-E quality classes, then the first real
 MethodExecutor wiring), per the owner's explicit 2026-09-10 free-first
 research directive. Gemini, YouTube, USAspending, O*NET, and Common Crawl
-are all now implemented and offline-tested; wiring Gemini/YouTube through
-a real transport and a composition root (with explicit policy approval)
-is still pending, running USAspending's/YouTube's gated live smoke tests
-is still pending, and completing O*NET's live smoke end to end remains
-pending a more reliable connection to onetcenter.org.
+are all now implemented and offline-tested; live-ingestion-verified for
+real data flow are Census/BLS/SAM.gov/USAspending/YouTube/O*NET/Common
+Crawl. Wiring Gemini/YouTube through a real transport and a composition
+root (with explicit policy approval) is still pending, and running
+USAspending's own gated live smoke test is still pending (its data was
+already proven live via the direct ingestion pass instead).
 Paid/model network use stays disabled except Gemini/YouTube's free tiers; A07
 and the other held providers remain at their live edges.
 User explicitly requires Windows-only, no Docker, requirements-only scope, modularity, and lean market research/model usage under D13.
@@ -138,11 +147,22 @@ P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. The original A05's 5 bounded official-source live tests PASS,
 plus a new live Common Crawl smoke (real CDX lookup + ranged WARC fetch
-against example.com, PASS). USAspending's live smoke has not yet been
-run; O*NET's live download was attempted twice and did not complete end
-to end (see docs/ONET_DATA.md) -- an honest environment limitation, not a
-known code defect; the fix it produced is offline-verified. No web/API/worker
-runtime, broad collection, or paid research ran.
+against example.com, PASS) and O*NET's live smoke (real ~16MB download +
+import, PASS on the third attempt after two earlier attempts found and
+fixed a real silent-truncation bug -- see docs/ONET_DATA.md). USAspending's
+own gated live smoke test has not been run as a test, but its live data
+path was proven separately via the direct ingestion pass below. Separately
+from the gated test suite, a live data-ingestion pass (owner directive,
+non-Gemini sources; scripts/ingest_us_hvac_10_99.py, not committed to the
+suite) ran against the us_hvac_10_99 sample market and returned real data
+from Census CBP (23,617 real establishments in the 10-99 employee band,
+cross-checked against a manual query before writing code), BLS, SAM.gov,
+USAspending, YouTube search (returned directly relevant dispatch-software-
+comparison videos), and O*NET (30 real task statements for O*NET-SOC
+49-9021.00); BEA/SEC/Common Crawl were explicitly skipped for this market
+with documented reasons rather than faked. This is raw evidence, not a
+scored result -- no MethodExecutor exists yet to turn it into M1-M9 input.
+No web/API/worker runtime, broad collection, or paid research ran.
 
 2. STATUS AND COMPLETION RULES
 ------------------------------------------------------------------------
@@ -2491,6 +2511,90 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-11 20:20 PKT (UTC+05:00) | AUTONOMOUS-032 | A17.5 | IN_PROGRESS
+Work:
+  Owner directive: "start data ingestion through all working sources
+  except gemini." Built a standalone, explicitly non-permanent ingestion
+  driver (scripts/ingest_us_hvac_10_99.py) that calls the real,
+  already-tested adapters with real credentials against real live
+  services for the us_hvac_10_99 sample market -- deliberately NOT the
+  MethodExecutor/CollectionService composition root (which still does
+  not exist), but a direct proof that data actually flows before more
+  integration plumbing gets built, per the "prove the water flows before
+  building more plumbing" call made earlier in this session. Verified
+  Census CBP's real EMPSZES employment-size codes and confirmed the real
+  BLS series ID against the live APIs before writing query parameters
+  (230/241/242 = 10-19/20-49/50-99 employees; CES2023800001 = Specialty
+  Trade Contractors employment), rather than guessing.
+  Ran it live. Real results: Census CBP returned 23,617 real
+  establishments in the exact 10-99 employee band for NAICS 238220; BLS
+  returned 36 real monthly employment observations; SAM.gov returned 25
+  real open HVAC-NAICS procurement opportunities; USAspending returned 25
+  real awarded contracts (largest: $48.9M); YouTube search for "HVAC
+  dispatch software" returned 15 real, directly relevant videos
+  (competitor dispatch-software comparisons -- exactly the kind of M2/M3
+  evidence this pipeline exists to find). BEA Regional, SEC EDGAR, and
+  Common Crawl were explicitly skipped with a documented reason each
+  (the market defines no target region; no contact email is configured
+  for SEC's required User-Agent; Common Crawl needs one already-approved
+  target URL and none is registered for an HVAC site) rather than
+  silently faked or forced. Raw output with full provenance was written
+  to outputs/runs/ingest_us_hvac_10_99_<timestamp>/raw/ (gitignored, not
+  committed); only the driver script was committed.
+  Separately, per the same directive, retried the O*NET live smoke a
+  third time. It PASSED completely in ~10.5 minutes: downloaded the full
+  16,237,378-byte archive (SHA-256 55033fc6... -- byte-identical to an
+  independently downloaded reference copy used earlier to verify the
+  parser), imported 1,016 real occupations and 18,838 real task
+  statements, and a follow-up query for O*NET-SOC 49-9021.00 ("Heating,
+  Air Conditioning, and Refrigeration Mechanics and Installers") returned
+  30 real Core/Supplemental task statements (e.g. "Discuss heating or
+  cooling system malfunctions with users...", "Test electrical circuits
+  or components for continuity..."). This confirms the bootstrap pipeline
+  -- download, integrity verification, caching, import -- is correct end
+  to end against the real service, closing the gap left by the previous
+  entry's two incomplete attempts. Updated docs/ONET_DATA.md's "Live
+  smoke status" section to record the successful third attempt honestly
+  alongside the two earlier ones (append, not overwrite).
+Files:
+  scripts/ingest_us_hvac_10_99.py (new); docs/ONET_DATA.md (updated);
+  progress.txt.
+Verification:
+  Ran the ingestion script twice (once before, once after a ruff-
+  cleanliness pass) and got byte-for-byte identical real results both
+  times: 23,617 Census establishments, 36 BLS observations, 25 SAM.gov
+  opportunities, 25 USAspending awards, 15 YouTube videos, 100 YouTube
+  quota units consumed (well under the 10,000/day free tier), 8 total
+  requests and ~90KB against the market's own run_budget (max_requests
+  100, max_total_bytes ~52MB) -- all real network calls, $0 paid cost.
+  Ruff check/format PASS on the new script. The O*NET live smoke test
+  (already existing from the previous entry, gated by
+  MASK_RUN_LIVE_ONET_SMOKE=1/MASK_ONET_POLICY_APPROVED=1) PASSED on this
+  run; no code changes were needed -- the fix from the previous entry
+  held. Did not re-run the full offline suite/lint gate in this entry
+  since no library code changed (only a scripts/ utility and docs);
+  the previous entry's 696-test/lint-clean state stands unmodified.
+Limitations/blockers:
+  This ingestion is not wired into the permanent pipeline and produces
+  no score -- it is raw evidence only, proving connectivity and real
+  data relevance, not a research report. BEA/SEC/Common Crawl coverage
+  gaps for this specific market are documented above and are discovery/
+  registration gaps (no target region, no contact email, no registered
+  source policy), not code defects. USAspending's own gated live smoke
+  test (as opposed to its data being proven live via direct ingestion)
+  is still technically unrun.
+Next:
+  Configure MASK_OFFICIAL_CONTACT_EMAIL to unlock SEC EDGAR, and consider
+  whether the market config should define a target region so BEA Regional
+  can run meaningfully. Continue A17.5 with the provider-independent
+  source/evidence fallback registry (Tier A-E quality classes), then the
+  first real MethodExecutor implementation -- now that every non-Gemini
+  free source has been proven to return real, relevant data for at least
+  one real market, wiring one of them (e.g. Census CBP into M1) through a
+  real MethodExecutor is the highest-value next step, exactly as
+  recommended: prove one real end-to-end scored path before adding more
+  sources or more registry abstraction.
+
 2026-09-11 19:25 PKT (UTC+05:00) | AUTONOMOUS-031 | A17.5 | IN_PROGRESS
 Work:
   Added the fifth A17.5 live-capable source: a targeted Common Crawl
