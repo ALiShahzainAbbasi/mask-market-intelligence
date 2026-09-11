@@ -292,3 +292,40 @@ Paid, credential-pending, and approval-pending sources stop before network acces
 and do not block later deterministic pipeline work. See
 `docs/SOURCE_AVAILABILITY.md` for the current owner-approved holds and fallback
 rules.
+
+## The first real MethodExecutor
+
+Every M1-M9 calculator built through A14 was correct and tested but never
+connected to a real source -- the `MethodExecutor` Protocol first defined
+alongside A12 had zero implementations. `mask_api.research_runner.executors
+.CensusM1Executor` is the first one. It owns no source or scoring logic of
+its own; it wires the existing `official_data` Census CBP adapter into the
+existing `method_metrics.calculate_m1` calculator through the public port
+each module already exposes, exactly the "runner coordinates public module
+ports" boundary this file's own module describes.
+
+All five M1 components come from the same Census County Business Patterns
+dataset, so the calculator's shared-geography/shared-population checks hold
+without approximation, rather than mixing in a differently-scoped source
+(e.g. a broader BLS industry series) that those checks would correctly
+reject: `serviceable_businesses` is the real establishment count in the
+market's company-employee band; `target_band_share` divides that by all
+establishments in the NAICS; `annual_payroll_per_serviceable_establishment
+_usd` divides real aggregate payroll in the band by establishments in the
+band; `fragmentation_share` is the real share of total industry employment
+held by establishments under 100 employees; and `growth_cagr` is the real
+band establishment-count CAGR between the current and a five-years-earlier
+Census CBP release at the same NAICS/band definition.
+
+Run live against `configs/markets/us_hvac_10_99.yaml`
+(`scripts/run_census_m1.py`), it produced the system's first genuine,
+source-grounded, `complete`-status score: **M1 = 6.34/10**, computed
+entirely from real 2017 and 2022 Census CBP data (23,617 real
+establishments in the 10-99 employee HVAC band, a real 2.25% five-year
+establishment CAGR, a real 71.2% under-100-employee employment share, and
+real average payroll per establishment), with every component's evidence
+reference traceable to an exact Census query and the nine raw API responses
+persisted as run artifacts. This is not wired into the `ResearchRunner`
+CLI's `executors=` list yet -- it is proof the architecture produces a real
+result end to end, ahead of building the provider-independent fallback
+registry and additional executors.

@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-11 20:20 PKT (UTC+05:00)
+Last updated: 2026-09-11 23:50 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -45,8 +45,23 @@ BLS, SAM.gov, USAspending, YouTube search, and (separately) O*NET
 Crawl were explicitly skipped for this market with documented reasons
 (no target region, no contact email configured, no approved source
 policy for an HVAC URL). This is raw evidence ingestion only -- no
-MethodExecutor wiring exists yet, so nothing has been scored. The
-youtube source profile entry is now operational_status: available (local
+MethodExecutor wiring existed yet at that point, so nothing was scored.
+MILESTONE: mask_api.research_runner.executors.CensusM1Executor is now the
+first real MethodExecutor implementation (MethodExecutor has had zero
+implementations since it was defined at A12). It wires the existing
+official_data Census CBP adapter into the existing method_metrics
+.calculate_m1 calculator through each module's public port, with no
+source or scoring logic of its own. Run live against us_hvac_10_99
+(scripts/run_census_m1.py), it produced the system's first genuine,
+source-grounded, complete-status score: M1 = 6.34/10, computed entirely
+from real 2017/2022 Census CBP data across all 5 components (23,617 real
+establishments in the target band, a real 2.25% five-year establishment
+CAGR, a real 71.2% under-100-employee employment share, real average
+payroll per establishment, and a real target-band share), every
+component's evidence reference traceable to an exact Census query, all 9
+raw API responses persisted as run artifacts. Not yet registered with the
+ResearchRunner CLI's executors= list. The youtube source profile entry is
+now operational_status: available (local
 MASK_youtube_API_KEY configured), matching how census_cbp/sam_gov are
 available despite also requiring a credential. Next: the provider-
 independent source/evidence fallback registry, then the first real
@@ -77,12 +92,16 @@ yet. Recalculate counts when the baseline changes; never inflate progress
 by marking documentation as implemented functionality.
 
 Next checkpoint: continue A17.5 (the provider-independent source/evidence
-fallback registry with Tier A-E quality classes, then the first real
-MethodExecutor wiring), per the owner's explicit 2026-09-10 free-first
+fallback registry with Tier A-E quality classes, then more MethodExecutor
+implementations beyond the first, then registering executors with the
+ResearchRunner CLI), per the owner's explicit 2026-09-10 free-first
 research directive. Gemini, YouTube, USAspending, O*NET, and Common Crawl
 are all now implemented and offline-tested; live-ingestion-verified for
 real data flow are Census/BLS/SAM.gov/USAspending/YouTube/O*NET/Common
-Crawl. Wiring Gemini/YouTube through a real transport and a composition
+Crawl. The first real MethodExecutor (CensusM1Executor, M1) now exists
+and produced a real complete-status score (6.34/10) for us_hvac_10_99 --
+see the CURRENT POSITION section above and the AUTONOMOUS-033 history
+entry. Wiring Gemini/YouTube through a real transport and a composition
 root (with explicit policy approval) is still pending, and running
 USAspending's own gated live smoke test is still pending (its data was
 already proven live via the direct ingestion pass instead).
@@ -123,7 +142,7 @@ Current verification: Supabase PostgreSQL 17 and pgvector 0.8.2 are live at
 Alembic 0006 with 12 private mask tables. The restricted mask_app runtime role,
 TLS, search path, grants, Data API isolation, schema reflection, tenant checks,
 and local-auth persistence passed 18 focused live tests. Full offline regression:
-696 Python tests PASS (was 628; +68 A17.5 O*NET and Common Crawl focused
+701 Python tests PASS (was 628; +68 A17.5 O*NET and Common Crawl focused
 tests: O*NET CSV parsing against real-verified column headers/blank-value
 behavior, local cache round-trip/corruption/path-traversal detection,
 bootstrap download-once/skip-when-cached/redownload-when-changed logic,
@@ -134,15 +153,25 @@ structure (including the trailing-terminator-truncation fix), the
 retriever's enabled/policy/source-policy-scope/budget gates and short-
 range/content-type/status rejection, and an integration suite proving
 reuse of the existing StaticHtmlCollector.parse()/normalize_document()
-unchanged). Ruff/format over 349 files, strict mypy over 187 source files
+unchanged; +5 more for CensusM1Executor: missing-API-key short-circuit
+before any network call, a full 5-component complete-status score with
+exact-value assertions against hand-computed fixture math, the 9-request
+band-fetch/raw-artifact-persistence count, an unmatched-company-band
+unknown result, and a transport-error-to-failed-result mapping).
+Ruff/format over 354 files, strict mypy over 189 source files
 (apps/api/src plus workers), architecture/import-cycle, and research-
 configuration/OpenAPI schema drift PASS (no new schema needed); local
-secret guard and current Gitleaks source scan PASS (confirmed the Gemini/
-YouTube local credential names remain unleaked, and no fixture API key
-pattern was flagged). Node.js/pnpm confirm the full web suite (11 tests),
-web lint, web format:check, web typecheck, `pnpm schemas:check`, and
-`pnpm check:progress` (31/172 completed, 141 remaining, matching this
-entry's hand-recalculated totals) all PASS.
+secret guard and current Gitleaks source scan PASS after fixing one
+false-positive finding (the generic-api-key heuristic matched the literal
+text "CENSUS_API_KEY_ENV, CensusM1Executor" on one combined import line in
+the new test file -- confirmed via a manual gitleaks run with a JSON
+report that it was two Python identifiers, not a credential; fixed by
+splitting the import rather than touching .gitleaks.toml's allowlist, so
+the scan gate itself stays exactly as strict for everyone). Node.js/pnpm
+confirm the full web suite (11 tests), web lint, web format:check, web
+typecheck, `pnpm schemas:check`, and `pnpm check:progress` (31/172
+completed, 141 remaining, matching this entry's hand-recalculated
+totals) all PASS.
 P01-08 remains open for its broader historical/CI
 acceptance rather than a current finding. Auth and collection routes remain
 disabled. The original A05's 5 bounded official-source live tests PASS,
@@ -2511,6 +2540,125 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-11 23:50 PKT (UTC+05:00) | AUTONOMOUS-033 | A17.5 | IN_PROGRESS
+Work:
+  Owner directive: "move onwards." Following the owner's own audit
+  question ("will we actually get research done, or is this
+  overengineering") and this session's own recommendation in response --
+  prove one real end-to-end scored path before adding more sources or
+  more registry abstraction -- built the first real MethodExecutor
+  implementation: mask_api.research_runner.executors.CensusM1Executor.
+  MethodExecutor has had zero implementations since it was defined
+  alongside A12; every M1-M9 calculator built since has been correct and
+  tested but never connected to a real source until now.
+  Read execution.py, runner.py, method_metrics/contracts.py,
+  method_metrics/m1.py, method_metrics/provenance.py, and the M1 section
+  of configs/formulas/v1.yaml to understand the exact MethodExecutor
+  Protocol, M1Inputs contract, and the v1 transform bounds for each of
+  M1's 5 components before writing any code. Designed the executor to own
+  no source or scoring logic of its own -- it wires the existing
+  official_data Census CBP adapter into the existing method_metrics
+  .calculate_m1 calculator through each module's already-public port,
+  matching docs/MODULARITY.md's "runner coordinates public module ports"
+  description of research_runner/ exactly.
+  All five M1 components deliberately come from the same Census County
+  Business Patterns dataset so calculate_m1's require_shared_geography/
+  require_shared_population checks hold without approximation, rather
+  than mixing in a differently-scoped source (e.g. BLS's broader
+  Specialty Trade Contractors series for "growth", which those checks
+  would correctly reject as an incompatible population). Verified this
+  was achievable with a real, live check before committing to the
+  design: fetched real Census CBP data for NAICS 238220 across all
+  EMPSZES employment-size bands for both 2022 and 2017 (a real, keyed
+  2017 CBP release exists with the same size-class codes), confirming a
+  legitimate real growth_cagr, fragmentation_share (share of industry
+  employment in establishments under 100 employees -- a standard
+  fragmentation proxy, not concentration), and economic_capacity were
+  all computable from data already being fetched for buyer_pool and
+  target_band_share, with no invented or mismatched-population inputs.
+  Implemented CensusM1Executor.execute(): reads MASK_CENSUS_API_KEY
+  (returns UNKNOWN with a specific reason_code if absent, never crashes);
+  maps the market's company_band to the Census EMPSZES codes that
+  exactly cover it (UNKNOWN if none do, rather than approximating);
+  fetches 9 real Census CBP band queries (6 for the current year, 3 for
+  the comparison year) through the budget-gated OfficialApiAdapter;
+  builds SourcedMetric/MetricProvenance objects with a shared geography/
+  population string and an exact, auditable evidence_reference per
+  component; calls calculate_m1(); persists all 9 raw API responses as
+  run artifacts; and returns a MethodExecutionResult with the full
+  calculator result as its payload. The transport is constructor-injected
+  (not hardcoded), matching this codebase's DI convention everywhere
+  else and making the executor properly fake-transport-testable.
+  Ran it live against configs/markets/us_hvac_10_99.yaml
+  (scripts/run_census_m1.py). It produced the system's first genuine,
+  source-grounded, complete-status score: M1 = 6.34/10, from real 2017/
+  2022 Census CBP data across all 5 components (23,617 real
+  establishments in the 10-99 employee HVAC band, a real 2.25% five-year
+  establishment CAGR, a real 71.2% under-100-employee employment share,
+  real ~$1.73M average payroll per establishment, and a real 21.5%
+  target-band share), every evidence_reference traceable to an exact
+  Census query, all 9 raw responses persisted under outputs/runs/
+  (gitignored).
+  While writing the offline test suite, the pinned Gitleaks scan flagged
+  a finding for the first time this session. Investigated properly
+  rather than reflexively suppressing it: reran gitleaks manually with a
+  JSON report (no secret values printed) and confirmed it was the
+  generic-api-key heuristic matching the literal text
+  "CENSUS_API_KEY_ENV, CensusM1Executor" on one combined Python import
+  line in the new test file -- two identifiers, not a credential. Fixed
+  by splitting the import (import the module and reference
+  census_m1.CENSUS_API_KEY_ENV, rather than importing the two names
+  together) so the coincidental token adjacency disappears, instead of
+  adding an allowlist entry to .gitleaks.toml -- deliberately keeping the
+  scan exactly as strict for every future file as it was before.
+Files:
+  apps/api/src/mask_api/research_runner/executors/{__init__.py,
+  census_m1.py} (new module); apps/api/tests/research_runner/executors/
+  test_census_m1.py (new); scripts/run_census_m1.py (new, one-off proof
+  driver, not a permanent CLI entry point); docs/AUTONOMOUS_RESEARCH_MODE
+  .md; README.md; progress.txt.
+Verification:
+  New focused suite PASS: 5 tests (missing-API-key short-circuit before
+  any network call; a full complete-status score with exact-value
+  assertions for every component computed against hand-verified fixture
+  math, not just structural checks; the exact 9-request band-fetch count
+  and 9 persisted raw artifacts; an unmatched-company-band case returning
+  UNKNOWN with no network call; and a transport-error-to-FAILED mapping).
+  Full offline suite PASS: 701 (was 696), 33 integration tests deselected
+  (unchanged) -- confirmed via the project's actual root-scoped `pnpm run
+  test:unit`. Ruff check/format PASS over 354 files; strict mypy PASS
+  over 189 source files (`apps/api/src` and `workers`). Architecture/
+  import-cycle check PASS (confirms the new research_runner/executors/
+  subpackage does not violate any layer boundary). `research:schemas
+  :check` PASS with no drift. Local secret guard PASS; pinned Gitleaks
+  source scan PASS after the import-line fix above (reran manually with
+  a JSON report to confirm the finding was resolved, then reran the
+  normal scan-secrets.ps1 gate clean). Node.js/pnpm confirm the full web
+  suite (11 tests), web lint, and web typecheck all PASS unaffected.
+  `pnpm check:progress` PASS at 31/172 (unchanged -- this is proof work
+  inside the existing A17.5 checkpoint, not a new checkpoint).
+Limitations/blockers:
+  CensusM1Executor is not registered with the ResearchRunner CLI's
+  executors= list yet -- running it today requires the one-off driver
+  script, not `research_runner run`. It covers only M1 and only when
+  MASK_CENSUS_API_KEY is configured; the other 8 methods still have no
+  executor. The company-band-to-Census-EMPSZES-band mapping only works
+  when the market's employee band aligns exactly with Census's discrete
+  size classes (10-19/20-49/50-99/etc.); a band that straddles a class
+  boundary (e.g. 15-30 employees) correctly returns UNKNOWN rather than
+  approximating, which is honest but means not every possible market
+  configuration can get a real M1 score from this executor as written.
+Next:
+  Register CensusM1Executor with the ResearchRunner CLI so `research_runner
+  run configs/markets/us_hvac_10_99.yaml --methods M1` produces this same
+  real result through the normal command, not just the proof script.
+  Then continue A17.5 with the provider-independent source/evidence
+  fallback registry (Tier A-E quality classes) and additional
+  MethodExecutor implementations for the other real sources now proven
+  live (YouTube into M2/M3, USAspending/SAM.gov into M4/M5, O*NET into
+  M3) -- building toward the first real, multi-method, source-backed
+  calibration market report at $0 paid-data cost.
+
 2026-09-11 20:20 PKT (UTC+05:00) | AUTONOMOUS-032 | A17.5 | IN_PROGRESS
 Work:
   Owner directive: "start data ingestion through all working sources
