@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 20:45 PKT (UTC+05:00)
+Last updated: 2026-09-14 21:00 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,53 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 21:00 PKT (UTC+05:00) | AUTONOMOUS-040 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Built scripts/run_m4_us_hvac_10_99.py (a one-off driver, matching
+  run_census_m1.py's proof-of-real-wiring pattern; M4 has no
+  MethodExecutor yet) and ran real M4 for us_hvac_10_99. Computed
+  mean_m2_purchase_intent_0_4 as a real SourcedMetric: the mean of the
+  2 real purchase_intent_0_4 values found among AUTONOMOUS-039's 9 real
+  M2 mentions (value 1.50), with its MetricProvenance.evidence_reference
+  explicitly stating the thin sample (n=2 of 9 mentions, 600 candidate
+  comments) so it is never read as a robust estimate. The other three
+  required M4 components (annual_problem_cost_usd,
+  annual_existing_paid_spend_usd, verified_paid_workaround_share) have
+  no real sourced evidence yet and were left None -- no BLS wage data,
+  Census payroll data, competitor pricing, or workaround-penetration
+  survey/directory evidence has been gathered for this specific
+  economic question. calculate_m4() was called unmodified with these
+  real inputs. Real, honest result: status=UNKNOWN, score=None,
+  unknown_reasons=["m4.required_component_missing"]; breakdown shows
+  commercial_intent=AVAILABLE (raw_value=1.50) and the other three
+  components MISSING. This is a real, valid M4 finding for Stage A, not
+  a blocker to be worked around.
+Files:
+  scripts/run_m4_us_hvac_10_99.py; progress.txt. (m4_result.json is
+  gitignored outputs/runs/ output.)
+Verification:
+  Ruff check/format and strict mypy PASS on the new script. Ran live
+  against the real AUTONOMOUS-039 M2 extraction output; printed
+  breakdown matches the expectation exactly (1 available component, 3
+  missing, UNKNOWN status). calculate_m4/M4Inputs/SourcedMetric were not
+  modified this entry, only exercised with real data.
+Limitations/blockers:
+  Real M4 will stay UNKNOWN until real annual_problem_cost_usd/
+  annual_existing_paid_spend_usd/verified_paid_workaround_share evidence
+  is sourced -- plausible real sources not yet attempted: BLS OEWS wages
+  for a relevant occupation (to cost real documented time-loss pain in
+  dollars), Common Crawl-retrieved competitor/vendor pricing pages (for
+  existing paid spend), and directory/association/Census-based estimates
+  of how many businesses already pay for a workaround. This is real,
+  additional evidence-gathering work, not a calculation change.
+Next:
+  Owner directive was "continue with M2 and M4"; both have now produced
+  real, honest results (M2 UNKNOWN/9 mentions, M4 UNKNOWN/1 of 4
+  components available) worth a checkpoint report to the owner before
+  continuing deeper into M4's remaining components or moving to
+  M3/M5/M6/M7/M9 real evidence gathering per the finalized 76-section
+  directive.
+
 2026-09-14 20:45 PKT (UTC+05:00) | AUTONOMOUS-039 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Ran the full real scripts/extract_m2_pain_us_hvac_10_99.py over all 600
