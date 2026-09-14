@@ -27,6 +27,7 @@ from mask_api.modules.official_data.requests import (  # noqa: E402
     bls_request,
     census_cbp_request,
     sam_opportunities_request,
+    sec_submissions_request,
     usaspending_award_search_request,
 )
 from mask_api.modules.official_data.transport import (  # noqa: E402
@@ -52,6 +53,10 @@ RUN_ID = f"ingest_us_hvac_10_99_{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
 OUT_DIR = ROOT / "outputs" / "runs" / RUN_ID / "raw"
 NAICS = 238220
 CONTACT_USER_AGENT = "MASK-AI-Market-Research/0.1"
+# Comfort Systems USA Inc (NYSE: FIX), a real publicly traded HVAC/mechanical
+# services company -- verified against SEC's own company_tickers.json and
+# submissions endpoint before use, not guessed.
+SEC_EDGAR_SAMPLE_CIK = 1035983
 
 
 def _load_env_file(path: Path) -> None:
@@ -181,14 +186,32 @@ def main() -> None:
         )
     )
 
-    # --- SEC EDGAR: skipped -- no contact email configured ---
-    results.append(
-        (
-            "sec_edgar",
-            "SKIPPED",
-            "MASK_OFFICIAL_CONTACT_EMAIL not configured (required in User-Agent)",
-        )
-    )
+    # --- SEC EDGAR: filing metadata for one real, verified HVAC-industry company ---
+    contact_email = _env("MASK_OFFICIAL_CONTACT_EMAIL")
+    if contact_email:
+        try:
+            sec_adapter = OfficialApiAdapter(
+                "sec_edgar",
+                _official_source(profile.sources, "sec_edgar"),
+                OfficialApiSettings(enabled=True, policy_approved=True),
+                official_transport,
+                user_agent=f"{CONTACT_USER_AGENT} ({contact_email})",
+            )
+            request = sec_submissions_request(cik=SEC_EDGAR_SAMPLE_CIK)
+            result = sec_adapter.fetch(request, ledger)
+            _write_raw(
+                "sec_edgar",
+                {
+                    "cik": SEC_EDGAR_SAMPLE_CIK,
+                    "company": "Comfort Systems USA Inc (NYSE: FIX)",
+                    "records": [rec.model_dump(mode="json") for rec in result.batch.records],
+                },
+            )
+            results.append(("sec_edgar", "OK", f"{len(result.batch.records)} filings"))
+        except OfficialTransportError as error:
+            results.append(("sec_edgar", "FAILED", error.code))
+    else:
+        results.append(("sec_edgar", "SKIPPED", "MASK_OFFICIAL_CONTACT_EMAIL not configured"))
 
     # --- SAM.gov: recent procurement opportunities for NAICS 238220 ---
     sam_key = _env("MASK_SAM_API_KEY")

@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-11 23:50 PKT (UTC+05:00)
+Last updated: 2026-09-14 13:44 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -41,11 +41,15 @@ directive, non-Gemini sources) was run against the us_hvac_10_99 sample
 market via scripts/ingest_us_hvac_10_99.py and got real data back from
 Census CBP (23,617 real establishments in the 10-99 employee band),
 BLS, SAM.gov, USAspending, YouTube search, and (separately) O*NET
-(30 real HVAC task statements for O*NET-SOC 49-9021.00); BEA/SEC/Common
-Crawl were explicitly skipped for this market with documented reasons
-(no target region, no contact email configured, no approved source
-policy for an HVAC URL). This is raw evidence ingestion only -- no
-MethodExecutor wiring existed yet at that point, so nothing was scored.
+(30 real HVAC task statements for O*NET-SOC 49-9021.00). Owner then
+supplied a real contact email (MASK_OFFICIAL_CONTACT_EMAIL); SEC EDGAR
+was wired in for real (a verified CIK for Comfort Systems USA Inc,
+NYSE: FIX -- SEC serves named-company filings, not a NAICS search) and
+now also returns real data (1,000 filing records) -- see AUTONOMOUS-034.
+BEA Regional and Common Crawl remain explicitly skipped for this market,
+pending the owner's choice of a target region and a specific pre-
+approved HVAC URL respectively. This is raw evidence ingestion only --
+no MethodExecutor wiring existed yet at that point, so nothing was scored.
 MILESTONE: mask_api.research_runner.executors.CensusM1Executor is now the
 first real MethodExecutor implementation (MethodExecutor has had zero
 implementations since it was defined at A12). It wires the existing
@@ -163,8 +167,9 @@ Ruff/format over 354 files, strict mypy over 189 source files
 configuration/OpenAPI schema drift PASS (no new schema needed); local
 secret guard and current Gitleaks source scan PASS after fixing one
 false-positive finding (the generic-api-key heuristic matched the literal
-text "CENSUS_API_KEY_ENV, CensusM1Executor" on one combined import line in
-the new test file -- confirmed via a manual gitleaks run with a JSON
+text of two adjacent Python identifiers -- a CENSUS_API_KEY env-var name
+constant next to the CensusM1Executor class name -- on one combined import
+line in the new test file -- confirmed via a manual gitleaks run with a JSON
 report that it was two Python identifiers, not a credential; fixed by
 splitting the import rather than touching .gitleaks.toml's allowlist, so
 the scan gate itself stays exactly as strict for everyone). Node.js/pnpm
@@ -2540,6 +2545,54 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 13:44 PKT (UTC+05:00) | AUTONOMOUS-034 | A17.5 | IN_PROGRESS
+Work:
+  Owner supplied a real contact email (added to .env.official.local as
+  MASK_OFFICIAL_CONTACT_EMAIL) to unblock SEC EDGAR, which the ingestion
+  script had hardcoded as unconditionally SKIPPED. Wired it in for real:
+  SEC EDGAR needs one specific company's CIK (it serves named-company
+  filing metadata, not a NAICS-wide search), so a real HVAC-industry
+  public company was identified and verified against SEC's own
+  company_tickers.json and submissions endpoint before use -- Comfort
+  Systems USA Inc (NYSE: FIX), CIK 1035983 -- rather than guessing a CIK.
+  Added sec_submissions_request/OfficialApiAdapter wiring to
+  scripts/ingest_us_hvac_10_99.py matching the existing working pattern
+  for the other sources, with the SEC-required contact email embedded in
+  the User-Agent (OfficialApiAdapter._require_enabled enforces an email
+  pattern in the user_agent string for SEC specifically). Ran live:
+  1,000 real filing records returned for Comfort Systems USA, persisted
+  to outputs/runs/ingest_us_hvac_10_99_<timestamp>/raw/sec_edgar.json.
+  BEA Regional (needs a target region the market config does not define)
+  and Common Crawl (needs one specific pre-approved HVAC URL, not a
+  search) remain the two intentionally-skipped sources in this script,
+  pending owner input on a target region and a target URL respectively --
+  unchanged from AUTONOMOUS-033, not attempted in this entry.
+Files:
+  .env.official.local (added MASK_OFFICIAL_CONTACT_EMAIL; not committed,
+  gitignored, no value ever printed in chat); scripts/ingest_us_hvac_10_99
+  .py; progress.txt.
+Verification:
+  Ran scripts/ingest_us_hvac_10_99.py live twice after the change (once
+  before, once after ruff format); both runs returned sec_edgar OK with
+  1000 filings, all other previously-working sources (census_cbp, bls,
+  sam_gov, usaspending, youtube_search) unaffected and still OK. Ruff
+  check/format PASS on the changed script. No new Python module was
+  added, so the offline pytest/mypy counts are unchanged from
+  AUTONOMOUS-033 (this is a one-off ingestion script, not part of the
+  tested `mask_api` package).
+Limitations/blockers:
+  BEA Regional and Common Crawl remain skipped pending the owner's target
+  region and target URL choices.
+Next:
+  Once the owner supplies a target region, add it to
+  configs/markets/us_hvac_10_99.yaml's geography.regions and wire BEA
+  Regional into the script the same way. Once the owner supplies a real,
+  specific HVAC-industry URL, register a SourcePolicy for it and wire
+  Common Crawl's find_capture()/fetch_resource() into the script. Then
+  continue A17.5 with the provider-independent source/evidence fallback
+  registry and further MethodExecutor implementations beyond the first
+  (CensusM1Executor).
+
 2026-09-11 23:50 PKT (UTC+05:00) | AUTONOMOUS-033 | A17.5 | IN_PROGRESS
 Work:
   Owner directive: "move onwards." Following the owner's own audit
@@ -2603,8 +2656,9 @@ Work:
   a finding for the first time this session. Investigated properly
   rather than reflexively suppressing it: reran gitleaks manually with a
   JSON report (no secret values printed) and confirmed it was the
-  generic-api-key heuristic matching the literal text
-  "CENSUS_API_KEY_ENV, CensusM1Executor" on one combined Python import
+  generic-api-key heuristic matching the literal text of two adjacent
+  Python identifiers (a Census env-var name constant next to the
+  CensusM1Executor class name) on one combined import
   line in the new test file -- two identifiers, not a credential. Fixed
   by splitting the import (import the module and reference
   census_m1.CENSUS_API_KEY_ENV, rather than importing the two names
