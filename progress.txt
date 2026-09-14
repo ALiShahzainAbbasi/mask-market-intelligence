@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 13:44 PKT (UTC+05:00)
+Last updated: 2026-09-14 20:10 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,86 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 20:10 PKT (UTC+05:00) | AUTONOMOUS-038 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Built scripts/extract_m2_pain_us_hvac_10_99.py to run real Gemini
+  COMMERCIAL_PAIN_V1 extraction over the 1,409 collected YouTube comments
+  (granularity: one real comment = one document = one Gemini call, kept
+  from AUTONOMOUS-037's reasoning, since GroundedPainContext.persona is a
+  single required field per document; EvidencePersona.UNKNOWN used for
+  every real anonymous commenter -- an explicit honest gap, not a guess;
+  >=100-character comments only, 600 of 1,409, a documented practicality
+  cutoff, not a silent drop). Reused ArtifactAnalysisCache/
+  ArtifactEmbeddingCache/LocalArtifactStore/PainIntelligenceService
+  exactly as already built and tested, not reimplemented.
+  The first real call hit real, load-bearing bugs in the Gemini
+  structured-output integration (mask_api.modules.analysis.gemini),
+  never exercised live before this session: (1) Gemini's responseSchema
+  dialect rejects `const` (pydantic's Literal[True] encoding for
+  commercial-pain-v1's pain_present) with HTTP 400; (2) it also rejects
+  `anyOf`-as-nullable (pydantic's X|None encoding, used by every optional
+  field under OpenAI-strict-mode's all-fields-required convention) and
+  undocumented `pattern`/`minLength`/`maxLength`; (3) most seriously, it
+  rejects -- with a bare, field-agnostic "Request contains an invalid
+  argument" -- any array whose item schema is an object that itself has
+  an array-typed property (commercial-pain-v1's real shape: records is
+  array<object> and each record has 3 array fields), and this held
+  across two different real models (gemini-flash-lite-latest,
+  gemini-3.5-flash-lite) and was independent of required/
+  propertyOrdering/numeric bounds -- all live-verified via a real,
+  isolated bisection script, not guessed. Given (3) is undocumented,
+  opaque, and reproduced even for minimal made-up schemas with certain
+  field-name/count combinations (e.g. exactly pain_present+pain_category
+  +pain_subcategory plus any 4th field), relying on Gemini's
+  responseSchema for real correctness was judged unsafe. Replaced it:
+  responseSchema is now a trivial one-string-field envelope
+  ({"result_json": string}); the real target JSON Schema is given to the
+  model as descriptive prompt text instead, and the model's real
+  response is decoded (json.loads twice) and validated against the exact
+  same pydantic output model as before -- so correctness is enforced
+  exactly as strictly as the original design intended, only the
+  unreliable third-party constrained-decoding step was removed. Verified
+  live end-to-end with a real HVAC-pain comment: correct pain_category,
+  pain_subcategory, a real extracted $2,000/month financial value with
+  its evidence_span, confidence 0.98. Then ran real smoke batches (5,
+  then 30 real comments) through the full pipeline (Gemini extract -> A10
+  validate_grounding -> mentions_from_grounding); all real calls
+  completed and were grounding-ACCEPTED; the 30-sample genuinely
+  contained 0 stated commercial pain (spot-checked several by hand: two
+  were off-topic EV/car comments pulled in by query overlap, one was
+  vendor marketing copy, one was unrelated praise) -- correct, honest
+  zero-record behavior, not a pipeline bug. A full real run over all 600
+  candidate comments was then launched.
+Files:
+  apps/api/src/mask_api/modules/analysis/gemini.py;
+  apps/api/tests/analysis/{test_gemini.py,
+  fixtures/gemini_relevance_completed.json};
+  scripts/extract_m2_pain_us_hvac_10_99.py; progress.txt.
+Verification:
+  tests/analysis/test_gemini.py focused suite PASS: 13 (rewritten for the
+  envelope response shape; a new test replaces the retired
+  to_gemini_schema-drops-unsupported-keys test and instead asserts
+  responseSchema is the trivial envelope and the real schema appears in
+  the prompt text). Full offline suite PASS: 710, 1 pre-existing failure
+  unrelated to this change (tests/test_api.py::
+  test_development_routes_require_secret, last touched by an earlier
+  commit, confirmed via git log before this session's edits). Ruff
+  check/format and strict mypy PASS on every changed file. Multiple real,
+  live Gemini calls verified the fix (isolated bisection scripts, a
+  crafted real-pain comment, then 5- and 30-real-comment batches); the
+  full 600-comment run's real result is not yet recorded here -- see the
+  next entry.
+Limitations/blockers:
+  The full 600-comment run had not finished at the time this entry was
+  written. Real M4 (economic pain) work is blocked on a real M2Result
+  existing first, since mean_m2_purchase_intent_0_4 is one of M4's four
+  required components.
+Next:
+  Record the full 600-comment run's real results (pain mention count,
+  grounding disposition breakdown, M2Result status/score/confidence) in
+  the next history entry, then compute real M4 using the real M2 mentions
+  plus whatever other real economic evidence can be honestly sourced.
+
 2026-09-14 19:30 PKT (UTC+05:00) | AUTONOMOUS-037 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Collected real M2 evidence: scripts/collect_youtube_pain_evidence_us_

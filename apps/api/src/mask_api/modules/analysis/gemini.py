@@ -49,7 +49,6 @@ Copy exact source spans for material claims and preserve contradictory evidence.
 Return only the structured output required by the supplied JSON Schema.
 Never calculate market scores, method scores, confidence indices, gates, or rankings."""
 
-_UNSUPPORTED_SCHEMA_KEYS = frozenset({"additionalProperties", "$defs", "title"})
 
 
 class GeminiError(RuntimeError):
@@ -176,39 +175,49 @@ def _read_fully(response: Any, max_bytes: int) -> bytes:
     return b"".join(chunks)
 
 
-def to_gemini_schema(schema: dict[str, Any]) -> dict[str, Any]:
-    """Inline `$ref`/`$defs` and drop keys Gemini's schema dialect rejects.
+_RESULT_ENVELOPE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {"result_json": {"type": "string"}},
+    "required": ["result_json"],
+}
 
-    Gemini's `responseSchema` is a restricted OpenAPI-3.0-like subset: it
-    understands `type`/`properties`/`required`/`items`/`enum`/`description`/
-    `nullable`, but not `$ref`, `$defs`, or `additionalProperties`. This does
-    not weaken validation of required fields, types, or enums -- only the
-    "no extra properties" guarantee OpenAI's strict mode adds is unavailable
-    here, a documented, accepted provider difference.
+
+def _schema_instructions(request: AnalysisRequest) -> str:
+    """Describe the required output shape as prompt text rather than `responseSchema`.
+
+    Verified live against the real API, across two different real models
+    (`gemini-flash-lite-latest` and `gemini-3.5-flash-lite`): Gemini's
+    structured-output `responseSchema` validator rejects a materially
+    unmodified `commercial-pain-v1` schema with a bare HTTP 400 "Request
+    contains an invalid argument" and no field-level detail. Extensive live
+    bisection ruled out every documented cause -- `$ref`/`$defs`/
+    `additionalProperties` (already stripped), `const`, `anyOf`-as-nullable,
+    `pattern`/`minLength`/`maxLength`, arrays nested inside an array's item
+    object, `required`, `propertyOrdering`, numeric bounds -- and landed on
+    an undocumented, opaque rejection tied to specific property-name/count
+    combinations that is not reproducible from any published constraint
+    (e.g. the exact field trio `pain_present`+`pain_category`+
+    `pain_subcategory` plus *any* fourth field fails outright, while
+    swapping out any one of those three field names alone fixes it).
+
+    Rather than chase an undocumented validator, `responseSchema` is kept
+    to a trivial, always-safe one-string-field envelope, and the real
+    target schema is instead given to the model as descriptive text with
+    an explicit instruction to return matching JSON, encoded as a string,
+    inside that one field. `parse_generate_content_result` decodes and
+    validates it against the same real pydantic output model afterward, so
+    correctness is enforced exactly as strictly as before -- only the
+    unreliable third-party constrained-decoding step is removed.
     """
-    defs = cast(dict[str, Any], schema.get("$defs", {}))
-    resolved = _resolve_schema(schema, defs)
-    if not isinstance(resolved, dict):
-        raise GeminiError("gemini.schema_invalid")
-    return resolved
-
-
-def _resolve_schema(node: object, defs: dict[str, Any]) -> object:
-    if isinstance(node, dict):
-        if "$ref" in node:
-            ref = cast(str, node["$ref"])
-            name = ref.rsplit("/", 1)[-1]
-            if name not in defs:
-                raise GeminiError("gemini.schema_invalid")
-            return _resolve_schema(defs[name], defs)
-        return {
-            key: _resolve_schema(value, defs)
-            for key, value in node.items()
-            if key not in _UNSUPPORTED_SCHEMA_KEYS
-        }
-    if isinstance(node, list):
-        return [_resolve_schema(item, defs) for item in node]
-    return node
+    schema_text = json.dumps(strict_json_schema(request.schema_id), indent=2, sort_keys=True)
+    return (
+        f"{_EXTRACTION_INSTRUCTIONS}\n\n"
+        "Populate the `result_json` field of your JSON response with a single "
+        "JSON-encoded string. That string, once parsed on its own, must be a JSON "
+        "value that exactly matches the following JSON Schema (correct field "
+        "names, correct types, every required field present):\n"
+        f"{schema_text}"
+    )
 
 
 def build_generate_content_payload(request: AnalysisRequest) -> dict[str, JsonValue]:
@@ -223,13 +232,12 @@ def build_generate_content_payload(request: AnalysisRequest) -> dict[str, JsonVa
         ensure_ascii=False,
         separators=(",", ":"),
     )
-    schema = cast(JsonValue, to_gemini_schema(strict_json_schema(request.schema_id)))
     return {
         "contents": [{"role": "user", "parts": [{"text": source_payload}]}],
-        "systemInstruction": {"parts": [{"text": _EXTRACTION_INSTRUCTIONS}]},
+        "systemInstruction": {"parts": [{"text": _schema_instructions(request)}]},
         "generationConfig": {
             "responseMimeType": "application/json",
-            "responseSchema": schema,
+            "responseSchema": cast(JsonValue, _RESULT_ENVELOPE_SCHEMA),
             "maxOutputTokens": request.model_policy.max_output_tokens,
             "temperature": 0,
         },
@@ -319,7 +327,11 @@ def parse_generate_content_result(
         output_text = _output_text(candidate)
         if output_text is None:
             raise GeminiError("gemini.output_text_missing")
-        validated = output_model_for(request.schema_id).model_validate_json(output_text)
+        envelope = json.loads(output_text)
+        if not isinstance(envelope, dict) or not isinstance(envelope.get("result_json"), str):
+            raise GeminiError("gemini.response_invalid")
+        output_json = json.loads(envelope["result_json"])
+        validated = output_model_for(request.schema_id).model_validate(output_json)
         structured = cast(dict[str, JsonValue], validated.model_dump(mode="json"))
         return _result(
             body,

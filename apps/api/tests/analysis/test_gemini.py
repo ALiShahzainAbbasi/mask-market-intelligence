@@ -22,7 +22,6 @@ from mask_api.modules.analysis.gemini import (
     GeminiTransportResponse,
     build_generate_content_payload,
     parse_generate_content_result,
-    to_gemini_schema,
 )
 from mask_api.modules.analysis.schemas import strict_json_schema
 from mask_api.research_runner.budgets import BudgetLedger, RunBudgetLimits
@@ -103,15 +102,33 @@ def enabled_settings(**changes: object) -> GeminiSettings:
     return GeminiSettings(**values)  # type: ignore[arg-type]
 
 
-def test_gemini_schema_inlines_refs_and_drops_unsupported_keys() -> None:
-    schema = strict_json_schema(AnalysisSchemaId.COMMERCIAL_PAIN_V1)
-    assert "$defs" in schema
+def test_response_schema_is_a_trivial_envelope_with_the_real_schema_in_prompt_text() -> None:
+    # Gemini's `responseSchema` structured-decoding validator was verified
+    # live, across two real models, to reject a materially unmodified
+    # commercial-pain-v1 schema (and even much simpler schemas sharing its
+    # field names) with an undocumented, unexplained HTTP 400 -- see
+    # `_schema_instructions`'s docstring for the full live investigation.
+    # `responseSchema` is kept to an always-safe one-string-field envelope;
+    # the real schema is instead given to the model as prompt text, and
+    # `parse_generate_content_result` decodes+validates the model's real
+    # response against it exactly as strictly as before.
+    pain_request = request(
+        analysis_type=AnalysisType.COMMERCIAL_PAIN,
+        schema_id=AnalysisSchemaId.COMMERCIAL_PAIN_V1,
+    )
+    payload = build_generate_content_payload(pain_request)
 
-    resolved = to_gemini_schema(schema)
-
-    assert "$defs" not in resolved
-    assert "$ref" not in json.dumps(resolved)
-    assert "additionalProperties" not in json.dumps(resolved)
+    assert payload["generationConfig"]["responseSchema"] == {
+        "type": "object",
+        "properties": {"result_json": {"type": "string"}},
+        "required": ["result_json"],
+    }
+    system_text = payload["systemInstruction"]["parts"][0]["text"]
+    embedded_schema = json.dumps(
+        strict_json_schema(AnalysisSchemaId.COMMERCIAL_PAIN_V1), indent=2, sort_keys=True
+    )
+    assert embedded_schema in system_text
+    assert "result_json" in system_text
 
 
 def test_payload_is_stateless_tool_free_and_separates_untrusted_text() -> None:
@@ -163,18 +180,20 @@ def test_parser_folds_thinking_tokens_into_output_and_keeps_totals_consistent() 
     # promptTokenCount + candidatesTokenCount. AnalysisUsage requires
     # input+output==total, so thinking tokens must be folded into output
     # (Google bills them at the output rate) rather than trusted blindly.
+    inner_text = json.dumps(
+        {
+            "label": "relevant",
+            "reasons": ["r"],
+            "evidence_spans": ["dispatch delays"],
+            "confidence": 0.9,
+        }
+    )
     body = json.dumps(
         {
             "candidates": [
                 {
                     "content": {
-                        "parts": [
-                            {
-                                "text": '{"label":"relevant",'
-                                '"reasons":["r"],"evidence_spans":["dispatch delays"],'
-                                '"confidence":0.9}'
-                            }
-                        ]
+                        "parts": [{"text": json.dumps({"result_json": inner_text})}]
                     },
                     "finishReason": "STOP",
                 }
@@ -208,40 +227,37 @@ def test_parser_folds_thinking_tokens_into_output_and_keeps_totals_consistent() 
 
 
 def test_null_optional_fields_stay_unknown_rather_than_invented() -> None:
+    inner_text = json.dumps(
+        {
+            "records": [
+                {
+                    "pain_present": True,
+                    "pain_category": None,
+                    "pain_subcategory": None,
+                    "pain_description": "Dispatch delays",
+                    "sentiment": -1,
+                    "severity_1_10": None,
+                    "urgency_1_10": None,
+                    "economic_impact_types": [],
+                    "economic_impact_1_10": None,
+                    "purchase_intent_0_4": None,
+                    "existing_workaround": None,
+                    "solution_dissatisfaction_1_10": None,
+                    "ai_suitability_1_10": None,
+                    "software_mentioned": [],
+                    "financial_value_mentioned": [],
+                    "evidence_span": "dispatch delays cost hours",
+                    "confidence": 0.6,
+                }
+            ]
+        }
+    )
     body = json.dumps(
         {
             "candidates": [
                 {
                     "content": {
-                        "parts": [
-                            {
-                                "text": json.dumps(
-                                    {
-                                        "records": [
-                                            {
-                                                "pain_present": True,
-                                                "pain_category": None,
-                                                "pain_subcategory": None,
-                                                "pain_description": "Dispatch delays",
-                                                "sentiment": -1,
-                                                "severity_1_10": None,
-                                                "urgency_1_10": None,
-                                                "economic_impact_types": [],
-                                                "economic_impact_1_10": None,
-                                                "purchase_intent_0_4": None,
-                                                "existing_workaround": None,
-                                                "solution_dissatisfaction_1_10": None,
-                                                "ai_suitability_1_10": None,
-                                                "software_mentioned": [],
-                                                "financial_value_mentioned": [],
-                                                "evidence_span": "dispatch delays cost hours",
-                                                "confidence": 0.6,
-                                            }
-                                        ]
-                                    }
-                                )
-                            }
-                        ]
+                        "parts": [{"text": json.dumps({"result_json": inner_text})}]
                     },
                     "finishReason": "STOP",
                 }

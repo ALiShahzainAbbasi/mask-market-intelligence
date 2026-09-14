@@ -5,7 +5,7 @@
         "role": "model",
         "parts": [
           {
-            "text": "{\"label\":\"relevant\",\"reasons\":[\"The source describes dispatch delays.\"],\"evidence_spans\":[\"dispatch delays cost us hours every week\"],\"confidence\":0.91}"
+            "text": "{\"result_json\":\"{\\\"label\\\":\\\"relevant\\\",\\\"reasons\\\":[\\\"The source describes dispatch delays.\\\"],\\\"evidence_spans\\\":[\\\"dispatch delays cost us hours every week\\\"],\\\"confidence\\\":0.91}\"}"
           }
         ]
       },
