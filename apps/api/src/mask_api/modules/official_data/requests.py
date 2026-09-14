@@ -49,7 +49,11 @@ def census_cbp_request(
         raise ValueError("NAICS must contain two to six digits")
     if not re.fullmatch(r"[0-9]{3}", employment_size):
         raise ValueError("employment size must be a three-digit Census code")
-    if not re.fullmatch(r"(?:us|state|county):[0-9*]{1,3}", geography):
+    if not re.fullmatch(
+        r"(?:us|state|county"
+        r"|metropolitan statistical area/micropolitan statistical area):[0-9*]{1,3}",
+        geography,
+    ):
         raise ValueError("unsupported Census geography")
     return OfficialRequest(
         source_id=OfficialSourceId.CENSUS_CBP,

@@ -35,6 +35,18 @@ def test_census_request_pins_dataset_vintage_and_redacts_key_from_provenance() -
     assert "fixture-not-a-real-key" not in provenance.model_dump_json()
 
 
+def test_census_request_accepts_the_cbsa_metro_geography_level() -> None:
+    request = census_cbp_request(
+        year=2023,
+        naics=238220,
+        employment_size="242",
+        geography="metropolitan statistical area/micropolitan statistical area:*",
+        api_key=KEY,
+    )
+
+    assert request.query["for"] == "metropolitan statistical area/micropolitan statistical area:*"
+
+
 def test_bls_unregistered_and_registered_limits_are_explicit() -> None:
     unregistered = bls_request(
         series_ids=("CES2023800001",),
