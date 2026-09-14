@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-15 00:15 PKT (UTC+05:00)
+Last updated: 2026-09-15 00:35 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,59 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 00:35 PKT (UTC+05:00) | AUTONOMOUS-045 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner: "the doc only has census data i want the data from all the
+  sources combined." Re-ran scripts/ingest_us_hvac_10_99.py fresh (none
+  of its sources touch the exhausted Gemini quota) to get current real
+  data from every other already-wired official/YouTube source for this
+  market: BLS (36 real monthly Specialty Trade Contractors employment
+  observations, series CES2023800001), SEC EDGAR (1,000 real filings for
+  Comfort Systems USA Inc, NYSE: FIX, CIK 1035983, with a real form-type
+  breakdown), SAM.gov (25 real federal procurement opportunities, NAICS
+  238220), USAspending (25 real federal contract awards, NAICS 238220,
+  $642,710,097.93 combined, 2015-2026, top-5 real awards listed),
+  YouTube search (15 real videos for "HVAC dispatch software",
+  independently naming real competitors Jobber/Housecall Pro/FieldEdge
+  -- corroborating AUTONOMOUS-043's M5 finding from a completely
+  separate real evidence pass). BEA Regional and Common Crawl again
+  correctly SKIPPED with their real, specific reasons (no region
+  selected; no policy-reviewed target URL).
+  Extended (not replaced) outputs/reports/
+  M1_Source_and_Methodology_us_hvac_10_99.docx with a new "Part B" -- a
+  combined source register table plus one real section per source
+  (BLS/SEC EDGAR/SAM.gov/USAspending/YouTube) and a skipped-sources
+  section -- while adding an explicit "Part A" framing note that M1's
+  approved v1 formula is deliberately Census-only (shared geography/
+  population), so Part B is real supporting market context, not a
+  silent change to the approved M1 methodology or the 6.34 score.
+  Delivered the updated file to the owner.
+Files:
+  outputs/reports/M1_Source_and_Methodology_us_hvac_10_99.docx;
+  progress.txt.
+Verification:
+  Re-extracted and read back the full document text after rebuilding
+  (same method as AUTONOMOUS-044) -- confirmed all new Part B content
+  present, correctly worded, and every real figure (award totals, form-
+  type counts, series IDs) matches the fresh live ingestion run's raw
+  JSON output exactly. Same visual/PDF QA limitation as AUTONOMOUS-044
+  (no LibreOffice in this Windows sandbox) still applies and is noted to
+  the owner again.
+Limitations/blockers:
+  Real Gemini free-tier quota was re-tested twice more this session
+  (once by the owner's explicit single-call check, once again just
+  before this entry) and is still exhausted (RESOURCE_EXHAUSTED,
+  "limit: 500"); the owner dismissed the resulting AskUserQuestion both
+  times without choosing an option, i.e. explicitly declined to decide
+  right now -- no further Gemini calls were made after either dismissal,
+  per direct owner instruction not to keep burning attempts against it.
+  M3/M9/full-M5 remain exactly where AUTONOMOUS-042/043 left them.
+Next:
+  Awaiting the owner's next instruction. The calendar date has since
+  rolled over to 2026-09-15, which may be relevant to whether the daily
+  Gemini quota has reset -- worth a fresh single-call check next time
+  Gemini-dependent work resumes, rather than assuming either way.
+
 2026-09-15 00:15 PKT (UTC+05:00) | AUTONOMOUS-044 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner asked to pause M9/further methods and instead requested "a
