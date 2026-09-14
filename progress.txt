@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 21:00 PKT (UTC+05:00)
+Last updated: 2026-09-14 21:30 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,76 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 21:30 PKT (UTC+05:00) | AUTONOMOUS-041 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner directive: "do the remaining [M4 components] then move forward."
+  Made a real, good-faith attempt to source the three M4 components left
+  UNKNOWN in AUTONOMOUS-040, rather than leaving them unattempted:
+  - annual_problem_cost_usd: found and live-verified a real BLS series,
+    CES2000000003 (Construction supersector, Average Hourly Earnings of
+    All Employees) -- $35.60/hr in 2023-M01, 36 real monthly
+    observations. (Several narrower NAICS-238000-specific wage-series
+    guesses, e.g. CES2023800003/007/030, were tried first and correctly
+    rejected by the live BLS API -- that industry level does not publish
+    AHE, only the employment series already used for M1.) This real
+    wage figure alone cannot honestly become annual_problem_cost_usd:
+    doing so needs a real hours-lost-per-week (or similar) quantity to
+    multiply it by, and none of the 9 real M2 mentions state one --
+    every real financial_value_mentioned field came back empty.
+    Multiplying a real wage by an invented hours figure would be exactly
+    the kind of fabrication the project's core doctrine forbids, so this
+    component stays UNKNOWN. The real wage figure itself is preserved
+    here (not discarded) as usable economic context for the dossier.
+  - annual_existing_paid_spend_usd: one of the 9 real M2 mentions names
+    a real, specific existing paid tool ("we use jobber now") -- a
+    genuine, real competitive-intelligence lead (see Next). Common
+    Crawl retrieval exists and is tested (mask_api.modules.
+    common_crawl_data), but per docs/SCRAPING_POLICY.md section 4,
+    dispatching it requires a reviewed, policy-compliant SourcePolicy
+    (terms/robots review, allowed path prefixes, etc.) for the specific
+    target -- getjobber.com's real pricing page -- which has not been
+    done. Fabricating a plausible-sounding SaaS price instead of doing
+    that review was rejected as exactly the kind of invented economic
+    value the project forbids. Stays UNKNOWN.
+  - verified_paid_workaround_share: no free, real source exists for
+    "what share of these businesses already pay for a workaround" short
+    of primary research (adjacent to M8, which the directive holds for
+    real behavioral evidence only). Stays UNKNOWN.
+  Real, final M4 result for this pass is unchanged from AUTONOMOUS-040:
+  status=UNKNOWN, 1 of 4 components (commercial_intent) available. This
+  is the honest ceiling of what free, already-collected, real evidence
+  supports for M4 right now -- not a shortcut, and not silently
+  abandoned either: every gap has a specific, real, named next action.
+Files:
+  progress.txt. (No source code changed this entry -- calculate_m4 and
+  its inputs were not touched; the BLS wage probe was a throwaway
+  diagnostic, not committed as a script, since it did not produce a
+  usable M4 input.)
+Verification:
+  Live BLS calls: CES2023800001 (already-verified employment series)
+  re-confirmed OK; CES2023800003/007/030 and CES3000000003 correctly
+  FAILED (invalid series at that industry-detail level); CES2000000003
+  (broader Construction supersector) OK with real data. No other code
+  changed, so no new test run was required.
+Limitations/blockers:
+  M4 remains UNKNOWN pending real evidence this pass could not honestly
+  source for free. The Jobber lead is real and specific enough to act
+  on directly, see Next.
+Next:
+  Move forward per owner directive. Two concrete options the Jobber
+  lead opens up for M5 (competitive intelligence) rather than M4:
+  Jobber is now a real, named, evidenced competitor/existing-workaround
+  entry (source: real M2 mention, evidence_span "we use jobber now and
+  thats the challenge"), which M5 explicitly wants ("all meaningful
+  alternatives... vertical SaaS"). Proceeding to real M3 (workflow/
+  bottleneck, via O*NET's already-imported real us_hvac task statements
+  plus BLS/job-posting/Gemini extraction) next per the directive's
+  stated M1-M9 ordering, then M5 (where the real Jobber evidence and any
+  further Common-Crawl-sourced competitor evidence will be used),
+  keeping the Common-Crawl-registration follow-up for
+  annual_existing_paid_spend_usd as an explicit, named open item rather
+  than silently dropped.
+
 2026-09-14 21:00 PKT (UTC+05:00) | AUTONOMOUS-040 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Built scripts/run_m4_us_hvac_10_99.py (a one-off driver, matching
