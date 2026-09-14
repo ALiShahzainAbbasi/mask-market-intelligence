@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-15 00:35 PKT (UTC+05:00)
+Last updated: 2026-09-15 01:10 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,69 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 01:10 PKT (UTC+05:00) | AUTONOMOUS-046 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner supplied the real capability registry that AUTONOMOUS-043 asked
+  for and was declined at the time: "MASK AI Capability Registry &
+  Delivery Fit Framework" v1.0 (Sept 2026), a real, leadership-authored
+  document covering 16 capability IDs with real PROVEN/DEMONSTRATED/
+  ADJACENT/LIMITED evidence levels, a real project evidence base
+  (Expert Buddy, SEC filings assistant, Mr Props, HydroHelp911, Google
+  Reviews automation, CRM/workflow engagements, commercial-glazing
+  workflow, this market-intelligence system itself), and the document's
+  own explicit section 10 rules for mapping it onto M9.
+  Built scripts/run_m9_us_hvac_10_99.py and ran real M9 for
+  us_hvac_10_99. technical_fit and integration_fit followed the
+  registry's own stated rules mechanically: 5 real capability
+  requirements drawn only from the automation/integration-addressable
+  subset of real M2 pain evidence (workflow automation, system
+  integration -- real "we use jobber now" evidence, voice/telephony --
+  real missed-call-revenue-loss evidence, CRM/revenue-ops, field-service
+  ops), all mapped to PROVEN/DEMONSTRATED registry capabilities
+  (CAP-01/02/04/07/08) -- technical_fit=10.0/10 (all 5 covered).
+  integration_fit used the one real, specifically-named currently-used
+  system (Jobber) with a deliberately conservative, explicitly-labeled
+  "thin estimate" prevalence (0.30) -- integration_fit=3.0/10.
+  The remaining five components (standardization, recurring_revenue_
+  potential, proof_potential, delivery_simplicity, expansion_potential)
+  are real judgment calls the registry itself says are Claude's to make
+  from its stated criteria, not fixed numbers in the document -- each
+  is grounded in a specific cited real fact (e.g. recurring_revenue's
+  0.75 is literally the midpoint of the registry's own stated "70-80%
+  reusable logic" range for this exact service shape; proof_potential's
+  count of 2 comparable projects deliberately excludes less-directly-
+  comparable ones like Expert Buddy) and flagged inline in the script as
+  "JUDGMENT CALL... owner review requested" rather than presented as
+  settled. Real, complete result: status=COMPLETE, score=6.4760/10,
+  zero missing components. Reported the full breakdown, every judgment
+  call, and its grounding to the owner directly for review before
+  treating it as final -- not silently locked in.
+Files:
+  scripts/run_m9_us_hvac_10_99.py; progress.txt. (The owner's registry
+  docx was read from ~/Downloads and its content cited by title/version/
+  date; it was NOT copied into this repo, since it is internal company
+  strategy material -- the owner was not asked whether to archive a copy
+  for reproducibility and this entry does not assume yes.)
+Verification:
+  Ruff check/format, strict mypy (180 source files), and the full
+  offline test suite (657 passed, 1 pre-existing unrelated failure, 8
+  live-smoke skips) all PASS. The live script run's printed score
+  (6.476029995663981195213738895) matches this entry's hand-computed
+  weighted sum exactly, cross-checked before reporting it.
+Limitations/blockers:
+  This M9 result should be treated as a draft pending the owner's review
+  of its five judgment-call components, per the registry document's own
+  reservation of that kind of assessment to a human reviewer. M3/full-M5
+  remain blocked on the Gemini quota as of the last check
+  (AUTONOMOUS-045); worth a fresh single-call recheck given the calendar
+  has now rolled to 2026-09-15.
+Next:
+  Awaiting the owner's review of the M9 judgment calls (confirm/adjust
+  standardization, recurring_revenue_potential, proof_potential,
+  delivery_simplicity, expansion_potential), then either finalize M9 or
+  recompute with the owner's corrections; separately, resume M3/full-M5
+  once the Gemini quota is confirmed reset.
+
 2026-09-15 00:35 PKT (UTC+05:00) | AUTONOMOUS-045 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner: "the doc only has census data i want the data from all the
