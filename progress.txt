@@ -2545,6 +2545,84 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 19:20 PKT (UTC+05:00) | AUTONOMOUS-036 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner directive: continue with M2 (commercial pain) and M4 (economic
+  pain), which the directive's own required pipeline names Gemini
+  extraction as a mandatory step. mask_api.modules.analysis.gemini had a
+  GeminiAdapter/GeminiSettings/GeminiTransport Protocol from A17.5 but no
+  concrete network transport -- it could not actually call a model.
+  Built UrllibGeminiTransport (the same safe pattern every other live
+  transport in this project uses: no ambient proxies, no redirects, TLS-
+  verified, chunked reads to true EOF). Verified live with real calls
+  before trusting it, and found a real bug in the process: the API's own
+  recommended current model, gemini-3.6-flash, forces extended "thinking"
+  and returns a third usageMetadata bucket (thoughtsTokenCount) that made
+  promptTokenCount + candidatesTokenCount != totalTokenCount, tripping
+  AnalysisUsage's input+output==total invariant and failing every real
+  call with gemini.response_invalid. Fixed parse_generate_content_result
+  to fold thoughtsTokenCount into output_tokens (Google bills thinking
+  tokens at the output rate) and derive total_tokens from input+output
+  itself rather than trusting the API's total -- correct for both
+  thinking and non-thinking models. Confirmed thinkingBudget=0 is
+  rejected for that model (a real 400, not usable to opt out), so
+  switched to gemini-flash-lite-latest, which does not force thinking
+  and matches the original two-bucket design with no extra tokens/cost.
+  Ran a full real end-to-end call after the fix: real structured
+  extraction, an exact evidence span matching the source text verbatim,
+  correct usage/cost accounting ($0.000214 for one call). Reviewed the
+  existing mask_api.modules.pain_intelligence (A11) and method_metrics.m4
+  (A12) modules in full to confirm the real M2/M4 pipeline this session
+  needs is already built and just needs real evidence fed into it:
+  PainIntelligenceService.run() (dedup -> local zero-cost embeddings ->
+  clustering -> formula-v1 M2) already exists and takes real PainMention
+  records built via mentions_from_grounding() from an A10-accepted
+  GroundingReport; calculate_m4 already exists and needs 4 real
+  SourcedMetric components, one of which (mean_m2_purchase_intent_0_4)
+  is a direct function of real M2 mentions once they exist. Also noted:
+  M2's formula-v1 sample rule requires >=100 real relevant unique
+  documents for a COMPLETE (non-UNKNOWN) score -- confirmed via the
+  existing test suite, not guessed -- so real evidence collection at
+  meaningful volume is the next required step before M2 can resolve to
+  anything but UNKNOWN.
+Files:
+  apps/api/src/mask_api/modules/analysis/gemini.py;
+  apps/api/tests/analysis/{test_gemini.py,test_gemini_transport.py};
+  docs/ANALYSIS_PROVIDER.md; progress.txt.
+Verification:
+  New/updated focused suite PASS: 45 tests in tests/analysis (was 41;
+  +1 thinking-token-folding regression test, +4 new
+  test_gemini_transport.py tests: exact endpoint/method/query-param
+  construction, key never appears in the POST body, chunked-read
+  reassembly across many small reads, and the byte-cap rejection path).
+  One real live end-to-end Gemini call verified manually (not part of
+  the automated suite -- consistent with this project's "no live call in
+  automated tests" rule; a gated live smoke test for Gemini, matching
+  the pattern already used for O*NET/Common Crawl/official_data, is
+  still open follow-up work, not done in this entry). Full offline suite
+  PASS: 707 (was 702), 33 integration tests deselected (unchanged --
+  no new live-gated test file was added in this entry). Ruff check/
+  format, strict mypy (189 source files), architecture, and local
+  secret guard/Gitleaks all PASS.
+Limitations/blockers:
+  No gated live Gemini smoke test exists yet (the live verification for
+  this entry was manual, via a throwaway script, deliberately not
+  committed). Real M2/M4 evidence collection and the actual real-data
+  extraction run have not started yet -- this entry is the
+  infrastructure-completion step the real run needs, not the run itself.
+Next:
+  Collect real YouTube evidence (search + comment threads) across
+  multiple genuinely distinct HVAC dispatch/scheduling/pain-relevant
+  queries, aiming for >=100 real relevant documents; run each through
+  real Gemini COMMERCIAL_PAIN_V1 extraction and A10 grounding
+  validation; feed the accepted mentions into PainIntelligenceService
+  for a real M2Result. Then attempt M4 with whatever real, defensible
+  evidence exists for its 4 components (mean M2 purchase intent will
+  already be real; the other 3 -- annual economic burden, existing paid
+  spend, paid-workaround penetration -- may honestly resolve to UNKNOWN
+  in this first pass if no defensible real source is found, which is
+  itself a correct, reportable research finding, not a failure).
+
 2026-09-14 13:57 PKT (UTC+05:00) | AUTONOMOUS-035 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner directive: the project objective is now finalized as a two-stage

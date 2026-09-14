@@ -156,6 +156,57 @@ def test_parser_validates_schema_preserves_usage_and_calculates_cost() -> None:
     assert len(result.response_sha256) == 64
 
 
+def test_parser_folds_thinking_tokens_into_output_and_keeps_totals_consistent() -> None:
+    # A real "thinking" model (verified live: gemini-3.6-flash) reports a
+    # third usage bucket, thoughtsTokenCount, that is neither prompt nor
+    # candidate output -- its own totalTokenCount does not equal
+    # promptTokenCount + candidatesTokenCount. AnalysisUsage requires
+    # input+output==total, so thinking tokens must be folded into output
+    # (Google bills them at the output rate) rather than trusted blindly.
+    body = json.dumps(
+        {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {
+                                "text": '{"label":"relevant",'
+                                '"reasons":["r"],"evidence_spans":["dispatch delays"],'
+                                '"confidence":0.9}'
+                            }
+                        ]
+                    },
+                    "finishReason": "STOP",
+                }
+            ],
+            "usageMetadata": {
+                "promptTokenCount": 180,
+                "candidatesTokenCount": 64,
+                "thoughtsTokenCount": 735,
+                "totalTokenCount": 979,
+            },
+            "modelVersion": "gemini-3.6-flash",
+        }
+    ).encode()
+
+    result = parse_generate_content_result(
+        body,
+        request(
+            model_policy=policy(
+                input_token_budget=500,
+                max_output_tokens=1_000,
+                max_call_cost_usd=Decimal("0.01"),
+            )
+        ),
+        created_at=NOW,
+    )
+
+    assert result.status == AnalysisStatus.COMPLETED
+    assert result.usage.input_tokens == 180
+    assert result.usage.output_tokens == 64 + 735
+    assert result.usage.total_tokens == 180 + 64 + 735
+
+
 def test_null_optional_fields_stay_unknown_rather_than_invented() -> None:
     body = json.dumps(
         {

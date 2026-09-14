@@ -68,10 +68,24 @@ enforces when the structured output is parsed back. Gemini's response
 envelope (`candidates`/`usageMetadata`/`promptFeedback`/`finishReason`) is
 mapped to the identical COMPLETED/REFUSED/INCOMPLETE states the OpenAI
 adapter uses, so both providers are interchangeable to every caller of the
-`AnalysisProvider` port. As with OpenAI, no concrete transport is bundled,
-the adapter cannot call a model under the current configuration, and
-Gemini may only extract/classify/summarize -- it never calculates a score,
-confidence index, gate, veto, or ranking.
+`AnalysisProvider` port. OpenAI's adapter still has no concrete transport
+bundled and cannot call a model. Gemini's does: `UrllibGeminiTransport`
+(A17.5) is the one concrete network edge, verified against the real API
+before use -- live-verified end to end (structured extraction with an
+exact evidence span, real cost accounting) using `gemini-flash-lite-latest`.
+`gemini-3.6-flash`, the model the API itself recommends as of this
+writing, was tried first and found to return a third usage-metadata
+bucket (`thoughtsTokenCount`, from its forced extended-thinking mode) that
+made `promptTokenCount + candidatesTokenCount != totalTokenCount`,
+tripping `AnalysisUsage`'s input+output==total invariant; a `-lite` model
+variant does not force thinking and was used instead.
+`parse_generate_content_result` now folds any `thoughtsTokenCount` into
+`output_tokens` (Google bills thinking tokens at the output rate) and
+derives `total_tokens` from `input_tokens + output_tokens` itself rather
+than trusting the API's own total, so a future thinking-capable model
+stays correct too. Regardless of model, Gemini may only extract/classify/
+summarize -- it never calculates a score, confidence index, gate, veto,
+or ranking.
 
 A10 now supplies the separate mandatory grounding gate described in
 `GROUNDING_VALIDATION.md`. Output from either provider alone is never

@@ -9,13 +9,19 @@ matching this project's stdlib-first convention.
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
+import ssl
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
+from http.client import HTTPException
 from typing import Any, Protocol, cast
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
 from pydantic import JsonValue, SecretStr, ValidationError
 
@@ -87,6 +93,87 @@ class GeminiTransport(Protocol):
         timeout_seconds: float,
         max_bytes: int,
     ) -> GeminiTransportResponse: ...
+
+
+class _NoRedirectHandler(HTTPRedirectHandler):
+    def redirect_request(
+        self, req: Request, fp: Any, code: int, msg: str, headers: Any, newurl: str
+    ) -> None:
+        return None
+
+
+class UrllibGeminiTransport:
+    """The one concrete network edge for `GeminiAdapter`.
+
+    Matches every other live transport in this project: no ambient
+    proxies, no redirects, TLS-verified, identity content encoding, and a
+    chunked read loop to true EOF rather than a single `.read(n)` call
+    (a single large read was found to silently truncate on a slow
+    connection during A17.5's O*NET work -- see docs/ONET_DATA.md).
+    """
+
+    def __init__(self) -> None:
+        self._opener = build_opener(
+            ProxyHandler({}),
+            _NoRedirectHandler(),
+            HTTPSHandler(context=ssl.create_default_context()),
+        )
+
+    def generate_content(
+        self,
+        payload: Mapping[str, JsonValue],
+        *,
+        model: str,
+        api_key: SecretStr,
+        timeout_seconds: float,
+        max_bytes: int,
+    ) -> GeminiTransportResponse:
+        url = GEMINI_ENDPOINT_TEMPLATE.format(model=model)
+        url = f"{url}?{urlencode({'key': api_key.get_secret_value()})}"
+        body = json.dumps(dict(payload), separators=(",", ":")).encode("utf-8")
+        request = Request(
+            url,
+            data=body,
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Accept-Encoding": "identity",
+            },
+        )
+        try:
+            response = cast(Any, self._opener.open(request, timeout=timeout_seconds))
+            with contextlib.closing(response):
+                content = _read_fully(response, max_bytes)
+                return GeminiTransportResponse(
+                    status_code=int(response.status),
+                    content_type=str(response.headers.get("Content-Type", "")),
+                    body=content,
+                )
+        except HTTPError as error:
+            with contextlib.closing(error):
+                error_body = error.read(max_bytes + 1)
+            return GeminiTransportResponse(
+                status_code=error.code,
+                content_type=str(error.headers.get("Content-Type", "")),
+                body=error_body[:max_bytes],
+            )
+        except (TimeoutError, URLError, OSError, HTTPException) as error:
+            raise GeminiError("gemini.network_error", retryable=True) from error
+
+
+def _read_fully(response: Any, max_bytes: int) -> bytes:
+    chunks: list[bytes] = []
+    total = 0
+    while True:
+        chunk = cast(bytes, response.read(65_536))
+        if not chunk:
+            break
+        chunks.append(chunk)
+        total += len(chunk)
+        if total > max_bytes:
+            raise GeminiError("gemini.response_too_large")
+    return b"".join(chunks)
 
 
 def to_gemini_schema(schema: dict[str, Any]) -> dict[str, Any]:
@@ -161,8 +248,18 @@ def parse_generate_content_result(
         root = _mapping(cast(object, json.loads(body)))
         usage_record = _mapping(root.get("usageMetadata", {}))
         input_tokens = _nonnegative_int(usage_record.get("promptTokenCount", 0))
-        output_tokens = _nonnegative_int(usage_record.get("candidatesTokenCount", 0))
-        total_tokens = _nonnegative_int(usage_record.get("totalTokenCount", 0))
+        # A "thinking" model (e.g. gemini-3.6-flash) reports a third bucket,
+        # thoughtsTokenCount, that is neither prompt nor candidate output --
+        # verified live: totalTokenCount otherwise doesn't equal input+output.
+        # Google bills thinking tokens at the output rate, so folding it into
+        # output_tokens keeps cost accounting correct and keeps AnalysisUsage's
+        # input+output==total invariant true regardless of what other token
+        # buckets a future model reports, rather than trusting the API's own
+        # totalTokenCount field.
+        candidate_tokens = _nonnegative_int(usage_record.get("candidatesTokenCount", 0))
+        thoughts_tokens = _nonnegative_int(usage_record.get("thoughtsTokenCount", 0))
+        output_tokens = candidate_tokens + thoughts_tokens
+        total_tokens = input_tokens + output_tokens
         if input_tokens > request.model_policy.input_token_budget:
             raise GeminiError("gemini.input_token_budget_exceeded")
         if output_tokens > request.model_policy.max_output_tokens:
