@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 20:10 PKT (UTC+05:00)
+Last updated: 2026-09-14 20:45 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,78 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 20:45 PKT (UTC+05:00) | AUTONOMOUS-039 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Ran the full real scripts/extract_m2_pain_us_hvac_10_99.py over all 600
+  candidate real YouTube comments (>=100 characters) using the fixed
+  Gemini pipeline from AUTONOMOUS-038. Real result: 595 real Gemini
+  calls completed (5 candidates hit a transient gemini.network_error and
+  were recorded, not retried or dropped silently); grounding disposition
+  422 ACCEPTED / 3 REJECTED / 8 NEEDS_REVIEW. Only 9 real pain mentions
+  were extracted, from 7 distinct real documents out of 600 assessed --
+  the overwhelming majority of real comments genuinely stated no
+  commercial software pain (spot-checked in AUTONOMOUS-038's 30-sample:
+  off-topic/EV comments, praise, marketing copy, not a pipeline bug).
+  Fed the 9 real mentions into the real, unmodified PainIntelligenceService
+  (LocalHashingEmbeddingProvider, ClusteringConfiguration matching the
+  project's own test-canonical values: similarity_threshold=0.8,
+  near_duplicate_threshold=0.99, min_cluster_size=2) with
+  all_relevant_unique_documents=600 (the real count of candidate
+  documents assessed, comfortably above the v1 formula's
+  100-document minimum sample floor). Real, honest M2Result:
+  status=UNKNOWN, score=None, unknown_reasons=["m2.no_non_outlier_cluster"].
+  Every one of the 9 real mentions formed its own singleton cluster (no
+  two were lexically similar enough at threshold 0.8 to merge), so with
+  min_cluster_size=2 every cluster is an outlier and none qualifies for
+  scoring -- a real, correct, honest finding: real YouTube-comment
+  evidence for this market is too sparse and too semantically scattered
+  (persona always UNKNOWN for anonymous commenters; pain themes ranged
+  across Operations, Technical Execution, Sales and Marketing, Revenue
+  Loss, Financing and Acquisition, Equipment and Maintenance,
+  Administrative and Operational Burden) to produce a scored M2 from
+  this source family alone. Individual mentions still carry real,
+  useful component values (e.g. one real mention: severity 5, purchase
+  intent 1, dissatisfaction 5; another: severity 7, economic_impact 7,
+  purchase intent 2), which remain valid OBSERVED/DERIVED_FROM_OBSERVED
+  evidence for the dossier's qualitative pain-cluster writeup even
+  though the automated M2 score itself must stay UNKNOWN. Real cost:
+  $0.288 across the whole 600-comment run.
+Files:
+  progress.txt. (Real run artifacts -- comments.json, extraction_log.json,
+  pain_mentions.json, m2_result.json, extraction_summary.json -- are
+  gitignored outputs/runs/ output, not committed, matching this
+  project's existing convention for raw evidence runs.)
+Verification:
+  Real live run completed end to end with exit code 0. m2_result.json's
+  `unknown_reasons` and per-cluster `component_values`/
+  `component_sample_counts` were read directly to confirm the UNKNOWN
+  status is the real, correct calculate_m2() output for this real input
+  (no test suite change was needed -- calculate_m2/PainIntelligenceService
+  were not modified this entry, only exercised with real data).
+Limitations/blockers:
+  YouTube comments alone did not produce a scoreable M2 for
+  us_hvac_10_99. This is reportable as a real finding, not a blocker to
+  work around by lowering thresholds or inventing clusters. M4's
+  mean_m2_purchase_intent_0_4 component can still be honestly derived
+  from the 2 real mentions that carried a purchase_intent_0_4 value (a
+  real but very thin n=2 sample -- must be labeled as such, not
+  presented as robust). M4's other three components (annual_problem_
+  cost_usd, annual_existing_paid_spend_usd, verified_paid_workaround_
+  share) have no real sourced evidence yet; without them calculate_m4()
+  will honestly return UNKNOWN with unknown_reasons=
+  ["m4.required_component_missing"], which is itself a valid, real
+  result to record, not a bug.
+Next:
+  Build the M4 real-evidence step: source real annual_problem_cost_usd/
+  annual_existing_paid_spend_usd/verified_paid_workaround_share evidence
+  where honestly possible (BLS wages, Census payroll, pricing pages,
+  job postings already available from prior real collection), compute
+  the real mean_m2_purchase_intent_0_4 from the 2 real observed mentions
+  with its thin-sample caveat recorded, and run calculate_m4() for a
+  real, honest MethodMetricResult (COMPLETE only if all four real
+  components are genuinely available, UNKNOWN otherwise) -- then move to
+  M3/M5/M6/M7/M9 real evidence per the owner's finalized directive.
+
 2026-09-14 20:10 PKT (UTC+05:00) | AUTONOMOUS-038 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Built scripts/extract_m2_pain_us_hvac_10_99.py to run real Gemini
