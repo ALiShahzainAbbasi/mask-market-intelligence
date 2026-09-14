@@ -11,7 +11,7 @@ __pycache__/
 .coverage
 htmlcov/
 coverage/
-reports/
+/reports/
 .env
 .env.*
 !.env.example

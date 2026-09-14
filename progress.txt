@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 23:45 PKT (UTC+05:00)
+Last updated: 2026-09-15 00:15 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,61 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 00:15 PKT (UTC+05:00) | AUTONOMOUS-044 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner asked to pause M9/further methods and instead requested "a
+  complete doc which shows all the sources and how and why we obtained
+  the score of 6.34" for M1. Re-ran scripts/run_census_m1.py live
+  (Census is not affected by the Gemini quota block) to get fresh, exact
+  real figures; hand-verified every raw value, transform, and weighted
+  contribution against the real CensusM1Executor code and
+  configs/formulas/v1.yaml's approved v1 M1 formula before writing
+  anything, rather than trusting the printed JSON alone. Built
+  outputs/reports/M1_Source_and_Methodology_us_hvac_10_99.docx (via the
+  docx skill): real Census CBP source/endpoint/fields/NAICS/geography/
+  years, the real raw 2017+2022 establishment/employment/payroll numbers
+  for every EMPSZES band used, a full component-by-component walkthrough
+  (buyer_pool, growth, fragmentation, economic_capacity,
+  target_band_match -- exact real numbers, exact transform formula and
+  bounds, exact weighted contribution for each), the final aggregation
+  to 6.3448 -> 6.34/10, a data-integrity section (status=COMPLETE, all 5
+  inputs OBSERVED, inputs SHA-256, zero AI-model involvement in this
+  score), real limitations (NAICS 238220 also covers plumbing-only
+  contractors; establishment != distinct company; national-only, no
+  region selected yet -- pointing to AUTONOMOUS-035's real state/metro
+  discovery), and exact reproduction steps. Delivered the file to the
+  owner directly.
+Files:
+  outputs/reports/M1_Source_and_Methodology_us_hvac_10_99.docx;
+  .gitignore (fixed a real pre-existing bug found while placing this
+  file: an unanchored `reports/` line, meant for coverage-tool reports,
+  was silently also matching `outputs/reports/`, this project's real
+  research-deliverable directory -- anchored it to `/reports/` so future
+  real reports under outputs/reports/ are tracked, not silently
+  ignored); progress.txt.
+Verification:
+  Every number in the document was hand-recomputed from the real raw
+  Census values and cross-checked against the live script's own printed
+  output (inputs_sha256 ceba3b87734067c01d57a3a1796e367e08857868c97f358
+  f3c9f63483ef70da3 unchanged from the AUTONOMOUS-030s-era run, i.e. the
+  real 2022/2017 Census CBP release has not changed). Docx structure
+  validated by loading it back with mammoth (no parse errors) and
+  extracting its full text for a manual read-through; a full visual/PDF
+  QA pass (LibreOffice) was not possible in this Windows sandbox
+  (soffice is not installed here and the skill's headless-conversion
+  helper assumes a Unix socket), so page-break/table-overflow layout was
+  checked by construction (consistent column-width totals) rather than
+  by looking at rendered pages -- flagged to the owner as a real,
+  reportable QA limitation, not silently skipped.
+Limitations/blockers:
+  M9 remains on hold at the owner's request; M3 and a proper M5 remain
+  blocked on today's Gemini quota (AUTONOMOUS-042). This entry's work
+  did not touch any of those.
+Next:
+  Awaiting the owner's next instruction -- likely either equivalent
+  source-and-methodology documents for M2/M4/M5/M6/M7, or resuming
+  M9/M3/M5-extraction once the owner returns to that thread.
+
 2026-09-14 23:45 PKT (UTC+05:00) | AUTONOMOUS-043 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Continuation of AUTONOMOUS-042's reordering (owner chose "do Gemini-
