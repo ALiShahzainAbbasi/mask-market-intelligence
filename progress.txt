@@ -2545,6 +2545,74 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 13:57 PKT (UTC+05:00) | AUTONOMOUS-035 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner directive: the project objective is now finalized as a two-stage
+  research program (Stage A: one complete HVAC calibration dossier for
+  us_hvac_10_99; Stage B, only after Stage A passes QA: a 50-100 market
+  landscape). Explicit instruction: no further infrastructure cycles,
+  research output over process, do not silently alter approved M1-M10
+  weights (verified unchanged in docs/SCORING.md and
+  configs/formulas/v1.yaml), preserve A01-A17/A17.5 work as-is.
+  Started Stage A's regional-analysis requirement (sections 22-26 of the
+  directive): the owner explicitly forbade manually picking a BEA region,
+  so states/regions had to be discovered from real data first. Built
+  scripts/discover_regions_us_hvac_10_99.py, which reuses the existing
+  official_data Census/BEA adapters completely unchanged -- `for=state:*`
+  (Census) and `GeoFIPS=STATE` (BEA) each return one real row per state in
+  a single call, verified against the real APIs before use (the BEA
+  CAINC4 table's correct LineCode values were looked up via BEA's own
+  GetParameterValuesFiltered metadata call rather than guessed, after an
+  initial wrong LineCode attempt failed cleanly). Ran live: fetched
+  current-year (2023) and 5-year-baseline (2018) establishment/employment/
+  payroll for all 3 target employment bands across all US states (8
+  Census calls), computed real per-state TargetEstablishments10_99,
+  national target-band share, and 5-year establishment CAGR, applied the
+  configurable minimum-state filter (>=300 target establishments OR
+  >=1.5% national share) -- 28 of 56 state-level rows qualify -- computed
+  RegionalPreScreenScore (40/20/20/20 business-count/concentration/
+  growth/economic-capacity, min-max normalized across qualifying states,
+  documented as this script's own secondary rule, explicitly not M1),
+  then enriched all 28 qualifying states with real BEA personal income
+  and per-capita personal income (2 more calls). Total: 10 real API
+  calls, $0 cost. Output written to outputs/runs/discover_regions_
+  us_hvac_10_99_<timestamp>/state_regional_discovery.json (gitignored
+  run artifact; the script itself is committed and reproducible).
+  National target establishments (NAICS 238220, 10-99 employees):
+  24,076. Top-ranked qualifying states by RegionalPreScreenScore:
+  California (2,260 target establishments, score 6.04), Florida (1,899,
+  score 5.91), Texas (1,958, score 5.90), Tennessee (558, score 5.10).
+  Metro-level (CBSA) discovery (section 27) and the deeper Regional
+  Opportunity Score (section 28, which needs M2/M4/M5/M6/M7 evidence
+  this session has not yet collected) remain open, next.
+Files:
+  scripts/discover_regions_us_hvac_10_99.py; progress.txt.
+Verification:
+  Ran live twice (once before, once after adding BEA enrichment); both
+  runs succeeded with real data and $0 cost, matching every already-
+  established live-adapter budget/policy gate unchanged. Ruff check/
+  format PASS on the new script. This is a one-off research script (not
+  part of the tested mask_api package), so it does not add to the
+  apps/api pytest/mypy counts; no existing test, formula, or weight was
+  touched.
+Limitations/blockers:
+  This is desk-research state-level discovery only; M2-M9 evidence has
+  not yet been collected for any region. RegionalPreScreenScore is
+  explicitly a secondary screening metric, not M1 and not the final
+  Regional Opportunity Score (section 28), which needs pain/economic/
+  competitive/accessibility/intent evidence not yet gathered. 28 states
+  currently show only Census+BEA data; the directive's fuller regional
+  evidence stack (pain signal, buyer accessibility, competitive
+  whitespace, commercial intent) is scoped for after M2-M7/M9 exist.
+Next:
+  Metro/CBSA-level discovery (section 27) if Census CBP supports an
+  equivalent bulk CBSA query; then M2 (real commercial-pain evidence via
+  YouTube/Common Crawl/Gemini extraction), M4 (economic pain), M5
+  (competition), M6 (free-mode search intent), M7 (buyer accessibility),
+  M9 (MASK AI fit) for us_hvac_10_99, each producing real, source-
+  grounded evidence -- then the M1-M9 AutomatedResearchScore, ICP/buyer/
+  service/GTM analysis, and finally the DOCX/JSON/CSV dossier itself.
+
 2026-09-14 13:44 PKT (UTC+05:00) | AUTONOMOUS-034 | A17.5 | IN_PROGRESS
 Work:
   Owner supplied a real contact email (added to .env.official.local as
