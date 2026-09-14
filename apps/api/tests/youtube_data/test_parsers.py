@@ -25,6 +25,18 @@ def test_parse_search_extracts_videos_and_flags_missing_title() -> None:
     assert any(issue.code == "youtube.search.title_missing" for issue in batch.issues)
 
 
+def test_parse_comment_threads_accepts_a_real_scale_next_page_token() -> None:
+    # commentThreads.list's real nextPageToken can exceed 200 characters
+    # (verified live against the real API), unlike search.list's shorter
+    # tokens -- the original 200-char bound, built and tested only against
+    # short fixtures, rejected a real token and crashed a live run.
+    payload = json.loads((FIXTURES / "comment_threads.json").read_bytes())
+    payload["nextPageToken"] = "Q" * 500
+    batch = parse_youtube_comment_threads(json.dumps(payload).encode())
+
+    assert batch.next_page_token == "Q" * 500
+
+
 def test_parse_search_rejects_malformed_json() -> None:
     with pytest.raises(YouTubeDataError) as captured:
         parse_youtube_search(b"not-json")

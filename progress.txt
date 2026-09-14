@@ -2545,6 +2545,58 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 19:30 PKT (UTC+05:00) | AUTONOMOUS-037 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Collected real M2 evidence: scripts/collect_youtube_pain_evidence_us_
+  hvac_10_99.py ran 13 deliberately diverse real YouTube searches
+  (dispatch software, scheduling problems, missed calls, field service
+  management, estimating, customer complaints, etc. -- covering the
+  market config's seed_terms/seed_problems, not one narrow phrase) and
+  fetched real comment threads for every distinct video found. Reused
+  the existing youtube_data adapter completely unchanged. Found and
+  fixed a real bug while running it live: YouTubeBatch.next_page_token
+  and the page_token request validators were built/tested only against
+  short fixture tokens (max_length=200), but commentThreads.list's real
+  nextPageToken can exceed 200 characters -- the very first real
+  multi-page comment fetch crashed with a pydantic validation error.
+  Widened both to a generous, verified-safe 2000-character bound (base64
+  url-safe alphabet). Result: 112 unique real videos discovered, 1,409
+  real comments collected across 106 videos with comments enabled (6
+  had comments disabled/blocked -- a normal, recorded outcome, not a
+  failure), well past M2's >=100-relevant-unique-document sample-
+  adequacy threshold. Only 1,412 of 9,000 daily YouTube quota units
+  used. Raw evidence (videos.json, comments.json, comment_failures.json,
+  collection_summary.json) written to a gitignored outputs/runs/
+  directory -- the collection script itself is committed and
+  reproducible.
+Files:
+  apps/api/src/mask_api/modules/youtube_data/{contracts.py,requests.py};
+  apps/api/tests/youtube_data/{test_parsers.py,test_requests.py};
+  scripts/collect_youtube_pain_evidence_us_hvac_10_99.py; progress.txt.
+Verification:
+  New/updated focused suite PASS: 42 tests in tests/youtube_data (was
+  39; +3: a long-page-token-accepted request test, a still-rejects-
+  over-2000-chars test, and a parser-level long-next-page-token
+  acceptance test). Ran the real collection script live twice (once
+  before discovering the bug, crashing correctly rather than silently
+  truncating pagination; once after the fix, completing successfully
+  end to end). Full offline suite PASS: 710 (was 707), 33 integration
+  tests deselected (unchanged). Ruff check/format, strict mypy (189
+  source files), architecture, and local secret guard/Gitleaks all
+  PASS.
+Limitations/blockers:
+  None new. This is raw evidence retention only -- no Gemini extraction,
+  grounding, or M2 calculation has run yet on this real corpus.
+Next:
+  Build the extraction stage: read the collected raw comments, run real
+  Gemini COMMERCIAL_PAIN_V1 extraction (batched per video -- one real
+  document = one video's full comment set in one Gemini call, not one
+  call per individual comment, for efficiency -- while still preserving
+  genuine per-video document identity for the M2 sample-adequacy
+  denominator), then A10 grounding validation on each result, then feed
+  the accepted mentions into PainIntelligenceService for a real,
+  source-grounded M2Result.
+
 2026-09-14 19:20 PKT (UTC+05:00) | AUTONOMOUS-036 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner directive: continue with M2 (commercial pain) and M4 (economic

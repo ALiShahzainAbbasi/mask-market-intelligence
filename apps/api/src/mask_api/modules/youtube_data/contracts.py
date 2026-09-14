@@ -48,7 +48,11 @@ class YouTubeBatch(YouTubeValue):
     videos: tuple[YouTubeVideoResult, ...] = ()
     comments: tuple[YouTubeCommentResult, ...] = ()
     issues: tuple[YouTubeParseIssue, ...] = ()
-    next_page_token: str | None = Field(default=None, max_length=200)
+    # Verified live against the real API: commentThreads.list's nextPageToken
+    # can exceed 200 characters (unlike search.list's shorter tokens), so the
+    # original 200-char bound -- built and tested only against fixtures --
+    # was too tight for real data. 2000 is a generous, safe bound.
+    next_page_token: str | None = Field(default=None, max_length=2000)
 
 
 class YouTubeRequestProvenance(YouTubeValue):

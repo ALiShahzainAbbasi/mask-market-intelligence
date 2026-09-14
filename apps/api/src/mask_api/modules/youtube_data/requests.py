@@ -61,7 +61,7 @@ def youtube_search_request(
             raise ValueError("YouTube publishedAfter must be RFC 3339 UTC (YYYY-MM-DDTHH:MM:SSZ)")
         params["publishedAfter"] = published_after
     if page_token is not None:
-        if not re.fullmatch(r"[A-Za-z0-9_-]{1,200}", page_token):
+        if not re.fullmatch(r"[A-Za-z0-9_=-]{1,2000}", page_token):
             raise ValueError("YouTube page token is invalid")
         params["pageToken"] = page_token
     return YouTubeRequest(
@@ -92,7 +92,7 @@ def youtube_comment_threads_request(
         "textFormat": "plainText",
     }
     if page_token is not None:
-        if not re.fullmatch(r"[A-Za-z0-9_-]{1,200}", page_token):
+        if not re.fullmatch(r"[A-Za-z0-9_=-]{1,2000}", page_token):
             raise ValueError("YouTube page token is invalid")
         params["pageToken"] = page_token
     return YouTubeRequest(

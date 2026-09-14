@@ -35,6 +35,24 @@ def test_search_request_accepts_published_after_and_page_token() -> None:
     assert built.query["pageToken"] == "CAUQAA"
 
 
+def test_page_token_over_200_characters_is_accepted() -> None:
+    # commentThreads.list's real nextPageToken can exceed 200 characters
+    # (verified live), unlike search.list's shorter tokens -- the original
+    # bound, built and tested only against short fixtures, rejected a real
+    # token and crashed a live collection run.
+    long_token = "Q" * 500
+    built = youtube_comment_threads_request(
+        video_id="dQw4w9WgXcQ", api_key=KEY, page_token=long_token
+    )
+
+    assert built.query["pageToken"] == long_token
+
+
+def test_page_token_over_2000_characters_is_still_rejected() -> None:
+    with pytest.raises(ValueError, match="page token"):
+        youtube_comment_threads_request(video_id="dQw4w9WgXcQ", api_key=KEY, page_token="Q" * 2001)
+
+
 @pytest.mark.parametrize(
     ("changes", "match"),
     [
