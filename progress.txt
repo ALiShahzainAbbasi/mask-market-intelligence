@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 23:20 PKT (UTC+05:00)
+Last updated: 2026-09-14 23:45 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,78 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 23:45 PKT (UTC+05:00) | AUTONOMOUS-043 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Continuation of AUTONOMOUS-042's reordering (owner chose "do Gemini-
+  free work now, M3/M5-extraction later"). Ran three more real, one-off
+  method drivers, none needing a Gemini call:
+  - M5 (scripts/run_m5_us_hvac_10_99.py): scanned all 9 real M2 mentions'
+    real `software_mentioned` fields (no new extraction -- already-
+    extracted structured output) and found 2 real, distinct named
+    existing tools: "jobber" and "sameday ai". Real result:
+    competitor_proof=2 (AVAILABLE), the other 4 components (pricing,
+    unresolved_gap, differentiation_space, traction_proof) have no real
+    evidence yet -- status=UNKNOWN. A proper M5 pass still needs real
+    COMPETITOR_V1 Gemini extraction over a targeted competitor sweep,
+    blocked by the same quota exhaustion as M3.
+  - M6 light (scripts/run_m6_us_hvac_10_99.py): confirmed the honest,
+    expected free-mode result -- all 5 components + qualified_keyword_
+    count MISSING (no Google Ads/paid-keyword-tool credential is
+    approved; this is a pre-existing owner decision from A07, not new).
+    status=UNKNOWN. Did not substitute YouTube's per-query result counts
+    as a stand-in demand signal: those were capped at 10/query during
+    collection, so they are not a real prevalence measure.
+  - M7 (scripts/run_m7_us_hvac_10_99.py): real evidence via
+    SCRAPING_POLICY.md's manual-capture path (#6) since none of this
+    project's built official_data sources answer individual-company
+    contact-channel questions and Gemini-grounded Search/Maps discovery
+    is blocked. Web-searched for independent (non-national-franchise)
+    small HVAC contractors, then manually checked 6 real candidate
+    homepages via WebFetch (2026-09-14): 4 reachable
+    (smallsolutionsheatingandairconditioning.com, tripleotoday.com,
+    cshvac.com, callmattioni.com), 2 returned HTTP 403 and were excluded
+    rather than guessed (acsystemsinc.com, trustallred.com). All 4
+    reachable sites had both a real phone number and a real contact
+    form; none had a named owner/buyer visible on the homepage checked
+    (left `accounts_with_economic_buyer` as None rather than a
+    misleadingly confident 0/4, since an About/Team subpage was not
+    checked). Real result: contact_coverage=1.0 (4/4, AVAILABLE),
+    channel_diversity=2 (AVAILABLE), the other 4 components MISSING --
+    status=UNKNOWN.
+  Asked the owner directly (AskUserQuestion) whether to supply MASK AI's
+  real product-capability/integration facts for M9 now or leave it
+  UNKNOWN for later, since this project's own docs/
+  AUTONOMOUS_RESEARCH_MODE.md reserves M9's capability-coverage/
+  integration-support judgments to a human leadership/technical
+  reviewer and no documentation of MASK AI's actual product exists in
+  this repo to draw from honestly. Owner dismissed the question and
+  asked to come back to it later, requesting instead a complete
+  source-and-methodology document for M1's real 6.34 score -- switching
+  this session's focus to that deliverable next.
+Files:
+  scripts/{run_m5_us_hvac_10_99.py,run_m6_us_hvac_10_99.py,
+  run_m7_us_hvac_10_99.py}; progress.txt.
+Verification:
+  Ruff check/format, strict mypy (180 source files), and the full
+  offline test suite (657 passed, 1 pre-existing unrelated failure,
+  8 live-smoke skips) all PASS -- unchanged from AUTONOMOUS-042 since
+  none of this entry's scripts altered shared application code.
+Limitations/blockers:
+  M9 is on hold at the owner's explicit request, not attempted further.
+  M3 and a proper M5 remain blocked on the Gemini free-tier daily quota
+  (AUTONOMOUS-042); M6 remains free-mode-limited by the pre-existing,
+  separate paid-keyword-tool hold. M7's real result rests on a tiny (4-
+  company), explicitly non-random, homepage-only sample -- reportable as
+  directional signal only, never as a national buyer-accessibility
+  estimate.
+Next:
+  Build the requested M1 source-and-methodology document: every real
+  source used (Census CBP requests/geography/NAICS/EMPSZES bands, exact
+  years), the exact per-component calculations
+  (CensusM1Executor/calculate_m1), and how they combine into the real
+  6.34/10 score, in a form the owner can hand to someone else. Resume
+  M3/M5-extraction/M9 once the owner returns to them.
+
 2026-09-14 23:20 PKT (UTC+05:00) | AUTONOMOUS-042 | RESEARCH-STAGE-A | BLOCKED
 Work:
   Owner directive: "Stop after M3 + M5 + M7 + M9 + light M6." Built the
