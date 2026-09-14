@@ -192,9 +192,7 @@ def test_parser_folds_thinking_tokens_into_output_and_keeps_totals_consistent() 
         {
             "candidates": [
                 {
-                    "content": {
-                        "parts": [{"text": json.dumps({"result_json": inner_text})}]
-                    },
+                    "content": {"parts": [{"text": json.dumps({"result_json": inner_text})}]},
                     "finishReason": "STOP",
                 }
             ],
@@ -256,9 +254,7 @@ def test_null_optional_fields_stay_unknown_rather_than_invented() -> None:
         {
             "candidates": [
                 {
-                    "content": {
-                        "parts": [{"text": json.dumps({"result_json": inner_text})}]
-                    },
+                    "content": {"parts": [{"text": json.dumps({"result_json": inner_text})}]},
                     "finishReason": "STOP",
                 }
             ],

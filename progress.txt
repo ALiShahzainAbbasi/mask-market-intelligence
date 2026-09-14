@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-14 21:30 PKT (UTC+05:00)
+Last updated: 2026-09-14 23:20 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,72 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-14 23:20 PKT (UTC+05:00) | AUTONOMOUS-042 | RESEARCH-STAGE-A | BLOCKED
+Work:
+  Owner directive: "Stop after M3 + M5 + M7 + M9 + light M6." Built the
+  real M3 collection/extraction pair (scripts/
+  collect_onet_workflow_evidence_us_hvac_10_99.py,
+  scripts/extract_m3_workflow_us_hvac_10_99.py), mirroring the M2
+  scripts. Collection ran live and real: real O*NET 31.0 database
+  bootstrapped (cached copy reused correctly on the second run's HEAD
+  check), 1,016 real occupations and 18,838 real task statements
+  imported, 30 real task statements retained for the real occupation
+  49-9021.00 (Heating, Air Conditioning, and Refrigeration Mechanics and
+  Installers -- confirmed against O*NET's own occupation title, not
+  assumed). The first live extraction attempt hit sustained real
+  gemini.http_429 errors starting at task 2 -- added real retry/backoff
+  (_analyze_with_retry: up to 4 attempts, 10/20/40s backoff), which
+  surfaced a second real bug: every attempt (including failed ones)
+  charges the BudgetLedger before the HTTP status is checked, so a tight
+  max_requests budget hit BudgetLimitExceeded mid-run; widened the
+  budget headroom (5x + 20) and added an explicit
+  BudgetLimitExceeded catch so a future budget issue stops the run
+  cleanly instead of crashing with a raw traceback. Re-ran live: all 30
+  tasks now correctly retried through all 4 attempts and still got 429
+  every time (120 real requests, $0 real cost -- none succeeded).
+  Fetched the real 429 response body directly (safe -- no API key in a
+  Gemini error body) to get the exact cause instead of guessing further:
+  "Quota exceeded for metric: generate_content_free_tier_requests,
+  limit: 500 ... model: gemini-3.5-flash-lite". This is the real
+  Gemini API free-tier daily request cap (500/day) for the model this
+  project uses, and it is genuinely exhausted -- AUTONOMOUS-039's 600
+  real M2 calls (in one earlier run today) is already well over 500 on
+  its own, before any of today's other real Gemini calls (schema
+  debugging, M4's BLS probe context, this M3 attempt) are counted.
+  Waited ~90 real seconds and re-tested with a single, cheap, isolated
+  call: still 429 with the same "limit: 500" message, which rules out a
+  short per-minute bucket refilling (that would have cleared) and
+  confirms this is a genuine daily cap, not a bug in this project's
+  retry logic or budget accounting.
+Files:
+  scripts/collect_onet_workflow_evidence_us_hvac_10_99.py;
+  scripts/extract_m3_workflow_us_hvac_10_99.py; .gitignore (added
+  `.cache/`, where the real ~16MB O*NET archive is cached locally, not
+  committed); progress.txt.
+Verification:
+  Ruff check/format and strict mypy PASS on both new scripts. Both real,
+  live collection runs succeeded end to end (dataset bootstrap + real
+  task-statement filtering). The real extraction run's failure is an
+  external API quota limit, not a code defect -- confirmed via a direct,
+  safe read of Gemini's own real error response body, not inferred.
+Limitations/blockers:
+  BLOCKED: the real Gemini API free-tier daily quota (500 requests/day)
+  for this project's model is exhausted for today by AUTONOMOUS-039's
+  600-call M2 run alone. No real M3 (and, by the same constraint, no
+  real M5/M6/M7/M9 Gemini-based extraction) can run further today
+  without either (a) waiting for the daily quota to reset, or (b) the
+  owner enabling a paid/billing-enabled tier for MASK_gemini_API_KEY's
+  Google AI Studio project, removing the free-tier cap. This blocks
+  completing the owner's "M3 + M5 + M7 + M9 + light M6" scope today as
+  a single continuous real-evidence-extraction pass.
+Next:
+  Awaiting owner decision on how to proceed (asked directly in chat):
+  wait for the free-tier daily quota to reset and resume the real M3
+  run then continue to M5/M7/M9/light M6 in that order, or switch to a
+  billing-enabled tier now to continue today. No further Gemini calls
+  will be made until that decision, to avoid burning more of tomorrow's
+  quota against a request that is guaranteed to fail right now.
+
 2026-09-14 21:30 PKT (UTC+05:00) | AUTONOMOUS-041 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner directive: "do the remaining [M4 components] then move forward."

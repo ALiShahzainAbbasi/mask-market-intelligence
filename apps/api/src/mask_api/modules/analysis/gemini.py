@@ -50,7 +50,6 @@ Return only the structured output required by the supplied JSON Schema.
 Never calculate market scores, method scores, confidence indices, gates, or rankings."""
 
 
-
 class GeminiError(RuntimeError):
     def __init__(self, code: str, *, retryable: bool = False) -> None:
         self.code = code
