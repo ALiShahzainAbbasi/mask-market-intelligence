@@ -2545,6 +2545,59 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 23:58 PKT (UTC+05:00) | AUTONOMOUS-051 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Ran Stage B Wave B (scripts/discover_wave_b_top24.py) on the real top 24
+  non-HVAC Wave A survivors, per the owner's "use start wave A" directive's
+  natural continuation. Real, honest result -- reported in full, not spun:
+  the run completed cleanly (all 24 markets processed, no crash, real
+  multi-key Gemini rotation genuinely exercised: 1 key switch,
+  1 key confirmed exhausted), but the REAL evidence volume per market
+  (2 YouTube queries, <=15 Gemini-extracted comment candidates -- a
+  deliberate "light" scale-down from HVAC's 13 queries / 600 candidates
+  to fit 24 markets in one real quota day) was too thin to surface real
+  commercial-pain evidence for almost all of them: 22 of 24 markets got
+  ZERO real Gemini-extracted pain mentions (Gemini correctly and honestly
+  returned empty records for every sampled comment -- not a bug, a real,
+  low base-rate outcome; HVAC's own real extraction rate was ~9 mentions
+  from 600 real candidates, ~1.5%, so an expected ~0.2 mentions per
+  market from only 15 real candidates is the expected real result, not
+  an error). Only 2 of 24 markets (Glass and Glazing Contractors NAICS
+  238150, Other Computer Related Services NAICS 541519) produced any
+  real m9_light signal (Gemini's own real ai_suitability_1_10 field).
+  m2_light and m4_light (which depends on m2_light's purchase-intent
+  extraction) are UNKNOWN for all 24 real markets. Net real effect:
+  Wave B's composite score collapsed to m1_light alone (30% coverage)
+  for 22/24 markets -- it did NOT add real differentiating multi-source
+  signal at the evidence density it was run at.
+  Real YouTube quota used: 5,077/9,000. Real Gemini calls: within one
+  key's normal budget plus rotation, no run-ending exhaustion.
+Files:
+  scripts/discover_wave_b_top24.py (new); progress.txt. Real per-market
+  results (outputs/runs/discover_wave_b_top24_20260915T182112Z/
+  wave_b_results.json) are a gitignored outputs/runs/ artifact, same
+  pattern as every other real-evidence run.
+Verification:
+  Ruff check, mypy strict (this script + full src/), and the full
+  offline test suite (657 passed, 1 pre-existing unrelated failure, 8
+  live-smoke skips) all PASS. The script itself was smoke-tested on 1
+  real market before the full 24-market run to confirm real end-to-end
+  wiring (YouTube -> Gemini extraction -> grounding -> real M2/M4
+  formulas -> composite) before spending quota broadly.
+Limitations/blockers:
+  Wave B as scoped did not achieve its intended purpose (adding real
+  multi-source differentiation on top of Wave A's Census-only ranking).
+  The real fix is either (a) far more evidence per market (HVAC-level
+  query diversity), which is not affordable across 24 markets in one
+  real quota day, or (b) skip a "medium-depth" breadth pass entirely and
+  apply HVAC-level real evidence depth directly to a smaller shortlist
+  chosen from Wave A's own (real, robust) M1-light ranking -- reported
+  to the owner as an explicit decision point, not resolved unilaterally,
+  per "we want the truth."
+Next:
+  Awaiting the owner's steer on how to proceed given this real finding
+  before spending further real Gemini/YouTube quota.
+
 2026-09-15 18:05 PKT (UTC+05:00) | AUTONOMOUS-050 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner directive: begin Stage B (the 10-20-market landscape), explicitly
