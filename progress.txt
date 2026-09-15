@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-15 13:50 PKT (UTC+05:00)
+Last updated: 2026-09-15 14:50 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,90 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 14:50 PKT (UTC+05:00) | AUTONOMOUS-048 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner supplied 4 additional real Gemini API keys
+  (MASK_gemini_API_KEY_fallback_1..4) after AUTONOMOUS-042/045's real
+  quota exhaustion. Built scripts/_gemini_multi_key.py: rotates across
+  every real configured key, switching to the next once a key shows a
+  real, sustained gemini.http_429 rather than stopping the whole run.
+  Found and fixed a real bug live: the first version switched keys on
+  the very first 429, which mis-marked keys exhausted after nothing but
+  a real, short per-minute burst limit (Gemini returns the same HTTP 429
+  for that as for the real per-day cap, and GeminiError doesn't carry
+  enough detail to tell them apart) -- confirmed live by testing all 5
+  real keys individually right after a resulting crash and getting a
+  clean 200 from every one. Fixed with a short same-key backoff before
+  treating a key as exhausted for the day, and replaced a bare
+  `assert last_error is not None` with a real
+  GeminiError("gemini.all_keys_exhausted").
+  Used it to complete real M5 (competitive intelligence): built scripts/
+  collect_youtube_competitor_evidence_us_hvac_10_99.py (8 real, targeted
+  competitor/pricing/review search queries -- distinct from M2's pain-
+  focused queries -- found 192 real comments across 66 real videos) and
+  scripts/extract_m5_competitors_us_hvac_10_99.py (real COMPETITOR_V1
+  Gemini extraction, A10 grounding, direct M5Inputs construction since
+  no competitive_intelligence module exists yet -- matching
+  AUTONOMOUS-043's precedent rather than building new, untested
+  infrastructure). Found and fixed a second real bug live: Gemini
+  extracted the same real company as both "housecall pro" and "house
+  call pro" across different real comments -- one entity, two real
+  spacing variants the existing case/unicode-only normalization didn't
+  collapse -- added a whitespace-collapsing normalization for the
+  competitor-grouping key specifically (kept the original, non-
+  collapsing normalization for weakness-text dedup, where collapsing
+  whitespace would wrongly merge unrelated phrases). A residual, real,
+  documented gap: "hcp" (one real comment's abbreviation) and
+  "housecallpro" were NOT merged this run -- the same real limitation
+  class, just an abbreviation instead of a spacing variant, which simple
+  normalization cannot catch without an alias dictionary; left as an
+  honest, reported caveat rather than a deeper fix.
+  Real, final M5 result: 7 real distinct competitor identifiers (Jobber,
+  FieldEdge, FieldAware, HCP/Housecall Pro as two entries, Workiz,
+  Workyard) with real weaknesses (Jobber: sales-call pressure, app
+  crashes, GPS time-tracking bugs; FieldEdge: difficult to use, weak
+  customer support, poor mobile UX) and real strengths (Workiz: reliable,
+  saves time, smoother scheduling/invoicing -- comment phrasing reads as
+  possibly promotional, flagged not filtered). competitor_proof (7) and
+  unresolved_gap are now real and AVAILABLE; pricing_proof,
+  differentiation_space, and traction_proof remain honestly MISSING (no
+  real comment stated explicit pricing; no defensible real source for
+  offer-similarity or verified-reference counts) -- status stays
+  UNKNOWN, same overall conclusion as AUTONOMOUS-043 but with
+  substantially more real, qualitative competitive evidence underneath
+  it. gap_score_0_10 remains the explicit, documented deterministic
+  rule from AUTONOMOUS-043 (2x real evidenced weaknesses, clamped to
+  10), still flagged for owner review, not Gemini-calculated.
+Files:
+  scripts/_gemini_multi_key.py;
+  scripts/collect_youtube_competitor_evidence_us_hvac_10_99.py;
+  scripts/extract_m5_competitors_us_hvac_10_99.py; progress.txt.
+Verification:
+  Ruff check/format and strict mypy PASS on every changed/new file. The
+  multi-key crash was reproduced live once, root-caused via evidence
+  (all 5 keys individually re-tested clean immediately after), fixed,
+  and re-verified with a clean real run (0 key switches, 0 keys
+  exhausted -- the primary key alone had real headroom the whole time,
+  confirming the crash was never genuine multi-key exhaustion). The
+  dedup fix was verified against the real, already-extracted evidence
+  before committing to a second live Gemini re-run.
+Limitations/blockers:
+  M5 remains UNKNOWN pending real pricing/differentiation/reference
+  evidence this pass could not honestly source. Competitor-name
+  deduplication is real but imperfect (abbreviations like "HCP" are not
+  caught); a full fix would need a maintained alias dictionary or fuzzy
+  matching, not attempted here as out of proportion to the residual
+  count-accuracy gain.
+Next:
+  Awaiting the owner's direction on what to work on next -- options on
+  the table: deepen M5 (real pricing-page evidence via a policy-
+  reviewed Common Crawl registration for a specific competitor, per
+  AUTONOMOUS-041/045's open item), resume M9's owner-review step, or
+  move to Stage A's remaining structural work (AutomatedResearchScore
+  aggregation, ICP/buyer hypotheses, service opportunity ranking,
+  source register, DOCX dossier assembly) now that M1-M7/M9 all have
+  real, honest results.
+
 2026-09-15 13:50 PKT (UTC+05:00) | AUTONOMOUS-047 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner: "now lets start the next modules." Checked the Gemini free-tier
