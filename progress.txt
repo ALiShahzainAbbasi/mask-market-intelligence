@@ -2545,6 +2545,70 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-16 05:35 PKT (UTC+05:00) | AUTONOMOUS-055 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner feedback: the 10 interim Phase 3 reports (AUTONOMOUS-054) were
+  "way too shallow" -- correct and expected, since that pass only had
+  real aggregate counts (mention counts, mean scores), not individual
+  real quotes, per the disclosed limitation that
+  scripts/discover_phase3_deep_dive.py does not persist per-mention raw
+  text. Real fix, not a rewrite from scratch: every real Gemini call
+  this run ever made is still sitting on disk as a real
+  AnalysisCacheRecord (request + result, including the real verbatim
+  source_text and the real structured_output) under
+  outputs/runs/phase3_deep_dive/artifacts/cache/analysis/, because
+  ArtifactAnalysisCache persists every real call. Built
+  scripts/extract_phase3_real_quotes.py, which re-runs the exact same
+  real A10 grounding validation (validate_grounding, reused unmodified)
+  against all 988 real cached records, recovering full real per-mention
+  detail (category, subcategory, description, severity, urgency,
+  economic impact, purchase intent, existing workaround, AI suitability,
+  verbatim evidence_span quote) for all 5 completed Phase 3 markets --
+  zero new API calls, zero new real quota spent. Recovered counts (10,
+  11, 2, 6, 6) exactly match the original run's own real aggregate
+  counts, confirming correctness.
+  Rebuilt all 10 interim reports with this real depth: each Technical
+  report now has a full real per-mention table (all real quotes,
+  scores); each Founder report now has a real per-market pain-evidence
+  table plus a genuinely differentiated "what this market needs"
+  synthesis and judgment, since the real qualitative themes now differ
+  meaningfully by market (e.g. Electrical Contractors' real pain
+  clusters around software/pricing/invoicing friction with several
+  ai_suitability 7-9 mentions -> judged PROMISING; Janitorial Services'
+  real pain is mostly sales/customer-acquisition and cash-flow stress
+  with ai_suitability 1/10 -> judged WEAK automation-fit signal).
+  Real bug found and fixed during this pass: an early version of the
+  report-builder script pushed a raw JS array (from
+  `topNeeds.length ? topNeeds.map(...) : [...]`) directly into a
+  Paragraph-children array without spreading it, corrupting 3 of 5
+  Founder .docx files (LibreOffice: "source file could not be loaded").
+  Fixed with the spread operator; all 10 files re-verified (zip
+  integrity + LibreOffice round-trip + visual page review) before
+  re-sending.
+Files:
+  scripts/extract_phase3_real_quotes.py (new, committed); all 10
+  outputs/reports/phase3_interim/*.docx files (regenerated in place,
+  same filenames); progress.txt.
+  outputs/runs/phase3_deep_dive/real_quotes_by_market.json is the real,
+  recovered per-market evidence (gitignored run artifact).
+Verification:
+  extract_phase3_real_quotes.py passed ruff/mypy. All 10 regenerated
+  docx files passed zip-integrity checks; a sample spanning the
+  richest-data market (Electrical Contractors, 10 mentions) and the
+  weakest-signal market (Janitorial Services) were rendered via
+  LibreOffice and reviewed page-by-page as JPEGs, confirming both the
+  bug fix and the real content.
+Limitations/blockers:
+  None new beyond the already-disclosed interim status (M7 and final
+  owner-reviewed M9 still pending for every Phase 3 market).
+Next:
+  Same as AUTONOMOUS-054: resume scripts/discover_phase3_deep_dive.py
+  tomorrow on quota reset for the remaining 9 shortlist markets. When
+  doing so, consider extending the script to persist per-mention raw
+  text directly (avoiding the need for a separate recovery pass next
+  time), or reuse extract_phase3_real_quotes.py's same cache-recovery
+  approach again once the fuller run completes.
+
 2026-09-16 05:05 PKT (UTC+05:00) | AUTONOMOUS-054 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner asked for Phase 3 reports now, on the 5 real markets already
