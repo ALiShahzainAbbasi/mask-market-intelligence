@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-15 14:50 PKT (UTC+05:00)
+Last updated: 2026-09-15 16:50 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,71 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 16:50 PKT (UTC+05:00) | AUTONOMOUS-049 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner: "complete M7 + M9 + light M6." M9 and light M6 (AUTONOMOUS-046,
+  AUTONOMOUS-047) already stand as real, complete-as-honestly-possible
+  results with no further owner correction supplied, so this entry
+  focuses on deepening M7 (AUTONOMOUS-043's 2-of-6-component pass) with
+  real evidence beyond the original homepage-only sample:
+  - accounts_with_economic_buyer: real About/Team-page check (via
+    WebFetch, 2026-09-15) of the same 4 real reachable companies from
+    AUTONOMOUS-043. 2 of 4 name a real, identifiable individual
+    (Dylan Smallwood - President, smallsolutionsheatingandairconditioning
+    .com; Luke Giannone - Founder, tripleotoday.com). A real, reportable
+    data-quality finding along the way: callmattioni.com's "Meet the
+    team" section contains unfilled "Jane Doe"/"Jane Doe First" template
+    placeholder text, not real names -- recorded as an observation about
+    the source, not treated as a name.
+  - meta_fit (active_relevant_advertisers + account_social_presence_
+    rate): real Meta Ad Library check (facebook.com/ads/library, no
+    login required for a basic keyword search), query "HVAC dispatch
+    software", US, active ads: ~37 real active ads; at least 6 real
+    distinct advertisers directly observed before stopping (Housecall
+    Pro, Ascora, Joby, ServiceTitan, Notifi, Podium) -- a conservative
+    real lower bound, not an exhaustive scroll-through count. This
+    independently corroborates AUTONOMOUS-043/048's real M5 competitor
+    findings from a completely different real source, and one real ad
+    (Joby) stated an explicit real price ("$89/month, unlimited users")
+    -- flagged as real, citable evidence for a future M5 pricing_proof
+    pass, not used in this M7 entry. account_social_presence_rate: real
+    WebSearch check confirmed all 4 of the same real companies have an
+    active real Facebook business page with real engagement (785/4,171/
+    1,758 real likes; 41 real reviews at 94% recommended for the
+    fourth) -> 4/4.
+  Real, deepened M7 result: 4 of 6 components now real and AVAILABLE
+  (buyer_identification=0.5, contact_coverage=1.0, channel_diversity=2,
+  meta_fit -- up from 2/6). sales_cycle_simplicity and
+  procurement_simplicity remain honestly missing: no real, free desk
+  source exists for either (both would need real primary/sales-process
+  research). Per v1's all-six-required completeness rule, M7 stays
+  UNKNOWN -- same conclusion as before, substantially more real evidence
+  underneath it.
+Files:
+  scripts/run_m7_us_hvac_10_99.py; progress.txt.
+Verification:
+  Ruff check/format and strict mypy PASS. Live run confirmed 4/6
+  components AVAILABLE with the expected real raw values
+  (0.5/1/2/available). Full offline test suite PASS: 657 passed, 1
+  pre-existing unrelated failure, 8 live-smoke skips (unchanged --
+  calculate_m7/M7Inputs were not modified this entry, only exercised
+  with more real data).
+Limitations/blockers:
+  M7 cannot reach COMPLETE without real primary/sales-process evidence
+  for sales_cycle_simplicity and procurement_simplicity -- desk research
+  has reached its honest ceiling for those two components. The Meta Ad
+  Library advertiser count (6) is a conservative, non-exhaustive real
+  lower bound, not a claimed total; scrolling further would likely find
+  more real distinct advertisers among the ~37 total ads.
+Next:
+  M3/M5/M7/M9/light-M6 all now have real, honest, as-complete-as-
+  desk-research-allows results. Awaiting the owner's direction: fold the
+  real Joby $89/month price point just found into a real M5
+  pricing_proof pass (median_annualized_customer_price_usd), or move to
+  Stage A's remaining structural work (AutomatedResearchScore
+  aggregation, ICP/buyer hypotheses, service opportunity ranking, source
+  register, DOCX dossier assembly).
+
 2026-09-15 14:50 PKT (UTC+05:00) | AUTONOMOUS-048 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner supplied 4 additional real Gemini API keys
