@@ -107,6 +107,17 @@ def _normalize_name(value: str) -> str:
     return unicodedata.normalize("NFKC", value).strip().casefold()
 
 
+def _normalize_competitor_name(value: str) -> str:
+    """Like _normalize_name, but also collapses internal whitespace.
+
+    Verified necessary on real data: Gemini extracted the same real
+    company as both "housecall pro" and "house call pro" across
+    different real comments -- same company, different real spacing --
+    which _normalize_name's case/unicode-only fold does not collapse and
+    which would otherwise double-count one real competitor as two."""
+    return "".join(_normalize_name(value).split())
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         raise SystemExit("Usage: extract_m5_competitors_us_hvac_10_99.py <collection_run_dir>")
@@ -192,7 +203,7 @@ def main() -> None:
                 output = CompetitorOutput.model_validate(report.scoring_input)
                 entry["records_extracted"] = len(output.records)
                 for record in output.records:
-                    name_key = _normalize_name(record.competitor_name)
+                    name_key = _normalize_competitor_name(record.competitor_name)
                     records_by_competitor[name_key].append(record)
             entry["outcome"] = "processed"
         except GeminiError as error:
