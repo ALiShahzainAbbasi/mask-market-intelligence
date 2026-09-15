@@ -1,7 +1,7 @@
 MASK AI MARKET INTELLIGENCE & SELECTION SYSTEM
 MASTER PROGRESS TRACKER
 ========================================================================
-Last updated: 2026-09-15 01:10 PKT (UTC+05:00)
+Last updated: 2026-09-15 13:50 PKT (UTC+05:00)
 Tracker version: 1
 Project root: outputs/mask-market-intelligence/ (relative to workspace)
 Canonical tracker: progress.txt in this project root
@@ -2545,6 +2545,54 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 13:50 PKT (UTC+05:00) | AUTONOMOUS-047 | RESEARCH-STAGE-A | IN_PROGRESS
+Work:
+  Owner: "now lets start the next modules." Checked the Gemini free-tier
+  quota with one real, cheap call before doing anything else -- status
+  200, real response -- confirming the AUTONOMOUS-042/045 daily-cap
+  blocker has cleared with the calendar rollover to 2026-09-15. Resumed
+  the real M3 extraction (scripts/extract_m3_workflow_us_hvac_10_99.py,
+  already built and fixed in AUTONOMOUS-042) against the same 30 real
+  O*NET task statements. This time every one of the 30 real Gemini calls
+  completed and was A10-ACCEPTED (0 rejections, 0 needs_review -- a
+  cleaner run than M2's, consistent with O*NET text being short, factual
+  task descriptions rather than casual comments prone to unverifiable
+  claims). Real, honest M3Result: status=UNKNOWN
+  (m3.step_component_missing), 30 distinct real workflow steps captured
+  (e.g. "Install, connect, or adjust thermostats, humidistats, or
+  timers"; "Test pipes, lines, components, and connections for leaks"),
+  every one correctly missing all 6 quantified components
+  (volume/labor_burden/failure_rate/business_consequence/
+  automation_potential/manuality) because O*NET task statements state
+  WHAT is done, never how often/how long/how it fails -- exactly the
+  instruction this pipeline's task_instructions gave Gemini, and exactly
+  what workflow_intelligence/AGENTS.md's completeness rule (any missing
+  component keeps the whole result UNKNOWN) is designed to surface
+  honestly rather than paper over. Real cost: $0.031.
+Files:
+  progress.txt. (m3_result.json etc. are gitignored outputs/runs/
+  output; the script itself was already committed in AUTONOMOUS-042.)
+Verification:
+  Live run completed end to end, exit code 0, 30/30 real Gemini calls
+  ACCEPTED. m3_result.json's per-step missing_components and
+  component_sample_counts (all 0) were read directly to confirm the
+  UNKNOWN status is the real, correct calculate_m3() output for this
+  real input, not a bug -- no source code changed this entry.
+Limitations/blockers:
+  O*NET alone cannot produce a scored M3 for this market: it has no
+  frequency/labor-hours/failure-rate data by design. A scored M3 would
+  need a source that states those (e.g. real job postings describing
+  actual workload, or primary interview evidence -- overlapping with
+  M8's territory) -- not attempted this entry.
+Next:
+  Move to full M5 (competitive intelligence): run real COMPETITOR_V1
+  Gemini extraction over a targeted real competitor-evidence sweep
+  (comments on the real "Jobber vs Housecall Pro vs FieldEdge"-style
+  comparison videos already discovered, plus any other real accessible
+  competitor evidence), now that the Gemini quota is confirmed clear,
+  to move AUTONOMOUS-043's UNKNOWN/1-of-5-component M5 result toward a
+  real, more complete score.
+
 2026-09-15 01:10 PKT (UTC+05:00) | AUTONOMOUS-046 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner supplied the real capability registry that AUTONOMOUS-043 asked
