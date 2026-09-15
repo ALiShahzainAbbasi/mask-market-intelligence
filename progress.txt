@@ -2545,6 +2545,85 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-16 04:15 PKT (UTC+05:00) | AUTONOMOUS-052 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Permanent, project-wide owner directive (2026-09-16): every market
+  reporting stage must now produce TWO separate real DOCX reports, not
+  one combined report -- a Technical Evidence & Audit Report (full real
+  methodology/status/sources for researchers) and a Founder Market
+  Decision Report (business-facing, Canonical/Partial/Observed-Signal
+  scores clearly distinguished, zero-evidence methods omitted). Saved as
+  a durable memory (feedback_two_report_requirement) so this rule
+  survives session boundaries. Retroactively applied to us_hvac_10_99
+  Stage A: split the prior single combined report into
+  outputs/reports/us_hvac_10_99_StageA_Technical_Evidence_Report.docx
+  and outputs/reports/us_hvac_10_99_StageA_Founder_Decision_Report.docx
+  (both real, LibreOffice-rendered and visually verified page-by-page).
+  The Founder report computes real Partial Decision Scores (renormalized
+  over only observed original-weight components, never padded) for M4
+  (3.75/10, 15% coverage), M5 (3.31/10, 55% coverage), M7 (6.32/10, 70%
+  coverage) and a real Observed Signal Score for M2 (5.6/10, built from
+  the actual per-mention severity/economic_impact/purchase_intent/
+  ai_suitability values in the 9 real M2 pain mentions, n=2-9 per
+  dimension, explicitly labeled low-confidence/thin-sample) -- all
+  distinct from and never overwriting the real canonical M1 (6.34) and
+  M9 (6.48, draft) scores. M3 and M6 (zero scoreable decision evidence)
+  are correctly omitted from the Founder scorecard per the new rule.
+  Stage B Wave B's report and the still-pending Phase 3 report still
+  need the same two-report split -- not yet done, explicit next step.
+
+  Also: Phase 3 deep-dive (scripts/discover_phase3_deep_dive.py, first
+  launched AUTONOMOUS-051) ran to its real, designed quota-exhaustion
+  stop: 5 of the 14 shortlist markets completed with real HVAC-
+  comparable-depth evidence (6 queries, up to 200 Gemini candidates/
+  market) before real YouTube quota (8,365/9,000 used today, cumulative
+  with Wave B) ran out. Real result, honestly better than Wave B's: real
+  m2_light pain mentions were found in EVERY one of the 5 completed
+  markets this time (10, 11, 2, 6, and 6 real mentions respectively --
+  vs. 0/24 in Wave B's thin-sample pass), confirming the evidence-volume
+  hypothesis from AUTONOMOUS-050/051. Real composite scores (m1+m9-proxy
+  only; m2/m4 still real UNKNOWN per-market despite mentions existing,
+  because the real PainIntelligenceService clustering rule and
+  calculate_m4's component-completeness rule were not met even with
+  mentions present): Electrical Contractors 6.26 (40% coverage),
+  Landscaping Services 5.55 (40%), Site Preparation Contractors 4.76
+  (40%), Other Building Equipment Contractors 4.60 (30%, no real
+  mentions cleared clustering), Janitorial Services 3.66 (40%). The
+  script stopped itself cleanly and correctly (STOPPING: real quota
+  remaining 535 < 600 needed for Security Systems Services), zero
+  crashes, checkpoint file intact for resumption.
+Files:
+  scripts/discover_phase3_deep_dive.py (new, committed this entry);
+  outputs/reports/us_hvac_10_99_StageA_Technical_Evidence_Report.docx,
+  outputs/reports/us_hvac_10_99_StageA_Founder_Decision_Report.docx
+  (new); progress.txt. outputs/runs/phase3_deep_dive/phase3_results.json
+  is the real, resumable checkpoint (gitignored, same pattern as every
+  other real-evidence run).
+Verification:
+  Ruff check/format and mypy strict pass on the new script; full offline
+  test suite (657 passed, 1 pre-existing unrelated failure, 8 live-smoke
+  skips). Both new HVAC docx reports were rendered via the
+  newly-installed real LibreOffice + Poppler toolchain (winget-installed
+  this session, per owner request) and visually verified page-by-page
+  before sending -- not just structurally validated as in earlier
+  entries, a real improvement in verification rigor now available.
+Limitations/blockers:
+  Real daily YouTube quota is now the hard pacing constraint on Phase 3:
+  at ~650-900 real units/market (query count + comment fetches), roughly
+  9-11 markets/day is the real ceiling when quota is available fresh;
+  today's run only had ~3,900 units of real headroom left after Wave B,
+  yielding 5 markets. 9 of 14 shortlist markets remain for a later real
+  day. Stage B Wave B's report and Phase 3's eventual report both still
+  owe the new mandatory two-report split.
+Next:
+  Re-run scripts/discover_phase3_deep_dive.py on a later real day (fresh
+  9,000-unit quota) to continue the remaining 9 shortlist markets from
+  its real checkpoint. Split outputs/reports/
+  StageB_WaveB_MultiSource_PreScreen_Report.docx into the two mandatory
+  reports. Once Phase 3 fully completes, produce its own Technical +
+  Founder report pair and use the results to narrow toward the final
+  10-20-market Stage B list.
+
 2026-09-15 23:58 PKT (UTC+05:00) | AUTONOMOUS-051 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Ran Stage B Wave B (scripts/discover_wave_b_top24.py) on the real top 24
