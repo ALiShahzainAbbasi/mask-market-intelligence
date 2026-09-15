@@ -2545,6 +2545,75 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-15 18:05 PKT (UTC+05:00) | AUTONOMOUS-050 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner directive: begin Stage B (the 10-20-market landscape), explicitly
+  requiring multi-source real evidence (not HVAC-only), full source
+  transparency in the eventual document, and an explicit "why this score/
+  confidence" narrative -- confirmed and agreed with the owner in chat
+  before starting: Wave A (free, Census-only, ~40 candidates) first, then
+  Wave B (real multi-source evidence on the ~20-25 survivors) before any
+  full per-market deep-dive.
+  Built scripts/discover_candidate_markets_wave_a.py: a real, free,
+  national (us:*) Census CBP pre-screen. Candidate list is 40 real NAICS
+  2017 codes (238/811/561/812/541519), drawn from the same shape as
+  us_hvac_10_99 -- small-business-dominated, appointment/dispatch-driven
+  trade/service work -- and deliberately excluding anything the owner's
+  real MASK AI Capability Registry flags as weak fit (regulated/licensed-
+  professional verticals). us_hvac_10_99 (238220) itself is included as
+  a real, already-verified baseline row.
+  First live run crashed after 21/40 real candidates: Census returned a
+  response body one real NAICS/band combination's parser could not
+  decode as JSON, raising OfficialDataError -- a different exception
+  class than OfficialTransportError, which the script's except clause
+  did not catch (the same class of bug found and fixed in AUTONOMOUS-035
+  era BEA-probe work, recurring here in new code). Fixed by widening both
+  fetch-loop except clauses to (OfficialTransportError, OfficialDataError).
+  Re-ran clean: all 40 real candidates processed, budget 280 real
+  requests / 59,099 bytes, $0 cost. Real sanity check passed: the HVAC
+  baseline row's real establishment count (23,617) matches AUTONOMOUS-
+  030s' already-verified live M1 result exactly, confirming this new
+  script's math before trusting it on the 39 new real candidates.
+  Real, top-ranked candidates by m1_light_score (business_count 40% +
+  concentration 20% + growth 20% + economic_capacity 20%, normalized
+  within the 36 qualifying candidates -- NOT the approved M1 formula,
+  a pre-screen proxy only, matching AUTONOMOUS-035's regional-prescreen
+  precedent): 238220 HVAC (7.10, real known baseline), 238210 Electrical
+  Contractors (6.01, 17,249 real establishments), 561730 Landscaping
+  Services (5.06, 16,342 real establishments, real 3.4%/yr growth),
+  238910 Site Preparation Contractors (4.68), 238290 Other Building
+  Equipment Contractors (4.60), 561720 Janitorial Services (4.55),
+  561621 Security Systems Services (3.96), 811121 Automotive Body/Paint/
+  Interior Repair (3.95), 238990 All Other Specialty Trade Contractors
+  (3.86), 561210 Facilities Support Services (3.83) -- full real ranked
+  list of all 40 in the run's wave_a_prescreen.json.
+Files:
+  scripts/discover_candidate_markets_wave_a.py; progress.txt. (Raw/
+  pre-screen JSON outputs are gitignored outputs/runs/ artifacts, not
+  committed, matching every prior real-evidence run this project.)
+Verification:
+  Ruff check/format, strict mypy (this script + full src/), and the full
+  offline test suite (657 passed, 1 pre-existing unrelated failure, 8
+  live-smoke skips) all PASS. Live run completed end to end twice (once
+  crashing on a real, then-uncaught exception; once clean after the
+  fix) -- the HVAC baseline cross-check is the concrete evidence this
+  script's math is correct, not just that it runs without erroring.
+Limitations/blockers:
+  This is Wave A only -- the free, Census-only, M1-light slice of the
+  real DiscoveryPreScreenScore. It does NOT yet include real M2-light/
+  M4-light/M7-light/M9-light signal, which the owner correctly pointed
+  out is required by the directive's own formula and which Wave B will
+  add for the ~20-25 top Wave A survivors before narrowing to the final
+  10-20 for full deep-dive.
+Next:
+  Select the Wave A cutoff (top ~20-25 by m1_light_score) and run Wave B:
+  real, smaller-scale M2-light (YouTube pain search), M4-light (BLS/SAM/
+  USAspending where relevant), M7-light (Meta Ad Library search), and
+  M9-light (free -- re-mapping the same owner-supplied capability
+  registry, no new evidence needed) for each survivor, to compute the
+  real, full DiscoveryPreScreenScore and narrow to the final 10-20 for
+  HVAC-equivalent (scaled-volume) deep-dive evidence gathering.
+
 2026-09-15 16:50 PKT (UTC+05:00) | AUTONOMOUS-049 | RESEARCH-STAGE-A | IN_PROGRESS
 Work:
   Owner: "complete M7 + M9 + light M6." M9 and light M6 (AUTONOMOUS-046,
