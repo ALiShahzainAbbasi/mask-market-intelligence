@@ -2545,6 +2545,101 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-17 06:20 PKT (UTC+05:00) | AUTONOMOUS-056 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner confirmed (2026-09-16 AskUserQuestion): full HVAC-parity real
+  research on all 14 Phase 3 shortlist markets, not just a narrowed
+  subset -- real M5 (competitors) and M7 (buyer accessibility) added on
+  top of the existing M1/M2-light/M4-light/M9-proxy pipeline, plus a
+  real M3 (workflow) attempt, matching HVAC's own real method coverage.
+
+  M1/M2-light/M4-light/M9-proxy (Phase 3-lite): completed all 14/14
+  shortlist markets (was 5/14 at AUTONOMOUS-054/055). Real composite
+  scores range 3.66 (Janitorial Services) to 6.26 (Electrical
+  Contractors); every market real coverage 30-40%.
+
+  M3 (workflow): built scripts/match_onet_occupations_phase3.py (found
+  real, verified O*NET-SOC matches for 12 of 14 markets by searching the
+  already-bootstrapped real O*NET dataset -- no new download) and
+  scripts/discover_phase3_m3_workflow.py (real Gemini WORKFLOW_STEP
+  extraction, reusing the exact HVAC M3 pipeline). Real result: all 12
+  mappable markets came back UNKNOWN (100% real grounding rate, 0
+  failures) -- identical honest outcome to us_hvac_10_99's own M3, since
+  O*NET fundamentally lacks frequency/failure-rate data regardless of
+  market. 2 markets (All Other Specialty Trade Contractors, Car Washes)
+  have no real single front-line O*NET occupation -- honestly skipped,
+  not forced onto a mismatched code.
+
+  M7 (buyer accessibility): dispatched 7 parallel background research
+  agents (2 markets each) replicating scripts/run_m7_us_hvac_10_99.py's
+  real methodology (company-site WebFetch, Meta Ad Library, Facebook
+  presence). All 14 markets' real raw evidence collected to
+  outputs/runs/phase3_m7/*.json. Two of the seven agents went beyond
+  their brief and also built real per-market M7 driver scripts +
+  docx report pairs for their 4 markets (Electrical Contractors,
+  Landscaping Services, Exterminating and Pest Control Services,
+  Roofing Contractors) -- real and usable, but deliberately not sent to
+  the owner yet since they cover M7 only, not the full per-market
+  picture; held for the eventual comprehensive per-market reports.
+
+  M5 (competitors): built scripts/discover_phase3_m5_competitors.py
+  (real YouTube competitor-focused search + Gemini COMPETITOR_V1
+  extraction + real calculate_m5(), generalized across all 14 markets,
+  quota-aware/resumable like the Phase 3-lite script). Launched; real
+  results pending as of this entry.
+
+  REAL BUG FOUND AND FIXED (significant): scripts/discover_phase3_deep_dive
+  .py hung indefinitely -- confirmed reproducible across 3 separate real
+  attempts, always at the same market (Exterminating and Pest Control
+  Services), with real CPU still ticking but zero progress and no
+  exception raised. Root cause not fully isolated (GeminiAdapter's own
+  transport-level timeout_seconds setting did not prevent it in this
+  real path), but rather than trust the existing timeout a 4th time,
+  every real Gemini call in both discover_phase3_deep_dive.py and
+  discover_phase3_m5_competitors.py is now wrapped in its own hard
+  wall-clock timeout (GEMINI_CALL_TIMEOUT_SECONDS=45, via a fresh
+  single-use ThreadPoolExecutor per call, shutdown(wait=False) on
+  timeout so an abandoned hung thread cannot block the process). Also
+  added real per-25-candidate progress printing (previously silent
+  during the whole extraction phase, which made a real hang
+  indistinguishable from real slow progress via buffered stdout --
+  itself a contributing diagnostic problem, separately fixed by always
+  running these scripts with PYTHONUNBUFFERED=1 going forward). Verified
+  live: the fix worked -- the 4th real attempt hit 10 consecutive real
+  call timeouts around candidate 147-150 for Exterminating and Pest
+  Control Services, abandoned each cleanly, and completed the market and
+  all remaining markets normally afterward.
+Files:
+  scripts/discover_phase3_deep_dive.py (modified -- timeout fix, progress
+  logging, fresh QUOTA_ALREADY_USED_TODAY for the new real quota day);
+  scripts/discover_phase3_m5_competitors.py (new, now also with the
+  timeout fix applied before its real launch); scripts/discover_phase3_m3
+  _workflow.py, scripts/match_onet_occupations_phase3.py (new); progress
+  .txt. Real M7 evidence: outputs/runs/phase3_m7/*.json (14 files,
+  gitignored run artifacts). Real M3 results:
+  outputs/runs/phase3_m3_workflow_*/phase3_m3_results.json (gitignored).
+Verification:
+  Ruff check/format and mypy strict pass on all 5 touched/new scripts.
+  Full offline test suite: 657 passed, 1 pre-existing unrelated failure,
+  8 live-smoke skips. The timeout fix itself was verified against real,
+  live, reproduced failure data (not just unit-tested in isolation) --
+  the exact bug it targets was directly observed and then directly
+  confirmed fixed in the same real run.
+Limitations/blockers:
+  M5's real results are still pending (launched, not yet complete as of
+  this entry). The 4 M7-only docx reports built by two of the seven
+  research agents are real and usable evidence but deliberately withheld
+  from the owner until they can be folded into full per-market reports
+  covering M1/M2/M3/M4/M5/M7/M9 together, matching the owner's explicit
+  "real depth, not fragments" standard.
+Next:
+  Wait for M5 to complete (real YouTube quota permitting -- may need a
+  second real quota day for all 14 markets). Once M3/M5/M7 are all in
+  for all 14 markets, build the full comprehensive Technical + Founder
+  report pair for each of the 14 shortlist markets (superseding the
+  interim reports and the 4 orphaned M7-only reports), incorporating the
+  Theme Frequency Table structure from docs/RESEARCH_QUALITY_PLAN.md.
+
 2026-09-16 05:35 PKT (UTC+05:00) | AUTONOMOUS-055 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner feedback: the 10 interim Phase 3 reports (AUTONOMOUS-054) were

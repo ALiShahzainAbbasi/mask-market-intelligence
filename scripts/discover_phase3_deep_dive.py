@@ -32,14 +32,16 @@ on m2_light/m4_light, exactly like Wave B's real, reported outcome for
 22/24 markets and exactly like calculate_m4()'s own real UNKNOWN
 behavior when a required component is missing.
 
-REAL DAILY QUOTA CONSTRAINT, handled honestly, not glossed over: Wave B
-already spent 5,077 of today's real 9,000-unit YouTube Data API quota
-(same real Google quota day -- YouTube resets at Pacific Time midnight,
-not local time, so Wave B's real usage still counts against today's
-pool). This script's local YouTubeQuotaLedger is seeded with
-units_used=WAVE_B_QUOTA_ALREADY_USED_TODAY to reflect that real fact,
-not started fresh at 0 (which would let this process send real requests
-Google will actually reject). At ~650-700 real units/market (6 queries +
+REAL DAILY QUOTA CONSTRAINT, handled honestly, not glossed over: real
+YouTube Data API quota resets daily at Pacific Time midnight (not local
+time), so this script's local YouTubeQuotaLedger must be seeded with
+units_used=QUOTA_ALREADY_USED_TODAY reflecting whatever this real
+Google account has genuinely already spent on the CURRENT real Pacific
+quota day -- update that constant before each run (AUTONOMOUS-051's run
+on 2026-09-15 used 5,077 from Wave B; AUTONOMOUS-056's run on 2026-09-16
+is a fresh real day, so it starts at 0). Starting fresh at 0 on a day
+where real usage is nonzero would let this process send real requests
+Google will actually reject. At ~650-700 real units/market (6 queries +
 comment-thread fetches), only a handful of markets fit in whatever real
 quota remains today; the rest wait for tomorrow's real reset.
 
@@ -63,6 +65,7 @@ Usage:
 
 from __future__ import annotations
 
+import concurrent.futures
 import hashlib
 import json
 import os
@@ -148,7 +151,13 @@ TOP_N_INCLUDING_HVAC = 25
 HVAC_NAICS = 238220
 SHORTLIST_SIZE = 14
 
-WAVE_B_QUOTA_ALREADY_USED_TODAY = 5_077
+QUOTA_ALREADY_USED_TODAY = 0
+# 2026-09-16: real Pacific-Time calendar day rolled over since AUTONOMOUS-051's
+# run (which used WAVE_B_QUOTA_ALREADY_USED_TODAY = 5_077 for 2026-09-15's real
+# quota day). Real YouTube quota resets daily -- update this constant to
+# whatever this real Google account has genuinely already spent TODAY (Pacific
+# Time) before each invocation; it must never carry a stale prior-day value
+# forward, or this script will under-use real available quota.
 DAILY_QUOTA_LIMIT = 9_000
 QUOTA_SAFETY_MARGIN = 100
 
@@ -158,6 +167,19 @@ MIN_COMMENT_LENGTH = 100
 MAX_GEMINI_CANDIDATES_PER_MARKET = 200
 MODEL_REFERENCE = "gemini-flash-lite-latest"
 SLEEP_BETWEEN_GEMINI_CALLS_SECONDS = 1.2
+# Real bug found live (2026-09-16/17): scripts/discover_phase3_deep_dive.py
+# hung indefinitely, three separate times, on the same market's Gemini
+# extraction loop -- no exception, no progress, real CPU still ticking.
+# GeminiAdapter's underlying HTTP call has its own real timeout_seconds
+# setting, but something in this real run's path (never fully isolated --
+# possibly a pathological single comment, possibly a transport-level
+# retry edge case) did not honor it. Rather than trust that timeout alone
+# a second time, every real Gemini call in this script is now wrapped in
+# its own hard wall-clock timeout via a worker thread -- if a single real
+# call exceeds this, it is abandoned and logged as a real timeout, and
+# the loop moves on to the next real candidate instead of hanging the
+# whole market (and every market queued after it) forever.
+GEMINI_CALL_TIMEOUT_SECONDS = 45.0
 
 WEIGHTS = {
     "m1_light": Decimal("0.30"),
@@ -313,7 +335,7 @@ def _extract_pain_mentions(
 
     mentions_by_id: dict[str, PainMention] = {}
     log: list[dict[str, object]] = []
-    for comment in candidates:
+    for index, comment in enumerate(candidates):
         text = str(comment["text"])
         normalized_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
         request = AnalysisRequest(
@@ -339,7 +361,27 @@ def _extract_pain_mentions(
         )
         entry: dict[str, object] = {"comment_id": comment["comment_id"]}
         try:
-            result = gemini_client.analyze(request, ledger)
+            # Fresh single-use executor per call, shut down with wait=False:
+            # if this specific call hangs past GEMINI_CALL_TIMEOUT_SECONDS,
+            # it is abandoned immediately (the worker thread may leak in the
+            # background, but this process does not block waiting for it --
+            # a plain `with ThreadPoolExecutor()` block would still block on
+            # shutdown(wait=True) even after future.result() times out,
+            # defeating the whole point).
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+            future = executor.submit(gemini_client.analyze, request, ledger)
+            try:
+                result = future.result(timeout=GEMINI_CALL_TIMEOUT_SECONDS)
+            except concurrent.futures.TimeoutError:
+                executor.shutdown(wait=False)
+                entry["outcome"] = "real_call_timeout_abandoned"
+                log.append(entry)
+                print(
+                    f"    [{index + 1}/{len(candidates)}] Gemini call exceeded "
+                    f"{GEMINI_CALL_TIMEOUT_SECONDS}s -- abandoned, continuing."
+                )
+                continue
+            executor.shutdown(wait=False)
             if result.status != AnalysisStatus.COMPLETED:
                 entry["outcome"] = f"analysis_{result.status.value}"
                 log.append(entry)
@@ -365,6 +407,10 @@ def _extract_pain_mentions(
         except GeminiError as error:
             entry["outcome"] = f"gemini_error:{error.code}"
         log.append(entry)
+        if (index + 1) % 25 == 0 or index == len(candidates) - 1:
+            print(
+                f"    [{index + 1}/{len(candidates)}] real mentions so far: {len(mentions_by_id)}"
+            )
         time.sleep(SLEEP_BETWEEN_GEMINI_CALLS_SECONDS)
     return list(mentions_by_id.values()), log
 
@@ -568,7 +614,7 @@ def main() -> None:
     )
     quota = YouTubeQuotaLedger(
         YouTubeQuotaLimits(max_quota_units=DAILY_QUOTA_LIMIT - QUOTA_SAFETY_MARGIN),
-        units_used=WAVE_B_QUOTA_ALREADY_USED_TODAY,
+        units_used=QUOTA_ALREADY_USED_TODAY,
     )
     print(
         f"Real YouTube quota today: {quota.units_used} used, "
