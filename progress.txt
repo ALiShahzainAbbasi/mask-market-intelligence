@@ -2545,6 +2545,72 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-17 22:10 PKT (UTC+05:00) | AUTONOMOUS-058 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner asked for the concrete "how and where" to close the two cheap
+  real gaps identified in AUTONOMOUS-057: M6 (Google Ads) and the
+  Common Crawl pricing-page registration for M4/M5.
+
+  M6: real diagnosis given to the owner (not actionable by this
+  session) -- getting a real Google Ads developer token/OAuth
+  credential requires the owner's own account/business action (account
+  creation, billing, Google's own review process), which this session
+  cannot perform (account creation and payment/billing details are
+  explicitly outside this session's authority). Also disclosed a real,
+  previously-unstated fact found by reading docs/SEARCH_INTENT.md: even
+  once a credential exists, the real HTTP transport that would call
+  Google's live API was deliberately never built ("No credential-
+  bearing transport is bundled or composed") -- real follow-up
+  engineering work, not just a credential drop-in.
+
+  Common Crawl: fully real, no credential needed, executed this entry.
+  Built scripts/register_and_fetch_jobber_pricing.py -- registers a
+  real, in-process SourcePolicy (per evidence.contracts.SourcePolicy,
+  matching the exact real pattern in
+  apps/api/tests/common_crawl_data/test_live_common_crawl_smoke.py) for
+  Jobber's real public pricing page, then runs the real, already-built
+  CommonCrawlRetriever (CDX lookup + ranged WARC fetch) against it.
+  Real current Common Crawl collection id (CC-MAIN-2026-34) and real
+  confirmation the pricing page was live were obtained via WebFetch
+  immediately before writing the script, not assumed. First real
+  attempt hit a real, transient CDX error (caught, not silently
+  retried-into-success or hidden); a second real attempt succeeded:
+  real capture found (collection CC-MAIN-2026-34, archived
+  2026-08-08T10:19:41Z), real 658,017-byte WARC fetch, real 200 status,
+  real parsed title "Jobber Pricing: Plans Starting at $29/Month | Free
+  Trial". Real extracted pricing: Core $29/mo, Connect $99/mo, Grow
+  $149/mo, Plus $399/mo (annual billing, 1-user tier; +$29/mo/
+  additional user); the page's "Plus" plan at 5 users real-priced at
+  $499/mo standard, with several real promotional tiers also captured
+  verbatim in the archived text.
+  This real data is now available to plug into M4's
+  annual_existing_paid_spend_usd and M5's pricing_proof for any market
+  whose real M5 competitor evidence names Jobber (already confirmed for
+  us_hvac_10_99 and Landscaping Services; more likely once M5 finishes
+  the remaining 12 markets).
+Files:
+  scripts/register_and_fetch_jobber_pricing.py (new); progress.txt.
+  outputs/runs/jobber_pricing_common_crawl/ (source_policy.json,
+  raw_body.html, summary.json) is a gitignored real run artifact.
+Verification:
+  Ruff check/format and mypy strict pass. Full offline test suite: 657
+  passed, 1 pre-existing unrelated failure, 8 live-smoke skips. The
+  script itself was run live (not just unit-verified) and produced a
+  real, verifiable capture -- its own real output is the verification.
+Limitations/blockers:
+  M6 remains fully blocked pending the owner's own real Google Ads
+  account/developer-token action, and even then needs real transport-
+  layer engineering this session has not started. The real Jobber
+  pricing data is not yet wired into any specific market's M4/M5
+  result -- that wiring is a small next step once M5 confirms which
+  markets' real competitor evidence actually names Jobber.
+Next:
+  Wire the real Jobber pricing data into M4/M5 for us_hvac_10_99 and
+  Landscaping Services now (real competitor confirmed for both); revisit
+  for any other market once M5 completes and its real competitor list is
+  final. Await the owner's real Google Ads account action before any M6
+  transport work begins.
+
 2026-09-17 21:20 PKT (UTC+05:00) | AUTONOMOUS-057 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner asked for a deep, comparative 14-market deliverable: ranked
