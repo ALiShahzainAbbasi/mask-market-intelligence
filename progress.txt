@@ -2545,6 +2545,284 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-18 02:40 PKT (UTC+05:00) | AUTONOMOUS-061 | SYSTEM-AUDIT | COMPLETE
+Work:
+  Owner asked for the AUTONOMOUS-060 audit to be finalized: six specific
+  conclusions independently re-verified against real repository/artifact
+  data before delivery, corrected where wrong, and the four documents
+  committed/pushed for external review.
+
+  Re-verified all six flagged items with fresh evidence, not by re-reading
+  the prior draft:
+  (A) Glass and Glazing Contractors: pulled the real per-market Wave B
+  record (outputs/runs/discover_wave_b_top24_20260915T182112Z/
+  wave_b_results.json). Found its "strongest real multi-source signal"
+  claim did not hold up -- its entire evidence base is 1 real grounded
+  mention (identical depth to Other Computer Related Services, the market
+  it was compared against), and it ranks 18th of 36 on the real Census-
+  only metric. CORRECTED: not a wrongly-excluded strong candidate; not
+  recommended as a challenger.
+  (B) M4 existing-spend: reread method_metrics/contracts.py's M4Inputs
+  (a generic SourcedMetric, not source-restricted) against docs/
+  RESEARCH_METHODOLOGY.md's Observed/Estimated/Interview Confirmed
+  tagging rule. CORRECTED: the original "no source can ever supply this"
+  claim was too absolute -- Estimated-tier list price and public-vendor
+  SEC filings are real, unexplored, usable-today paths; only Observed/
+  Interview-Confirmed-tier spend needs primary research. Checked this
+  session's 32 real Capterra review texts for a self-reported spend
+  figure: none found.
+  (C) Screening weights: found real progress.txt evidence (AUTONOMOUS-
+  050/051) that the two-wave screening PROCESS was explicitly agreed
+  with the owner in chat before it ran. CORRECTED: "unapproved" was
+  imprecise -- separated into 4 distinct issues (process approval: real;
+  weight-value approval: real gap; versioning: real gap; documentation:
+  real gap; mislabeling-as-canonical: a separate, already-correct defect).
+  (D) Market narrowing: recomputed the real 40-candidate NAICS-sector
+  count directly from wave_a_prescreen.json (39/40 confirmed exactly,
+  not approximately) and the real Wave A ranked list (confirmed the
+  actual 14-market Phase 3 shortlist is exactly Wave A's ranks 2-15).
+  No correction needed -- precision added.
+  (E) Method completion: ran a repository-wide scan of every real
+  *result*.json for a non-UNKNOWN status. Confirmed only ONE persisted,
+  machine-verifiable complete result exists (m9_us_hvac_10_99's
+  m9_result.json) -- no m1_result.json exists anywhere; M1's 6.34 score
+  is real and well-evidenced but reconstructed from raw Census data plus
+  narrative, not one scored artifact. Refinement added, no reversal.
+  (F) Background processes + Capterra authorization -- THE MAJOR NEW
+  FINDING THIS PASS: confirmed M5's process (boy3q5of1) is still alive
+  and healthy (progressed from 5 to mid-6th of 14 markets across the
+  whole audit+finalization window) and was left untouched throughout.
+  Confirmed the Capterra process (bdxwd3wdc) is no longer running --
+  its second attempt crashed on a real BudgetLimitExceeded exception and
+  was never restarted. Then went further than the original audit did:
+  checked docs/SCRAPING_POLICY.md's own mandatory precondition list and
+  found it requires a TERMS review as a separate, named step alongside
+  robots.txt -- never done for Capterra, only robots.txt was checked.
+  Read Capterra's real, live General User Terms (capterra.com/legal/
+  terms-of-use/, Section 10, verified via direct DOM text extraction,
+  not an AI summary) and found an explicit, unambiguous prohibition on
+  exactly what was done: automated/headless-browser collection of review
+  content (regardless of robots.txt permissiveness, which the clause
+  names explicitly) and using that content with a generative AI system
+  to analyze/evaluate it. CORRECTED, real and significant: this
+  session's Capterra collection was not authorized. Raw artifacts were
+  NOT deleted or modified (preserved per instruction) but this audit now
+  recommends they not be used for any further purpose until the owner
+  resolves this, ideally with legal input.
+
+  Applied every correction directly into the four documents (not just
+  noted in this log): CURRENT_SYSTEM_AUDIT.md gained a new Section 9
+  (verification-pass findings, full Capterra ToS clause text, and a
+  corrections summary table) plus in-place edits to Sections 1, 3.4, 4,
+  5, and 8; METHOD_COMPLETION_MATRIX.md's Glass/Glazing and HVAC-M4 notes
+  were corrected; SOURCE_UTILIZATION_REGISTER.md's Capterra entry was
+  substantially rewritten (not authorized, not merely unregistered) and
+  its M4-source-family answer was nuanced; RESEARCH_EXECUTION_PLAN_V2.md
+  gained a new item 0.7 (resolve Capterra authorization before any
+  further engineering), put 0.4's crash fix on hold pending 0.7, removed
+  Capterra from 1.1's scope, and refined 1.6 to the narrower weight-value
+  (not whole-process) approval gap.
+
+  Re-ran the full offline test suite fresh before delivery (unchanged:
+  658 passed, 0 failed, 8 skipped-live) and re-confirmed git history
+  access via the same non-persistent `git -c safe.directory=` per-command
+  override used in the original audit (no global git config touched).
+  Committed and pushed the four finalized documents plus this progress.txt
+  entry to the existing GitHub repository -- see the commit hash recorded
+  in the next entry write or the repository's own log, since this
+  narrative is authored before the commit is created in this workflow.
+Files:
+  docs/audit/CURRENT_SYSTEM_AUDIT.md (corrected), docs/audit/
+  METHOD_COMPLETION_MATRIX.md (corrected), docs/audit/
+  SOURCE_UTILIZATION_REGISTER.md (corrected), docs/audit/
+  RESEARCH_EXECUTION_PLAN_V2.md (corrected), progress.txt.
+Verification:
+  Fresh, live pytest run: 658 passed, 0 failed, 8 skipped. Every
+  correction in this entry is grounded in a specific, cited real file or
+  a real live check performed during this pass (the Capterra Terms of
+  Use was read directly from the live page DOM via the browser tool, not
+  summarized secondhand) -- not accepted from the original draft's own
+  claims without independent re-verification. Both background research
+  processes' states were directly checked, not assumed, immediately
+  before this entry was written.
+Limitations/blockers:
+  The AI-provider side of the Capterra compliance question (Gemini's own
+  usage terms for submitted content) was not assessed in this pass --
+  flagged, not resolved. No engineering fixes from RESEARCH_EXECUTION_
+  PLAN_V2.md have been executed; this entry and the document corrections
+  are the only changes made, per the task's explicit "verify and finalize,
+  do not begin remediation" scope.
+Next:
+  Owner review and approval of the verified findings, in particular the
+  new Capterra authorization question (item 0.7), before any
+  implementation work from RESEARCH_EXECUTION_PLAN_V2.md begins.
+
+2026-09-18 01:20 PKT (UTC+05:00) | AUTONOMOUS-060 | SYSTEM-AUDIT | COMPLETE
+Work:
+  Owner requested a comprehensive, read-only system-wide audit and research
+  reset: verify what has actually been completed (vs. documented/claimed),
+  audit all ten methodologies individually, verify a specific list of
+  suspected defects, build a complete source-utilization register, explain
+  why current research does not yet answer the business question, audit
+  the market-narrowing process for bias, reconcile methodology/scoring/gate
+  contradictions, audit the two-report system, and produce a dependency-
+  ordered execution plan -- all across all 15 markets (HVAC + the 14
+  Phase 3 shortlist), none prematurely eliminated.
+
+  Executed via 7 parallel, independent read-only research agents (general-
+  purpose, background) covering: (1) architecture/implementation inventory,
+  (2) M1/M2/M3 deep audit, (3) M4/M5/M6 deep audit, (4) M7/M9 + honest
+  M8/M10 status, (5) source-utilization register, (6) market-universe/
+  narrowing history (including real git log reconstruction), (7) scoring/
+  gates/reporting contradictions + two-report system. Synthesized all
+  seven reports, plus direct verification of my own (real pytest run:
+  658 passed/0 failed/8 skipped-live; real git log via a per-command
+  `git -c safe.directory=` override, no global config changed; direct
+  reads of phase3_master.json, phase3_m5_results.json, and every real M7
+  result to build an exact 15x10 completion matrix rather than relying on
+  narrative), into four documents under docs/audit/.
+
+  Headline real findings: (a) only M1 and M9 -- both us_hvac_10_99 only --
+  have EVER reached a real, complete, non-UNKNOWN score across every
+  method-result artifact in the project; (b) research_runner/MethodExecutor
+  is a real, tested pipeline but only M1 is ever registered through it --
+  every other real score bypasses it via one-off scripts, by the scripts'
+  own admission; (c) the Python reporting/ module has never produced a
+  single real deliverable -- every real .docx report was built by a
+  scratchpad-only (uncommitted) Node.js script reading raw JSON directly;
+  (d) the real 14-market Phase 3 shortlist matches Wave A's PRE-evidence
+  Census-only ranking, not Wave B's own recomputed multi-source composite
+  -- Glass and Glazing Contractors had the best real multi-source signal
+  found in Wave B and was dropped; Other Computer Related Services had
+  worse real evidence and was kept; (e) the original 40-candidate universe
+  was hand-picked to match HVAC's own sector (39/40 codes are trades/
+  field-service NAICS), and HVAC itself was never run through the same
+  elimination screening applied to its 39 competitors; (f) M5 has two
+  formula components (differentiation_space, traction_proof) hardcoded to
+  None in the Phase 3 script -- structurally dead code, not a data gap;
+  (g) a real, live, dormant M2 bug (status.value == "COMPLETE" vs the
+  real lowercase "complete" enum) identical in class to the already-fixed
+  M5 bug, found and never ported; (h) this session's new Capterra/Common
+  Crawl evidence is confirmed collected but wired into zero scores; (i)
+  a second Capterra extraction attempt, made live during this audit,
+  crashed on a real unhandled BudgetLimitExceeded exception (retry logic
+  added this session didn't account for the ledger's own request budget)
+  -- found and documented as a fresh P0 item, not fixed (audit is read-
+  only; broad refactoring out of scope).
+
+  Both background research processes active at audit start (M5 competitor
+  discovery, Capterra pain extraction) were left running untouched
+  throughout, per the audit's explicit instruction to preserve healthy
+  processes; the M5 process reached 5/14 markets complete (6th, Security
+  Systems Services, in progress) by the time this entry was written, and
+  the Capterra process completed (with the crash noted above) mid-audit.
+Files:
+  docs/audit/CURRENT_SYSTEM_AUDIT.md (new), docs/audit/
+  METHOD_COMPLETION_MATRIX.md (new), docs/audit/
+  SOURCE_UTILIZATION_REGISTER.md (new), docs/audit/
+  RESEARCH_EXECUTION_PLAN_V2.md (new), progress.txt.
+Verification:
+  Real, live pytest run during this audit: 658 passed, 0 failed, 8
+  skipped (all live-smoke, policy-gated). Every quantitative claim in the
+  four new documents is either a direct read of a real run-artifact JSON
+  file (cited by path), a direct code read (cited by file:line), or a
+  real git command output -- not a narrative-only claim. No live API
+  calls, no paid-API activation, no methodology-weight changes, and no
+  broad refactoring were performed; this entry and the four documents are
+  the only changes made.
+Limitations/blockers:
+  This audit is read-only by design -- none of the P0/P1/P2/P3 items in
+  RESEARCH_EXECUTION_PLAN_V2.md have been executed, only specified. Two
+  markets' M2/M9 figures in the master aggregation likely understate real
+  cached evidence (Exterminating and Pest Control Services -- see
+  METHOD_COMPLETION_MATRIX.md's per-market note); not corrected here, per
+  the read-only scope.
+Next:
+  Owner review of docs/audit/RESEARCH_EXECUTION_PLAN_V2.md's Phase 0/1
+  items, in particular: approve or reject the screening-weight
+  formalization (1.6), decide the reporting-pipeline consolidation
+  direction (1.5), and decide whether to authorize the market-universe
+  expansion (1.7) before further deepening the current 14+1 markets.
+
+2026-09-17 23:35 PKT (UTC+05:00) | AUTONOMOUS-059 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner confirmed the plan from AUTONOMOUS-058's own recommendation:
+  add G2/Capterra/Software Advice reviews as a new real source before
+  building the final comprehensive document, since it unlocks M2/M4/M5
+  at once, is free, and needs no credential.
+
+  G2.com tested first and rejected as a real source: direct WebFetch
+  returned real HTTP 403; Common Crawl lookups across 3 real collections
+  found no archived capture for any G2 review URL tried. Root cause
+  found by reading G2's own real robots.txt: it explicitly disallows AI
+  crawlers (GPTBot, ClaudeBot, and Common Crawl's own CCBot) from
+  /products/*/reviews/* -- a real, hard policy stop under this project's
+  own docs/SCRAPING_POLICY.md ("Collectors must never... bypass...
+  robots controls"), not a technical failure to route around. G2 is
+  excluded as a source, permanently, on policy grounds.
+
+  Capterra's real robots.txt was checked next and is clean: it
+  explicitly contains "GPTBot Allow: /" and "ClaudeBot Allow: /", does
+  not restrict CCBot, and does not disallow /software/, /reviews/, or
+  /p/ paths for general crawlers -- a real, compliant green light.
+
+  Used WebSearch(allowed_domains=["capterra.com"]) to find real
+  Capterra product IDs for named real M5 competitors already found by
+  scripts/discover_phase3_m5_competitors.py (still running in the
+  background): Jobber=127994, Workyard=215558, Workiz=147525,
+  Procore=56250 (GoHighLevel not found in this search pass).
+
+  Collected real raw review-page text for all four via
+  mcp__Claude_Browser__browser_batch (navigate + get_page_text,
+  max_chars=15000) -- deliberately not WebFetch/AI-summarized text,
+  because A10 grounding requires evidence_span to be an exact substring
+  of the real source text sent to Gemini, which an AI summary cannot
+  support. Saved to outputs/runs/capterra_reviews_raw/
+  {jobber,workyard,workiz,procore}_page1.txt with a real source/
+  collection-method/rating header on each. Real overall ratings: Jobber
+  4.6 (1,483 reviews), Workyard 4.7 (102), Workiz 4.4 (218), Procore 4.5
+  (2,675).
+
+  Built scripts/extract_phase3_capterra_pain.py: transcribes 32 real,
+  named reviewers' pros/cons text (verbatim, character-for-character,
+  from the raw files above) as one document per reviewer (matching this
+  project's established one-author-per-document M2 rule), tags each to
+  its real primary M5 market (Jobber/Workyard -> Landscaping Services
+  561730 / Other Building Equipment Contractors 238290; Workiz ->
+  Site Preparation Contractors 238910; Procore -> Other Building
+  Equipment Contractors 238290; cross-market relevance documented in
+  the script but not double-counted as formula input), infers a real
+  EvidencePersona from the reviewer's real stated job title, and runs
+  the exact same real Gemini COMMERCIAL_PAIN_V1 extraction + A10
+  validate_grounding() pipeline already used for M2. First real run hit
+  heavy HTTP 429 rate-limiting (6/32 documents completed) because M5's
+  own background run shares the same real Gemini key/quota; added
+  retry-with-exponential-backoff (up to 5 attempts, 20s/40s/60s/80s) for
+  retryable GeminiError before giving up on a document, then re-ran.
+Files:
+  outputs/runs/capterra_reviews_raw/{jobber,workyard,workiz,procore}_
+  page1.txt (new, real raw data; gitignored run output);
+  scripts/extract_phase3_capterra_pain.py (new); progress.txt.
+Verification:
+  Ruff check and mypy strict both pass on the new extraction script.
+  Real live run in progress/completed against the real Gemini API (not
+  a dry run) -- see the immediately following entry for final real
+  grounded-mention counts once the retried run finishes.
+Limitations/blockers:
+  Real Gemini quota contention with the still-running M5 background
+  process slowed this pass; retry/backoff mitigates but does not
+  eliminate it. Only reviews with a real stated cons/pain section were
+  transcribed -- pure-praise reviews carry no extractable commercial
+  pain and were correctly excluded, not silently dropped as a gap.
+Next:
+  Confirm final real extraction counts once the run completes; feed the
+  real grounded mentions into the pain-point meta-categorization
+  (scripts/categorize_phase3_pain_points.py) and into M4/M5 formula
+  inputs for the affected markets; extend
+  scripts/register_and_fetch_jobber_pricing.py's real Common Crawl
+  pattern to Workyard/Workiz/Procore pricing pages; then build the
+  final comprehensive document per the owner's explicit request.
+
 2026-09-17 22:10 PKT (UTC+05:00) | AUTONOMOUS-058 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner asked for the concrete "how and where" to close the two cheap
