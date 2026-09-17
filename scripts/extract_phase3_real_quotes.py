@@ -41,6 +41,15 @@ MARKETS = [
     (238910, "Site Preparation Contractors"),
     (238290, "Other Building Equipment Contractors"),
     (561720, "Janitorial Services"),
+    (561621, "Security Systems Services (except Locksmiths)"),
+    (811121, "Automotive Body, Paint, and Interior Repair and Maintenance"),
+    (238990, "All Other Specialty Trade Contractors"),
+    (561210, "Facilities Support Services"),
+    (811192, "Car Washes"),
+    (541519, "Other Computer Related Services"),
+    (812910, "Pet Care Services (except Veterinary)"),
+    (561710, "Exterminating and Pest Control Services"),
+    (238160, "Roofing Contractors"),
 ]
 
 

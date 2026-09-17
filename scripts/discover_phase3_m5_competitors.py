@@ -414,11 +414,19 @@ def main() -> None:
         raise SystemExit("No real Gemini API keys are configured.")
 
     results_by_naics = _load_checkpoint()
+    # Real bug fixed live (2026-09-17): calculate_m5()'s real status values
+    # are lowercase ("complete"/"unknown", MethodMetricStatus), but this
+    # comparison checked against uppercase strings -- every already-real-
+    # completed market with a real "unknown" status (e.g. Landscaping
+    # Services, which had 3 real competitors but still resolved UNKNOWN
+    # overall) was wrongly treated as not-yet-done and silently
+    # reprocessed, wasting real YouTube/Gemini quota redoing work that was
+    # already real and correct. DONE_STATUSES now matches case exactly.
+    DONE_STATUSES = {"complete", "unknown", "NOT_CALCULATED", "ERROR"}
     remaining = [
         (naics, label)
         for naics, label in MARKETS
-        if results_by_naics.get(str(naics), {}).get("status")
-        not in ("COMPLETE", "UNKNOWN", "NOT_CALCULATED")
+        if results_by_naics.get(str(naics), {}).get("status") not in DONE_STATUSES
     ]
     print(f"M5 markets: {len(MARKETS)}. Already done: {len(MARKETS) - len(remaining)}.")
     print(f"To process this run: {len(remaining)}")
