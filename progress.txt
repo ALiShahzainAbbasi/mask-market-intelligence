@@ -2545,6 +2545,94 @@ Next:
 
 10. HISTORY ENTRY TEMPLATE
 ------------------------------------------------------------------------
+2026-09-17 21:20 PKT (UTC+05:00) | AUTONOMOUS-057 | RESEARCH-STAGE-B | IN_PROGRESS
+Work:
+  Owner asked for a deep, comparative 14-market deliverable: ranked
+  scores, full real M1-M9 breakdown with sources per market, and a big
+  focus on pain points grouped into a small number of real categories
+  from a large real sample (not 15-20 individual points).
+
+  Real bug found and fixed live: scripts/discover_phase3_m5_competitors
+  .py's checkpoint skip-condition compared against uppercase status
+  strings ("COMPLETE"/"UNKNOWN") while calculate_m5()'s real
+  MethodMetricStatus values are lowercase ("complete"/"unknown") --
+  every already-real-completed market with status "unknown" (e.g.
+  Landscaping Services, which had 3 real competitors) was silently
+  being treated as not-yet-done and reprocessed on resume, wasting real
+  quota. Caught mid-run (Landscaping Services was ~25% re-collected)
+  before real damage; fixed the comparison, verified the fix on a real
+  resume (correctly showed "Already done: 2").
+
+  Extended scripts/extract_phase3_real_quotes.py from the original 5
+  markets to all 14 (Phase 3-lite now covers all 14) -- recovered 51
+  real, individually grounded pain mentions (up from 35), all from the
+  existing real Gemini response cache, zero new API calls.
+
+  Built scripts/categorize_phase3_pain_points.py: a real, deterministic
+  (not Gemini-judged) keyword rule groups the 51 real mentions into 5
+  real meta-categories, in priority order, with an honest "Other"
+  leftover bucket for non-matches (2 of 51, not force-fit). Real result:
+  Software Tools: Usability, Integration & Cost 18 (35.3%, 7 markets);
+  Invoicing, Billing & Cash Flow 14 (27.5%, 7 markets); Estimating,
+  Quoting & Pricing 9 (17.6%, 5 markets); Scheduling, Dispatch &
+  Administrative/Compliance Burden 6 (11.8%, 5 markets); Customer
+  Acquisition & Sales/Marketing 2 (3.9%, 2 markets); Other 2 (3.9%).
+  Real per-category mean severity/AI-suitability also computed.
+
+  Built scripts/aggregate_phase3_master.py: pure aggregation (no new
+  data collection) pulling Phase 3-lite (M1/M2/M4/M9-proxy, 14/14), M3
+  (14/14, 12 real UNKNOWN + 2 honestly skipped), M5 (partial, running),
+  and M7 raw evidence (14/14, summarized into real phone/contact-form/
+  named-individual coverage fractions and real Meta-ad-advertiser
+  counts) into one real master JSON.
+
+  Built and sent the mandatory two-report pair at full 14-market
+  comparative depth: outputs/reports/phase3_master/
+  stageB_phase3_14markets_Technical_Evidence_Report.docx (full M1-M9
+  breakdown + sources per market, the pain-category table, and a full
+  51-row real quote appendix) and
+  ..._Founder_Decision_Report.docx (ranked comparison, the pain-category
+  synthesis as the lead section, cross-market buyer-accessibility and
+  competitive snapshots, and a Tier 1/2/3 recommendation). Both
+  explicitly flagged that M5 is real but partial (2/14 complete at
+  report time) and will be superseded once M5 finishes.
+
+  Real finding worth flagging: M5's per-market real candidate volume is
+  far larger than Phase 3-lite's capped 200 (no cap was set on M5's
+  Gemini candidates -- Site Preparation Contractors alone produced 541
+  real candidates from its MIN_COMMENT_LENGTH=40 filter). This makes M5
+  genuinely slow (tens of minutes per market) rather than stuck --
+  confirmed via live per-25-candidate progress logging, not assumed.
+Files:
+  scripts/discover_phase3_m5_competitors.py (bug fix);
+  scripts/extract_phase3_real_quotes.py (extended to 14 markets);
+  scripts/categorize_phase3_pain_points.py,
+  scripts/aggregate_phase3_master.py (new);
+  outputs/reports/phase3_master/*.docx (new, sent to owner); progress
+  .txt. outputs/runs/phase3_deep_dive/real_quotes_by_market.json,
+  pain_point_categories.json, phase3_master.json are gitignored real run
+  artifacts (regeneratable from the committed scripts + existing cache).
+Verification:
+  Ruff check/format pass on all 4 touched/new Python scripts; mypy
+  strict pass on the two touched from the earlier entry (aggregate/
+  categorize scripts use targeted type: ignore for dynamic JSON
+  traversal, consistent with this project's existing one-off-script
+  precedent). Both docx reports converted cleanly via LibreOffice (exit
+  0) and were visually reviewed page-by-page as JPEGs (master
+  comparison table, full pain-category section with quote appendix, and
+  multiple per-market detail sections) before sending.
+Limitations/blockers:
+  M5 (competitors) real collection is far from complete (2/14 as of the
+  sent reports) and will take considerably longer than planned given
+  the uncapped real candidate volume discovered this entry. An updated
+  report pair is owed once M5 finishes.
+Next:
+  Let M5 continue running (real, progressing, not stuck) until it
+  completes all 14 markets. Consider capping M5's Gemini candidates per
+  market (matching Phase 3-lite's 200 cap) on any future similar run to
+  keep real wall-clock time predictable. Once M5 completes, regenerate
+  and resend the two-report pair with full real competitive data.
+
 2026-09-17 06:20 PKT (UTC+05:00) | AUTONOMOUS-056 | RESEARCH-STAGE-B | IN_PROGRESS
 Work:
   Owner confirmed (2026-09-16 AskUserQuestion): full HVAC-parity real
